@@ -1,0 +1,101 @@
+# ---------------------------------------------------------------------------
+# Virtual environments
+# ---------------------------------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ---------------------------------------------------------------------------
+# Python caches and build output
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---------------------------------------------------------------------------
+# Credentials and secrets — never commit any of these
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+.aws/
+.aws/credentials
+credentials
+credentials.json
+*_credentials.json
+.hf_token
+.huggingface/
+secrets.yml
+secrets.yaml
+
+# ---------------------------------------------------------------------------
+# Notebooks
+# ---------------------------------------------------------------------------
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# Generated data
+# The raw dataset IS committed: it is the audited evidence for the project and
+# its Git blob SHA is verified. Derived splits are reproducible and are not.
+# ---------------------------------------------------------------------------
+data/processed/*
+!data/processed/.gitkeep
+
+# ---------------------------------------------------------------------------
+# Logs and local scratch
+# ---------------------------------------------------------------------------
+*.log
+logs/
+tmp/
+scratch/
+
+# ---------------------------------------------------------------------------
+# Local screenshots not intended for version control.
+# Evidence screenshots for the report belong in docs/screenshots/.
+# ---------------------------------------------------------------------------
+screenshots/
+*.screenshot.png
+Screenshot*.png
+
+# ---------------------------------------------------------------------------
+# Editors and operating system
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+~$*
+
+# ---------------------------------------------------------------------------
+# Build inputs kept in the working folder but not part of the deliverable.
+# The canonical dataset copy is data/raw/Telco-Customer-Churn.csv; the data
+# dictionary is versioned as docs/DATA_DICTIONARY.csv. The instructor brief and
+# the build specification are third-party documents and are not republished.
+# ---------------------------------------------------------------------------
+/Telco-Customer-Churn.csv
+/IBM_Telco_Customer_Churn_Data_Dictionary.csv
+/IBM_Telco_Customer_Churn_Data_Dictionary.xlsx
+/CLAUDE_CODE_MASTER_PROMPT.md
+/Final Group Project.docx

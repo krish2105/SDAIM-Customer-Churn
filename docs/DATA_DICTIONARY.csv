@@ -1,0 +1,22 @@
+Column,Recommended type,Modeling role,Description,Observed/expected values,Recommended preprocessing,Suggested Streamlit control,Validation rule
+customerID,String,Identifier,Unique customer identifier.,Unique alphanumeric IDs,Exclude from model features; retain only for traceability.,Not shown in prediction form,Required; unique; non-null
+gender,Categorical,Predictor,Customer gender as represented in the sample.,"Female, Male",Most-frequent imputation; one-hot encoding.,Selectbox,Non-null expected
+SeniorCitizen,Binary categorical,Predictor,Indicates whether the customer is classified as a senior citizen.,"0, 1","Treat as categorical/binary, not continuous; one-hot or passthrough.",Selectbox: No/Yes,Only 0 or 1
+Partner,Binary categorical,Predictor,Indicates whether the customer has a partner.,"Yes, No",Most-frequent imputation; one-hot encoding.,Selectbox,Yes/No
+Dependents,Binary categorical,Predictor,Indicates whether the customer has dependents.,"Yes, No",Most-frequent imputation; one-hot encoding.,Selectbox,Yes/No
+tenure,Integer,Predictor,Number of months the customer has stayed with the company.,0 to 72 months in the sample,Median imputation; scaling for linear models.,Number input or slider,Must be >= 0
+PhoneService,Binary categorical,Predictor,Indicates whether the customer has phone service.,"Yes, No",Most-frequent imputation; one-hot encoding.,Selectbox,Yes/No
+MultipleLines,Categorical,Predictor,Indicates whether the customer has multiple phone lines.,"Yes, No, No phone service",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+InternetService,Categorical,Predictor,Customer internet service type.,"DSL, Fiber optic, No",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+OnlineSecurity,Categorical,Predictor,Whether the customer has online security service.,"Yes, No, No internet service",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+OnlineBackup,Categorical,Predictor,Whether the customer has online backup service.,"Yes, No, No internet service",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+DeviceProtection,Categorical,Predictor,Whether the customer has device protection service.,"Yes, No, No internet service",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+TechSupport,Categorical,Predictor,Whether the customer has technical support service.,"Yes, No, No internet service",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+StreamingTV,Categorical,Predictor,Whether the customer has streaming television service.,"Yes, No, No internet service",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+StreamingMovies,Categorical,Predictor,Whether the customer has streaming movies service.,"Yes, No, No internet service",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+Contract,Categorical,Predictor,Customer contract term.,"Month-to-month, One year, Two year",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+PaperlessBilling,Binary categorical,Predictor,Indicates whether the customer uses paperless billing.,"Yes, No",Most-frequent imputation; one-hot encoding.,Selectbox,Yes/No
+PaymentMethod,Categorical,Predictor,Customer payment method.,"Electronic check, Mailed check, Bank transfer (automatic), Credit card (automatic)",Most-frequent imputation; one-hot encoding.,Selectbox,Use observed categories only
+MonthlyCharges,Float,Predictor,Amount charged to the customer monthly.,Positive monetary value,Median imputation; scaling for linear models.,Number input,Must be >= 0
+TotalCharges,"Raw string, converted to float",Predictor,Total amount charged to the customer. Blank strings may occur for new customers.,Non-negative monetary value or blank,Strip whitespace; coerce invalid/blank values to missing; median imputation; scale for linear models.,Number input,Must be >= 0 after conversion
+Churn,Binary categorical,Target,Indicates whether the customer left within the last month.,"Yes, No",Map Yes to 1 and No to 0 for training. Never include as a predictor.,Prediction output only,Exactly Yes/No

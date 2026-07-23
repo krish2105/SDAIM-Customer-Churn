@@ -1,0 +1,18 @@
+# Local development, analysis, training and testing dependencies.
+# Runtime-only dependencies for the deployed application live in deploy/requirements.txt.
+# Python 3.11 is the supported runtime.
+
+pandas
+numpy
+scikit-learn
+joblib
+matplotlib
+streamlit
+
+# Testing
+pytest
+
+# Notebook generation and execution (notebooks/01_eda_and_modeling.ipynb)
+nbformat
+nbclient
+ipykernel

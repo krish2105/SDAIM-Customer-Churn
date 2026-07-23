@@ -1,0 +1,43 @@
+# Root-level Docker ignore.
+#
+# The deployment image is built from the deploy/ directory, which has its own
+# .dockerignore. This file exists so that a build run from the repository root
+# by mistake still excludes the environment, caches, raw data and history rather
+# than copying the whole project into a layer.
+
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.git/
+.github/
+.gitignore
+
+# Nothing outside deploy/ belongs in the runtime image.
+data/
+notebooks/
+reports/
+tests/
+scripts/
+docs/
+src/
+
+# Credentials must never enter a build context.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+.aws/
+credentials
+credentials.json
+.hf_token
+
+*.log
+.DS_Store
+~$*

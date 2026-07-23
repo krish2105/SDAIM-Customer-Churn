@@ -1,0 +1,16 @@
+{
+  "dataset_name": "Telco-Customer-Churn.csv",
+  "publisher": "IBM",
+  "business_context": "Fictional telecommunications company customer churn sample",
+  "official_repository": "https://github.com/IBM/telco-customer-churn-on-icp4d",
+  "official_raw_url": "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv",
+  "ibm_description": "https://www.ibm.com/docs/en/cognos-analytics/12.0.x?topic=samples-telco-customer-churn",
+  "repository_license": "Apache-2.0",
+  "license_url": "https://github.com/IBM/telco-customer-churn-on-icp4d/blob/master/LICENSE",
+  "expected_data_rows": 7043,
+  "expected_columns": 21,
+  "expected_git_blob_sha": "3de7a612d1609f25f21a455bda77948729369002",
+  "target": "Churn",
+  "identifier_excluded_from_model": "customerID",
+  "important_note": "The IBM sample represents a fictional company and must not be described as actual observed commercial customer data."
+}
