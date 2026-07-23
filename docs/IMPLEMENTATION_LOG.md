@@ -221,3 +221,88 @@ claimed.**
 | Root-level build inputs git-ignored | Duplicate dataset and third-party documents |
 
 Every deviation is recorded in `docs/DECISIONS.md`.
+
+---
+
+# Horizon 1 and 2 implementation
+
+Continues the log after version 1.1.0 was deployed. Same rule as above: commands, results,
+failures and decisions — no secrets, nothing claimed that was not observed.
+
+## 15. Deployment completed and verified
+
+| Step | Result |
+|---|---|
+| `git push -u origin main` | **PASS** — 6 commits to `krish2105/SDAIM-Customer-Churn` |
+| Commit attribution | Author email was a placeholder; rewritten to the GitHub noreply address so commits attribute correctly without exposing a personal email on a public repository |
+| CI run 30019016553 | **PASS** — all 10 steps green, first run |
+| Deploy run 30019016510 | **FAILED AS DESIGNED** — validate job passed, deploy job failed at the config gate with `HF_SPACE_ID is not configured` and **skipped** the sync. The guard was demonstrated firing before it was demonstrated passing |
+| Space created | `krish21may/churn`, Docker SDK. Note the handle asymmetry: GitHub `krish2105`, Hugging Face `krish21may` |
+| `HF_TOKEN` / `HF_SPACE_ID` | Fine-grained token scoped to the single Space (created by the user; never seen by the assistant). Variable set via `gh variable set` |
+| Deploy run 30020847651 | **PASS** — validate + sync both green |
+| Space build | **PASS** — reached `RUNNING` |
+| Live prediction | **PASS** — 22.9%, identical to local and to the local Docker container |
+| Visible-change test, run 30023117028 | **PASS** — triggered automatically by the `deploy/**` path filter; version 1.1.0 and the caption confirmed live; predictions still working |
+
+**Cross-environment consistency:** the same input returns 22.9% in the local venv, the local
+Docker container and the deployed Space.
+
+## 16. Horizon 1 — decision-grade rigour
+
+| Module | Result |
+|---|---|
+| `src/analysis_base.py` | Shared evaluation context. Rebuilds the exact training split from the immutable raw file so four analyses cannot drift apart |
+| `src/fairness.py` | **`gender`: no material disparity.** **`SeniorCitizen`: material on all four criteria** — but driven by a genuine base-rate gap (0.4414 vs 0.2325). Recall is *higher* for seniors (0.9286 vs 0.7319), so the group under-served on the governing criterion is non-seniors. The real burden is the false-positive gap (0.5000 vs 0.2492) |
+| Counterfactual retrain | Removing both protected attributes costs **+0.0008 ROC-AUC**, +0.0027 recall — inside CV noise. Changed the recommendation to **remove**. See D-22 |
+| `src/calibration.py` | **Over-confident by 0.15** — mean predicted 0.4157 against a 0.2654 base rate, ECE 0.1503. Predicted in advance from `class_weight="balanced"`. Isotonic cuts ECE to 0.0194; ROC-AUC unchanged (0.8414 → 0.8413), confirming ranking is unaffected |
+| `src/threshold.py` | Cost-ratio sweep: optimum 0.73 at 1:1 down to 0.12 at 20:1. The deployed 0.50 is optimal at roughly 3:1 |
+| `deploy/explain.py` | Exact log-odds decomposition. Reconstructs the model to float precision — asserted by test across 25 real customers |
+
+## 17. Horizon 2 — MLOps maturity and platform
+
+| Module | Result |
+|---|---|
+| `src/tracking.py` | 3 runs tracked with nested per-candidate runs; model registered with a `production` alias and a documented manual rollback |
+| MLflow backend | First attempt used the filesystem store: **FAILED** — MLflow 3.14 has retired it. Switched to local SQLite (the documented migration target) rather than setting `MLFLOW_ALLOW_FILE_STORE=true` to keep a retired code path alive |
+| MLflow model logging | **FAILED** — skops serialisation refused `numpy.dtype` as untrusted. Declared that single type explicitly rather than falling back to pickle, which would trust everything |
+| `src/drift.py` | **Validated both ways**: stable on the unshifted holdout (0 of 19 flagged), alert on a simulated acquisition campaign (15 of 19, 7 at alert) |
+| `deploy/batch.py` | 1,000 customers ranked in **0.01 s**. Strict up-front validation; uploaded data never written to disk |
+| `deploy/rationale.py` | Guardrailed brief. Ships **disabled**; deterministic fallback |
+
+## 18. Failures found and fixed during this work
+
+Recorded because each was a genuine defect, not a rough edge.
+
+1. **Drift false positive.** The detector flagged `OnlineBackup` on the *unshifted control
+   set* — PSI 0.0044 (no meaningful drift) with chi-squared p = 0.047. The escalation rule
+   let the p-value override PSI, contradicting the module's own documentation. **PSI alone
+   now governs the status.** See D-25.
+2. **Guardrail false positive.** The prohibited-language filter matched the word "causes"
+   inside the deterministic template's own disclaimer ("associations, not causes"). The
+   pattern now matches assertions of cause, not the noun. The invariant — *the fallback must
+   pass the filter it enforces* — is asserted by test.
+3. **Stale claims invalidated by the new work.** The model card still said "no formal
+   fairness audit has been carried out" and both READMEs said no per-prediction explanation
+   existed. A test now asserts the card cannot claim the audit is missing once the report
+   exists, and the card's fairness section is **generated from the fairness report** so the
+   two cannot drift apart again.
+4. **Streamlit config conflict.** `enableCORS = false` alongside `enableXsrfProtection =
+   true` — rejected by Streamlit. CORS line removed, XSRF kept.
+
+## 19. Test suite
+
+**52 → 106 tests**, all passing. `tests/test_analysis.py` (23) and
+`tests/test_app_features.py` (31) added. Every quality gate re-run: **10 PASS, 0 FAIL**.
+
+## 20. Still unresolved
+
+Unchanged from the original list except where noted:
+
+1. Instructor confirmation on the fictional-data question (D-01) — **still pending**.
+2. Required report format and presentation duration — **still unknown**.
+3. Screenshots — capturable now, not yet captured.
+4. The written report itself.
+
+Everything else in the original unresolved list is now closed: repository, Space, token,
+variable, CI run, deployment run, Space build, live prediction and the visible-change test
+have all been completed and observed.

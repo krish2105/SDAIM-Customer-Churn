@@ -113,6 +113,89 @@ reports stay in GitHub and never enter the Space.
 
 ---
 
+## 3b. Post-training analysis flow
+
+Added in Horizon 1 and 2. Every analysis rebuilds the **same** train/test split from the
+immutable raw file, so none can silently evaluate against a different partition than the one
+the model was fitted on.
+
+```mermaid
+flowchart LR
+    A["data/raw (immutable)"] --> B["src/analysis_base.py<br/>rebuilds the exact split<br/>seed 42, stratified"]
+    M["deploy/artifacts/<br/>model_pipeline.joblib"] --> B
+
+    B --> F["src/fairness.py<br/>subgroup metrics<br/>+ counterfactual retrain"]
+    B --> C["src/calibration.py<br/>reliability, Brier, ECE"]
+    B --> T["src/threshold.py<br/>cost-ratio sweep"]
+    B --> D["src/drift.py<br/>baseline + PSI + chi-squared"]
+
+    F --> R1["reports/fairness_report.md"]
+    C --> R2["reports/calibration_report.md"]
+    T --> R3["reports/threshold_analysis.md"]
+    D --> R4["reports/drift_report.md"]
+
+    F -.->|regenerates| MC["model_card.md<br/>fairness section written<br/>FROM the audit"]
+    D --> BL["artifacts/drift_baseline.json"]
+
+    TR["src/tracking.py<br/>MLflow, SQLite"] --> REG["Registry<br/>alias: production<br/>manual rollback"]
+
+    style B fill:#eef3fb,stroke:#1e40af,color:#12306e
+    style MC fill:#e4f5ea,stroke:#15803d,color:#0f5228
+```
+
+**Why the model card is generated from the audit.** Version 1.0.0 stated "no fairness audit
+has been carried out". Once the audit existed, that claim was false — and a hand-edited card
+would drift again. The card's fairness section is now written from
+`reports/tables/fairness_report.json`, and a test asserts the card cannot claim the audit is
+missing while the report exists.
+
+---
+
+## 3c. Extended inference surface
+
+```mermaid
+flowchart TD
+    U["Retention specialist"] --> MODE{Single record<br/>or whole book?}
+
+    MODE -->|single| S1["Form: 19 predictors<br/>dependency rules enforced"]
+    S1 --> P["pipeline.predict_proba"]
+    P --> R["Probability · class · risk band<br/>· cautious review action"]
+    P --> E["deploy/explain.py<br/>coefficient x value<br/>reconstructs score EXACTLY"]
+    E --> CH["Contribution chart<br/>+ causal disclaimer"]
+    R --> BR["deploy/rationale.py<br/>retention brief"]
+    E --> BR
+
+    MODE -->|batch| B1["deploy/batch.py<br/>CSV upload"]
+    B1 --> B2["Validate vs feature_schema<br/>BEFORE scoring anything"]
+    B2 -->|errors| B3["Per-column errors<br/>nothing scored"]
+    B2 -->|ok| B4["Score all rows<br/>rank by probability"]
+    B4 --> B5["Work queue + CSV export<br/>never written to disk"]
+
+    TH["Threshold slider<br/>default 0.50"] --> R
+    TH --> B4
+
+    BR --> G{"Generation enabled?"}
+    G -->|no, the default| GT["Deterministic template"]
+    G -->|yes| GL["LLM renders computed facts only"]
+    GL --> GV{"Structure + language<br/>guardrails pass?"}
+    GV -->|no| GT
+    GV -->|yes| GO["Labelled AI-generated"]
+
+    R --> H["HUMAN REVIEW REQUIRED"]
+    B5 --> H
+    GT --> H
+    GO --> H
+
+    style H fill:#fbf0df,stroke:#b45309,color:#6b3406
+    style B3 fill:#fdecea,stroke:#b4232b,color:#7a1a1f
+    style GT fill:#e4f5ea,stroke:#15803d,color:#0f5228
+```
+
+The LLM never sees the customer record. It receives only values already computed
+deterministically, and the deterministic template is the default rather than a degraded mode.
+
+---
+
 ## 4. Repository layout and responsibilities
 
 | Path | Responsibility |
@@ -125,6 +208,15 @@ reports stay in GitHub and never enter the Space.
 | `src/eda.py` | Source of truth for every quantitative statement in the report. |
 | `src/train.py` | Split, cross-validate, select, evaluate, export. |
 | `src/evaluate.py` | Metrics, figures and the executive summary. Reusable without retraining. |
+| `src/analysis_base.py` | Shared evaluation context — one split definition for all four analyses. |
+| `src/fairness.py` | Subgroup audit and the counterfactual retrain (H1-1). |
+| `src/calibration.py` | Reliability, Brier, ECE and calibrator comparison (H1-2). |
+| `src/threshold.py` | Cost-ratio sensitivity sweep (H1-3). |
+| `src/drift.py` | Baseline profile and the validated detectors (H2-2). |
+| `src/tracking.py` | MLflow tracking and registry. Development only (H2-1). |
+| `deploy/explain.py` | Exact log-odds decomposition (H1-4). |
+| `deploy/batch.py` | Batch validation, scoring and work-queue construction (H2-3). |
+| `deploy/rationale.py` | Guardrailed retention brief, disabled by default (H2-4). |
 | `deploy/` | Exactly what ships to the Space: app, theme, charts, Dockerfile, artifacts. |
 | `tests/` | 52 tests over the data contract, the artifact, prediction behaviour and deployment config. |
 | `.github/workflows/` | CI and deployment. |
@@ -137,3 +229,6 @@ reports stay in GitHub and never enter the Space.
 - **`data/raw/` is written by nothing.** Validation reads it; EDA and training copy from it.
 - **The application never trains.** It loads one artifact and scores one row.
 - **The model never acts.** It returns a number, a band and a suggestion; a person decides.
+- **MLflow never reaches the container.** It is a development dependency; a test asserts the
+  application does not import it, so the runtime image stays small.
+- **The LLM never reasons.** It renders values the deterministic pipeline already produced.

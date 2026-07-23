@@ -37,6 +37,20 @@ Status is factual: **Complete** means it exists and was verified in this build.
 | 26 | Quality-gate results | `docs/QUALITY_GATE_RESULTS.md` | ✅ Complete | Actual recorded output |
 | 27 | Manual commands for external setup | `README.md` §8, `docs/IMPLEMENTATION_PLAN.md` phases 9–11 | ✅ Complete | Exact commands provided, none executed |
 
+## A2. Horizon 1 and 2 deliverables — all complete
+
+| # | Deliverable | Location | Status | Verification |
+|---|---|---|---|---|
+| 28 | Fairness audit | `src/fairness.py`, `reports/fairness_report.md` | ✅ Complete | 2 attributes, 3 criteria, counterfactual retrain measured |
+| 29 | Calibration analysis | `src/calibration.py`, `reports/calibration_report.md` | ✅ Complete | Over-confidence of 0.15 measured; isotonic cuts ECE to 0.0194 |
+| 30 | Threshold analysis | `src/threshold.py`, `reports/threshold_analysis.md` | ✅ Complete | Cost-ratio curve, 8 ratios; app exposes the control |
+| 31 | Per-prediction explainability | `deploy/explain.py` | ✅ Complete | Reconstructs the model exactly, asserted on 25 customers |
+| 32 | Experiment tracking + registry | `src/tracking.py`, `reports/tracking_report.md` | ✅ Complete | 3 runs, registry alias, documented rollback |
+| 33 | Drift apparatus | `src/drift.py`, `reports/drift_report.md` | ✅ Complete | Validated both ways: stable on control, alert on shift |
+| 34 | Batch scoring work queue | `deploy/batch.py` | ✅ Complete | 1,000 rows in 0.01 s; export; nothing written to disk |
+| 35 | Guardrailed retention brief | `deploy/rationale.py` | ✅ Complete | Disabled by default; fallback passes its own filter |
+| 36 | Improvement plan | `docs/IMPROVEMENT_PLAN.md` | ✅ Complete | Three horizons; H1 and H2 marked delivered |
+
 ## B. Supporting documentation — all complete
 
 | Deliverable | Location | Status |
@@ -47,7 +61,8 @@ Status is factual: **Complete** means it exists and was verified in this build.
 | Design decisions | `docs/DECISIONS.md` | ✅ Complete — 20 decisions |
 | Architecture with Mermaid diagrams | `docs/ARCHITECTURE.md` | ✅ Complete — training, inference, CI/CD |
 | Security documentation | `docs/SECURITY.md` | ✅ Complete |
-| Test plan | `docs/TEST_PLAN.md` | ✅ Complete |
+| Test plan | `docs/TEST_PLAN.md` | ✅ Complete — 106 tests across six modules |
+| Improvement plan | `docs/IMPROVEMENT_PLAN.md` | ✅ Complete — H1 and H2 delivered |
 
 ---
 

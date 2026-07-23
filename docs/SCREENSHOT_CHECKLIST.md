@@ -237,6 +237,64 @@ make validate
 
 ---
 
+---
+
+## G. Horizon 1 and 2 evidence
+
+These cover the improvement work. All are capturable now from `reports/` and the live Space.
+
+### Figure 38 — Fairness audit
+**Capture.** `reports/figures/15_fairness_seniorcitizen.png` and `15_fairness_gender.png`.
+**Caption.** *Figure 38: Fairness criteria by subgroup on the held-out test set. No material disparity on `gender`. A material disparity on `SeniorCitizen`, shown alongside the group base rates that make the three criteria mutually exclusive.*
+**Proves.** The audit was performed and reported per criterion, not summarised into a single verdict.
+
+### Figure 39 — The counterfactual that changed the recommendation
+**Capture.** The "Decision" section of `reports/fairness_report.md`.
+**Caption.** *Figure 39: Cost of removing the protected attributes — +0.0008 ROC-AUC, inside the cross-validation standard deviation. The keep-or-remove decision was made after measuring, and removal is now recommended.*
+**Proves.** An evidence-based governance decision rather than an asserted one. **Strong viva material.**
+
+### Figure 40 — Calibration
+**Capture.** `reports/figures/16_calibration_curve.png`.
+**Caption.** *Figure 40: Reliability diagram. The deployed model is over-confident about churn (mean predicted 0.4157 against a 0.2654 base rate, ECE 0.1503) — the predicted consequence of balanced class weights. Isotonic calibration reduces ECE to 0.0194 while leaving ROC-AUC unchanged.*
+**Proves.** Probabilities were validated as probabilities, and the cause of the miscalibration is understood rather than merely observed.
+
+### Figure 41 — Threshold sensitivity
+**Capture.** `reports/figures/17_threshold_analysis.png`.
+**Caption.** *Figure 41: Threshold trade-off and the cost-minimising threshold against the miss-to-review cost ratio. The deployed 0.50 is optimal at roughly 3:1; the business supplies the ratio, the model supplies the curve.*
+**Proves.** The threshold assumption is quantified and exposed rather than defaulted to silently.
+
+### Figure 42 — Drift detector validated both ways
+**Capture.** `reports/figures/18_drift_detection.png` plus the `make drift` terminal output showing both control and shifted status.
+**Caption.** *Figure 42: Drift detection. The detector reports STABLE on the unshifted holdout (0 of 19 features flagged) and ALERT on a simulated acquisition campaign (15 of 19, 7 at alert).*
+**Proves.** The apparatus works in both directions. A detector never shown to fire — or one that always fires — is not evidence of anything.
+
+### Figure 43 — Per-prediction contributions
+**Capture.** The "Why this score" tab in the live application.
+**Caption.** *Figure 43: Exact log-odds contribution breakdown for a single prediction, with the causal-language disclaimer. For a linear model this decomposition is the model, not an approximation of it.*
+**Proves.** A specialist can see what moved the score, without the interface implying causation.
+
+### Figure 44 — Batch scoring work queue
+**Capture.** The "Batch scoring" tab after uploading `data/raw/Telco-Customer-Churn.csv` (first 1,000 rows).
+**Caption.** *Figure 44: Retention work queue — customers ranked by estimated churn risk with risk bands and CSV export. Uploaded data is scored in memory and never written to disk.*
+**Proves.** The tool prioritises a book of accounts, not just one record.
+
+### Figure 45 — Adjustable decision threshold
+**Capture.** The sidebar slider at 0.50 and again at a different value, with the result changing.
+**Caption.** *Figure 45: The decision threshold exposed as an adjustable control, labelled as an assumption rather than an optimum.*
+**Proves.** The assumption is visible to the user, not buried in a report.
+
+### Figure 46 — MLflow tracked runs and registry
+**Capture.** `make mlflow-ui` → http://127.0.0.1:5000, showing the runs list and the registered model.
+**Caption.** *Figure 46: MLflow experiment tracking with nested per-candidate runs and the registered model carrying the `production` alias.*
+**Proves.** Comparability across runs and a rollback path — what a seed alone cannot provide.
+
+### Figure 47 — Retention brief with provenance
+**Capture.** The "Retention review brief" expander in the live app.
+**Caption.** *Figure 47: Retention brief. AI generation is disabled by default, so the deterministic template is shown with its provenance stated explicitly.*
+**Proves.** The GenAI layer is governed: labelled, optional, and safe by default.
+
+---
+
 ## Completion tracker
 
 | Range | Figures | Status |
@@ -244,9 +302,10 @@ make validate
 | Dataset and EDA | 1–6 | Reproducible now from `reports/` |
 | Modelling | 7–12 | Reproducible now |
 | Local application | 13–22 | Reproducible now (app and container both run) |
-| GitHub | 23–29 | **Pending** — needs the repository and a real run |
-| Hugging Face | 30–33 | **Pending** — needs the Space |
-| Visible-change test | 34–37 | **Pending** — after the first deployment |
+| GitHub | 23–29 | Capturable now — repo public, runs green |
+| Hugging Face | 30–33 | Capturable now — Space live |
+| Visible-change test | 34–37 | Capturable now — the test has been performed |
+| Horizon 1 and 2 evidence | 38–47 | Capturable now |
 
-Figures 1–22 can be captured immediately. Figures 23–37 require the external steps in
-`docs/IMPLEMENTATION_PLAN.md` phases 9–11 and must show genuine platform evidence.
+**All 47 figures are capturable now.** The repository, both workflow runs, the Space and the
+visible-change test are all complete and public; the analysis figures are in `reports/`.

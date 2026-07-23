@@ -289,8 +289,8 @@ evaluation. See decision D-08.
 
 ## 19. Local testing
 
-- 52 automated tests across the data contract, artifact integrity, prediction behaviour and
-  deployment configuration — **all passing**.
+- **106 automated tests** across the data contract, artifact integrity, prediction behaviour,
+  deployment configuration, the analysis modules and the application features — all passing.
 - Streamlit smoke test: server starts and answers `/_stcore/health` with HTTP 200.
 - Manual testing of both demonstration profiles and both themes.
 - Quality gate results recorded in `docs/QUALITY_GATE_RESULTS.md`.
@@ -382,6 +382,78 @@ other secret or variable is referenced.
 *Insert Figures 34, 35, 36, 37.*
 
 Procedure: `docs/DEMONSTRATION_SCRIPT.md`.
+
+---
+
+## 25b. Post-deployment analysis — Horizon 1 and 2
+
+Added after the initial deployment. Each item closes a limitation this project had already
+published about itself, which is the strongest available framing: *we identified it, then we
+fixed it.*
+
+### Fairness audit (`reports/fairness_report.md`)
+
+Optimises for **equal opportunity** — equal recall across groups — because the harm that
+matters is an at-risk customer being missed.
+
+| Attribute | Finding |
+|---|---|
+| `gender` | No disparity exceeded the 0.10 materiality convention on any criterion |
+| `SeniorCitizen` | Material on all four criteria — **but** seniors churn at 44.14% against 23.25%, and the model finds at-risk seniors *better* (recall 0.9286 vs 0.7319). The group under-served on the governing criterion is **non-seniors**. The real burden is the false-positive gap (0.5000 vs 0.2492) |
+
+**Counterfactual.** Removing both attributes costs **+0.0008 ROC-AUC** and **+0.0027 recall**
+— inside the ±0.0124 CV standard deviation. **Removal is recommended.** A group-specific
+threshold was rejected outright as direct differential treatment.
+
+*Insert Figures 38, 39.*
+
+### Calibration (`reports/calibration_report.md`)
+
+| Variant | Brier | ECE | ROC-AUC | Mean predicted |
+|---|---:|---:|---:|---:|
+| Deployed (uncalibrated) | 0.1688 | 0.1503 | 0.8414 | 0.4157 |
+| Isotonic | 0.1388 | 0.0194 | 0.8413 | 0.2671 |
+| Sigmoid | 0.1383 | 0.0254 | 0.8416 | 0.2678 |
+
+Observed base rate 0.2654. The model is **over-confident about churn by 0.15** — the
+predicted consequence of `class_weight="balanced"`, chosen deliberately to raise recall.
+Ranking is unaffected: ROC-AUC moves by 0.0003.
+
+*Insert Figure 40.*
+
+### Threshold analysis (`reports/threshold_analysis.md`)
+
+| Cost ratio | Optimal threshold | Recall | Precision |
+|---:|---:|---:|---:|
+| 1:1 | 0.73 | 0.5695 | 0.6574 |
+| 3:1 | 0.44 | 0.8422 | 0.4817 |
+| 5:1 | 0.33 | 0.9171 | 0.4403 |
+| 20:1 | 0.12 | 0.9866 | 0.3545 |
+
+The deployed 0.50 is cost-optimal at roughly **3:1** — using it was always an implicit
+assertion about relative costs, now made explicit.
+
+*Insert Figures 41, 45.*
+
+### Drift apparatus (`reports/drift_report.md`)
+
+**No real drift can be observed** — the dataset is a single cross-section. The apparatus was
+built and validated **both ways**: STABLE on the unshifted holdout (0 of 19 flagged), ALERT
+on a simulated acquisition campaign (15 of 19, 7 at alert).
+
+*Insert Figure 42.*
+
+### Explainability, batch scoring, tracking and the retention brief
+
+- **Contributions** are the exact log-odds decomposition, reconstructing the score to float
+  precision (asserted on 25 customers). Not SHAP — for a linear model this *is* the model.
+- **Batch scoring** ranks 1,000 customers in 0.01 s with a CSV export; nothing written to disk.
+- **MLflow** tracks 3 runs with nested per-candidate runs, a registered model and a
+  documented manual rollback.
+- **The retention brief** confines the LLM to rendering pre-computed values. Structured
+  output, prohibited-language filter, provenance labelling, kill switch, disabled by default.
+
+*Insert Figures 43, 44, 46, 47.*
 
 ---
 

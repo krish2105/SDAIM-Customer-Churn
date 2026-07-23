@@ -300,3 +300,152 @@ deployment.
 false claim in the report. The Space build happens after the sync and must be observed
 separately. Configuration is checked first so a missing `HF_SPACE_ID` or `HF_TOKEN` fails
 with an actionable message rather than an obscure push error.
+
+---
+
+# Horizon 1 and 2 decisions
+
+Recorded when the improvement plan was implemented. These are the choices an examiner is
+most likely to probe, so the reasoning is written down rather than left in commit messages.
+
+---
+
+## D-21 — Equal opportunity as the governing fairness criterion
+
+**Decision.** Report demographic parity, equal opportunity and predictive parity; optimise
+for **equal opportunity**.
+
+**Rationale.** The three criteria are mathematically incompatible whenever group base rates
+differ, so a choice is forced and must be justified. This model exists to find at-risk
+customers so a specialist can review them. The harm that matters is a customer being
+**missed** — receiving no review at all — and that harm should not fall more heavily on one
+group. Equal opportunity equalises recall, which is exactly that.
+
+**Why not demographic parity.** Senior citizens churn at 44.14% against 23.25% for
+non-seniors. Forcing equal flag rates would mean deliberately under-flagging the group that
+actually churns more — worse service dressed up as fairness.
+
+**The finding that surprised us.** The equal-opportunity gap runs *in favour* of seniors:
+recall 0.9286 against 0.7319. The group under-served on the criterion we optimise for is
+**non-seniors**. The genuine burden on seniors is the false-positive gap (0.5000 against
+0.2492) — unnecessary contact, not missed reviews. Stating this correctly matters more than
+reporting a gap and implying the usual direction.
+
+---
+
+## D-22 — Measure the cost of removing protected attributes before deciding
+
+**Decision.** Retrain without `gender` and `SeniorCitizen`, measure the loss, then decide.
+
+**Rationale.** "Keep or remove a protected attribute" is usually argued from principle. It
+is answerable with evidence, and the evidence changed the recommendation: removal costs
+**+0.0008 ROC-AUC** and **+0.0027 recall**, well inside the ±0.0124 cross-validation
+standard deviation. The attributes buy nothing measurable while creating a disparity that
+must then be explained. **Removal is now recommended.**
+
+**Why they are retained in 1.1.0 regardless.** The measured metrics are already published
+across the report, the model card and the live application. Silently changing the model
+mid-submission would invalidate that evidence trail. Recorded as the first Horizon 3 action
+with the cost quantified — documented, not deferred by omission.
+
+---
+
+## D-23 — Log-odds contributions instead of SHAP
+
+**Decision.** Decompose predictions as `coefficient × transformed_value`.
+
+**Rationale.** For a linear model this is not an approximation of the model — it **is** the
+model, and it reconstructs the score exactly (asserted by test on 25 customers). SHAP would
+estimate, at the cost of a heavy dependency, a quantity available here in closed form.
+Under viva questioning, arithmetic the team can derive beats a library it cannot.
+
+**Limitation accepted.** The method does not generalise. If the Random Forest were ever
+selected, `explain_prediction` reports that no additive decomposition exists rather than
+silently substituting a different method — permutation importance would be the correct
+replacement.
+
+---
+
+## D-24 — Publish a cost-ratio curve instead of choosing a threshold
+
+**Decision.** Sweep the ratio of miss-cost to review-cost and publish the optimum against it.
+
+**Rationale.** The cost-optimal threshold depends entirely on a business quantity nobody
+supplied. Inventing a currency figure would be fabricating exactly the kind of business
+claim this project refuses to make elsewhere. Only the *ratio* matters, not absolute costs,
+so the whole answer can be published without inventing anything: 0.73 at 1:1, down to 0.12
+at 20:1.
+
+**Consequence.** The deployed 0.50 is cost-optimal at roughly **3:1** — using it was always
+an implicit assertion about relative costs. The number was there all along; it simply was
+not stated. The application now exposes the threshold so the assumption is visible rather
+than buried.
+
+---
+
+## D-25 — PSI alone governs drift status; the chi-squared p-value does not
+
+**Decision.** Report the chi-squared p-value for information, but let PSI decide the status.
+
+**Rationale.** This was not theoretical. An earlier version escalated status when p < 0.05
+and produced a **false positive on the unshifted control set** — `OnlineBackup`, PSI 0.0044
+(no meaningful drift) with p = 0.047. At n ≈ 1,400 the test flags differences far too small
+to matter. A detector that cries wolf on its own holdout would be switched off within a week.
+
+The documentation had already said "PSI, not the p-value, governs the status". The code
+contradicted it. The code was wrong and was fixed.
+
+---
+
+## D-26 — Build drift apparatus, and refuse to call it monitoring
+
+**Decision.** Build the detectors and validate them on a simulated shift; state plainly that
+no real drift can be observed.
+
+**Rationale.** The dataset is a single cross-section with no time dimension. There is no
+"later" distribution. Claiming to monitor drift would be false. What *can* be demonstrated
+is that the apparatus works — and it is validated **both ways**: stable on the unshifted
+holdout (0 of 19 flagged) and alert on a simulated acquisition campaign (15 of 19, 7 at
+alert). A detector never shown to fire is not evidence of anything; nor is one that always
+fires.
+
+**Why not Evidently.** Evaluated and rejected. A large transitive dependency tree for two
+detectors implemented here in a few dozen lines, whose internals the team could not defend.
+
+---
+
+## D-27 — The LLM is a writing tool, not a reasoning tool
+
+**Decision.** The retention brief receives only pre-computed values, never the customer
+record. It is never asked to predict or to explain *why* anyone might leave.
+
+**Rationale.** An LLM asked to explain a churn score will produce fluent causal claims the
+model cannot support. That would undermine the governance position that is this project's
+strongest feature — every other surface is careful to say association, not causation.
+Confining the model to rendering numbers keeps the guarantee intact.
+
+**Guardrails, all enforced rather than assumed:** structured output validated before display;
+a prohibited-language filter rejecting causal and deterministic phrasing; provenance
+labelling on screen; a kill switch; and a deterministic fallback that must pass the same
+language filter it enforces. **Ships disabled by default**, so the Space never depends on an
+external provider.
+
+---
+
+## D-28 — MLflow on SQLite, and precision about what it adds
+
+**Decision.** Local SQLite backend. No tracking server, no cloud.
+
+**Rationale.** MLflow 3.x retired the plain filesystem store and raises unless
+`MLFLOW_ALLOW_FILE_STORE=true`. Opting out of a deprecation to keep a retired code path
+alive would be borrowing trouble. SQLite is the documented migration target and is still a
+single local file with no infrastructure, so the scope limit is unaffected.
+
+**Precision that matters.** MLflow does **not** add reproducibility — seeds and pinned
+versions already provide that, and claiming otherwise would be wrong. It adds
+**comparability across runs**, **rollback**, and **attribution** of a metric to a dataset
+revision via the logged blob SHA.
+
+**Rollback is deliberately manual.** Re-pointing production at a different model has
+customer-facing consequences and should require a human, consistent with the governance
+position taken everywhere else.

@@ -1,7 +1,8 @@
 # Implementation Plan
 
-Phases, acceptance criteria and the exact command sequence. Phases 0–8 are complete
-locally; phases 9–11 require the user's platform credentials and cannot be performed here.
+Phases, acceptance criteria and the exact command sequence. **Phases 0–12 are complete**,
+including the external deployment phases, which were performed and observed on the real
+platforms. Only the report, the screenshots and the instructor confirmation remain.
 
 ---
 
@@ -157,36 +158,36 @@ make verify
 
 ---
 
-## Phase 9 — GitHub (PENDING — requires the user)
+## Phase 9 — GitHub (COMPLETE)
 
 | Acceptance criterion | How to verify |
 |---|---|
-| Repository exists and is accessible | Open the URL |
+| Repository exists and is accessible | ✅ https://github.com/krish2105/SDAIM-Customer-Churn |
 | `main` contains the full project | Compare the file tree |
-| CI run succeeds | Open the run, confirm every step green |
+| CI run succeeds | ✅ Run 30019016553, all 10 steps green |
 | `HF_TOKEN` secret exists | Settings page shows the **name** only |
 | `HF_SPACE_ID` variable set correctly | Settings page shows name and value |
 
 ```bash
-git remote add origin https://github.com/krish2105/MLops-Huggingface.git
+git remote add origin https://github.com/krish2105/SDAIM-Customer-Churn.git
 git branch -M main
 git push -u origin main
 ```
 
 ---
 
-## Phase 10 — Hugging Face Space (PENDING — requires the user)
+## Phase 10 — Hugging Face Space (COMPLETE)
 
 | Acceptance criterion | How to verify |
 |---|---|
-| Docker Space created, ID recorded | Space settings page |
+| Docker Space created, ID recorded | ✅ `krish21may/churn` |
 | Deployment workflow succeeds | Actions run page |
 | Space build succeeds | Space build logs |
-| Live application loads and predicts | Use the live app |
+| Live application loads and predicts | ✅ https://krish21may-churn.hf.space — 22.9% |
 
 ---
 
-## Phase 11 — Visible-change deployment test (PENDING — requires the user)
+## Phase 11 — Visible-change deployment test (COMPLETE)
 
 | Acceptance criterion | How to verify |
 |---|---|
@@ -201,23 +202,47 @@ Full procedure in `docs/DEMONSTRATION_SCRIPT.md` §"Visible-change deployment te
 
 ---
 
+## Phase 12 — Improvement plan, Horizons 1 and 2 (COMPLETE)
+
+Executed after deployment. Full detail in `docs/IMPROVEMENT_PLAN.md`.
+
+| Acceptance criterion | Result |
+|---|---|
+| Fairness audit published; model card updated | Met — no material disparity on `gender`; material on `SeniorCitizen`; counterfactual shows removal costs +0.0008 ROC-AUC |
+| Calibration measured; decision documented | Met — over-confident by 0.15; isotonic cuts ECE 0.1503 → 0.0194 |
+| Threshold sensitivity published; control exposed | Met — 8 cost ratios; slider in the application |
+| Per-prediction contributions with guardrails | Met — reconstructs the model exactly, asserted on 25 customers |
+| Experiment tracking and registry with rollback | Met — 3 runs, `production` alias, documented manual rollback |
+| Drift detector demonstrated firing **and** staying quiet | Met — 0/19 on control, 15/19 on a simulated shift |
+| Batch scoring under 10 s for 1,000 rows | Met — **0.01 s** |
+| LLM layer guardrailed and off by default | Met — fallback passes the filter it enforces |
+| Test suite grown with real guards | Met — **52 → 106**, all passing |
+
+```bash
+make fairness && make calibration && make threshold && make drift && make track
+make test && make verify
+```
+
+---
+
 ## Command sequence, start to finish
 
 ```bash
-# Local (all verified)
+# Local — all verified
 bash scripts/bootstrap_macos.sh
 make validate
 make eda
 make train
 make notebook
-make test
+make analysis       # fairness + calibration + threshold + drift
+make track          # MLflow tracking and registry
+make test           # 106 tests
 make secret-scan
 make app            # http://localhost:8501
 make docker-run     # http://localhost:7860
-make verify
+make verify         # 10 quality gates
 
-# External (requires your credentials — run these yourself)
-git remote add origin <your repository URL>
-git branch -M main
-git push -u origin main
+# External — all completed and observed
+# https://github.com/krish2105/SDAIM-Customer-Churn
+# https://huggingface.co/spaces/krish21may/churn
 ```

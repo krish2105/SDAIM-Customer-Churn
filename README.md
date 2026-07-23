@@ -112,7 +112,7 @@ Mermaid diagrams for the training, inference and CI/CD flows are in
 │   ├── Dockerfile, requirements.txt, README.md, .dockerignore
 │   └── artifacts/                model_pipeline.joblib, model_metadata.json,
 │                                 feature_schema.json, reference_rates.json, model_card.md
-├── tests/                        52 tests
+├── tests/                        106 tests
 ├── scripts/                      bootstrap, validate, eda, train, test, app,
 │                                 docker, secret scan, release verification
 ├── docs/                         Audit trail and all supporting documentation
@@ -145,7 +145,9 @@ make validate      # Validate the raw dataset against the documented contract
 make eda           # Regenerate 11 figures, 13 tables and the observations document
 make train         # Train, compare, select and export the pipeline and artifacts
 make notebook      # Regenerate and execute notebooks/01_eda_and_modeling.ipynb
-make test          # Run the full pytest suite
+make analysis      # Fairness, calibration, threshold and drift analyses
+make track         # Train and log the run to MLflow with the registry
+make test          # Run the full pytest suite (106 tests)
 make app           # Run the Streamlit application on http://localhost:8501
 make docker-build  # Build the deployment image
 make docker-run    # Build, run and health-check on http://localhost:7860
@@ -324,6 +326,12 @@ All three members contributed to the report, the evidence pack and the demonstra
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Training, inference and CI/CD diagrams |
 | [docs/SECURITY.md](docs/SECURITY.md) | Credentials, scanning, rotation, container hardening |
 | [docs/TEST_PLAN.md](docs/TEST_PLAN.md) | What is tested, and what is deliberately not |
+| [docs/IMPROVEMENT_PLAN.md](docs/IMPROVEMENT_PLAN.md) | Three-horizon roadmap; H1 and H2 delivered |
+| [reports/fairness_report.md](reports/fairness_report.md) | Subgroup audit and the keep-or-remove decision |
+| [reports/calibration_report.md](reports/calibration_report.md) | Reliability, Brier, ECE and the calibration decision |
+| [reports/threshold_analysis.md](reports/threshold_analysis.md) | Cost-ratio sensitivity curve |
+| [reports/drift_report.md](reports/drift_report.md) | Drift apparatus and its two-way validation |
+| [reports/tracking_report.md](reports/tracking_report.md) | MLflow runs, registry and rollback |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Eleven documented failure modes and fixes |
 | [docs/SCREENSHOT_CHECKLIST.md](docs/SCREENSHOT_CHECKLIST.md) | Every evidence screenshot, with captions |
 | [docs/DELIVERABLES_CHECKLIST.md](docs/DELIVERABLES_CHECKLIST.md) | Complete / pending status of every deliverable |
