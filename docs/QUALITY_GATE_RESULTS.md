@@ -153,22 +153,49 @@ Two further test failures were found and fixed during development, both recorded
 
 ---
 
-## External gates — NOT RUN, and NOT passed
+## External gates — observed results
 
-These cannot be executed here. They require the user's platform credentials and must be
-verified by direct observation. **No deployment has occurred, and none is claimed.**
+Five of six now verified by direct observation on the real platforms.
 
-| Gate | Status | Evidence required |
+| Gate | Status | Evidence |
 |---|---|---|
-| GitHub repository push | ⬜ Not run | Repository URL; real commit SHAs |
-| GitHub Actions CI run | ⬜ Not run | Run URL, run ID, timestamp, all steps green |
-| GitHub Actions deployment run | ⬜ Not run | Run URL and timestamp |
-| Hugging Face Space build | ⬜ Not run | Build log showing success |
-| Live application prediction | ⬜ Not run | Screenshot of a prediction on the Space |
-| Visible-change redeployment (1.0.0 → 1.1.0) | ⬜ Not run | Second run plus version 1.1.0 visible live |
+| GitHub repository push | ✅ **PASS** | https://github.com/krish2105/SDAIM-Customer-Churn — public, 7 commits |
+| GitHub Actions CI run | ✅ **PASS** | [run 30019016553](https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30019016553) — all 10 steps green |
+| GitHub Actions deployment run | ✅ **PASS** | [run 30020847651](https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30020847651) — validate + sync jobs both green |
+| Hugging Face Space build | ✅ **PASS** | `krish21may/churn` reached runtime stage `RUNNING` |
+| Live application prediction | ✅ **PASS** | https://krish21may-churn.hf.space returned 22.9%, Low risk band, 3 context charts |
+| Visible-change redeployment (1.0.0 → 1.1.0) | ⬜ **Not run** | Second run plus version 1.1.0 visible live |
 
-Local gates passing says the code is correct and the container runs. It says nothing about
-whether a deployment succeeded. Those are separate claims requiring separate evidence.
+### The configuration guard was demonstrated working
+
+Before `HF_SPACE_ID` and `HF_TOKEN` were configured, deployment run **30019016510** behaved
+exactly as designed: the `validate` job passed all steps, then the `deploy` job **failed at
+the "Verify deployment configuration is present" step** with the actionable message
+`::error::Repository variable HF_SPACE_ID is not configured`, and **skipped** the sync,
+package-verification and summary steps rather than attempting a push with an empty repository
+id.
+
+This is stronger evidence than a first-time success would have been: the guard was shown to
+fire, then shown to pass once configured — the same standard applied to the secret scanner.
+
+### Cross-environment consistency
+
+The same input returns **22.9%** in all three environments:
+
+| Environment | Probability |
+|---|---|
+| Local Python 3.11 venv | 22.9% |
+| Local Docker container (port 7860) | 22.9% |
+| Deployed Hugging Face Space | 22.9% |
+
+This confirms the artifact and its pinned dependencies behave identically wherever they run,
+and is the practical justification for pinning `scikit-learn` to the training version.
+
+### Still outstanding
+
+The visible-change redeployment test (brief Part 4.4) has **not** been performed. Procedure in
+`docs/DEMONSTRATION_SCRIPT.md`. Until a second workflow run and version 1.1.0 have been
+observed in the live application, that requirement is not met and is not claimed.
 
 ---
 

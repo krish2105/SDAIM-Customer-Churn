@@ -284,14 +284,20 @@ output requires human review before a customer is contacted. See
 
 ## 16. Links
 
-| Resource | Status |
-|---|---|
-| GitHub repository | `<<UNRESOLVED — add once the repository exists and has been verified>>` |
-| Hugging Face Space | `<<UNRESOLVED — add once the Space is created and its build has been observed>>` |
-| Successful CI run | `<<UNRESOLVED — add the real run URL>>` |
-| Successful deployment run | `<<UNRESOLVED — add the real run URL>>` |
+| Resource | Link | Verified |
+|---|---|---|
+| GitHub repository | https://github.com/krish2105/SDAIM-Customer-Churn | ✅ Public, 7 commits |
+| Hugging Face Space | https://huggingface.co/spaces/krish21may/churn | ✅ Built and running |
+| Live application (direct) | https://krish21may-churn.hf.space | ✅ Prediction confirmed |
+| Successful CI run | https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30019016553 | ✅ All 10 steps green |
+| Successful deployment run | https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30020847651 | ✅ Validate + sync both green |
 
-No link is recorded here until it has been opened and confirmed to work.
+Every link above was opened and confirmed working before being recorded.
+
+**Cross-environment consistency check.** The same input returns a churn probability of
+**22.9%** in all three environments — the local Python environment, the local Docker
+container, and the deployed Hugging Face Space. The artifact and its pinned dependencies
+behave identically wherever they run.
 
 ## 17. Team contributions
 

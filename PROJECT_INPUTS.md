@@ -20,12 +20,20 @@ No token, key or password may ever be written in this file.
 
 | Field | Value | Verified? |
 |---|---|---|
-| GitHub repository | `https://github.com/krish2105/MLops-Huggingface` | **Not verified** — stated in the input template; existence and access were never confirmed by this build |
-| GitHub default branch | `main` | Not verified |
-| Hugging Face username or organisation | `<<UNRESOLVED>>` | — |
-| Desired Space name | `customer-churn-intelligence` | Preference only |
-| Intended Space ID (`username-or-org/space-name`) | `<<UNRESOLVED>>` | — |
-| Space visibility | `<<UNRESOLVED: public / protected / private>>` | — |
+| GitHub repository | `https://github.com/krish2105/SDAIM-Customer-Churn` | ✅ **Verified** — public, 7 commits pushed, CI green |
+| GitHub username | `krish2105` | ✅ Verified |
+| GitHub default branch | `main` | ✅ Verified |
+| Hugging Face username | `krish21may` (Pro plan) | ✅ Verified |
+| **Space ID** (`HF_SPACE_ID`) | `krish21may/churn` | ✅ Verified — built and running |
+| Space URL | https://huggingface.co/spaces/krish21may/churn | ✅ Verified |
+| Live application URL | https://krish21may-churn.hf.space | ✅ Verified — prediction confirmed |
+| Space visibility | Public | ✅ Verified |
+
+> **Note the username asymmetry.** GitHub is `krish2105`; Hugging Face is `krish21may`. The
+> `HF_SPACE_ID` variable uses the **Hugging Face** handle.
+
+An earlier repository URL (`krish2105/MLops-Huggingface`) appeared in the input template and
+was never verified. It is superseded by the repository above.
 
 ## Dataset — all verified
 
