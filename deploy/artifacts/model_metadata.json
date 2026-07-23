@@ -1,0 +1,80 @@
+{
+  "project_name": "Customer Churn Intelligence and Retention Decision-Support Platform",
+  "model_name": "Logistic Regression",
+  "model_version": "1.0.0",
+  "target": "Churn",
+  "positive_class": 1,
+  "decision_threshold": 0.5,
+  "random_state": 42,
+  "training_timestamp_utc": "2026-07-23T14:05:31+00:00",
+  "dataset_git_blob_sha": "3de7a612d1609f25f21a455bda77948729369002",
+  "dataset_rows": 7043,
+  "dataset_columns": 21,
+  "train_rows": 5634,
+  "test_rows": 1409,
+  "test_size": 0.2,
+  "cv_folds": 5,
+  "selection_rule": "Candidates were compared by mean ROC-AUC under stratified 5-fold cross-validation on the training split only. Where the two means differed by less than 0.01 the tie was broken first on mean CV F1 and then on mean CV recall, because a missed churner costs more than an unnecessary review. The held-out test set was evaluated once, after selection, and did not influence the choice.",
+  "selection_justification": "Cross-validated ROC-AUC (gap 0.0005) and F1 (gap 0.0010) were both within the 0.01 tolerance, so the rule fell through to mean CV recall. Logistic Regression was selected with 0.8013, because a missed churner costs more than an unnecessary review.",
+  "metrics": {
+    "accuracy": 0.737402,
+    "precision": 0.503436,
+    "recall": 0.783422,
+    "f1": 0.612971,
+    "roc_auc": 0.841406
+  },
+  "cross_validated_metrics": {
+    "cv_roc_auc_mean": 0.845952,
+    "cv_roc_auc_std": 0.012354,
+    "cv_f1_mean": 0.628582,
+    "cv_f1_std": 0.023248,
+    "cv_recall_mean": 0.801338,
+    "cv_recall_std": 0.037933,
+    "cv_precision_mean": 0.51736,
+    "cv_precision_std": 0.018826,
+    "cv_accuracy_mean": 0.748848,
+    "cv_accuracy_std": 0.015231
+  },
+  "confusion_matrix": {
+    "true_negative": 746,
+    "false_positive": 289,
+    "false_negative": 81,
+    "true_positive": 293
+  },
+  "all_model_test_metrics": {
+    "Logistic Regression": {
+      "accuracy": 0.737402,
+      "precision": 0.503436,
+      "recall": 0.783422,
+      "f1": 0.612971,
+      "roc_auc": 0.841406
+    },
+    "Random Forest": {
+      "accuracy": 0.760823,
+      "precision": 0.533698,
+      "recall": 0.783422,
+      "f1": 0.634886,
+      "roc_auc": 0.841711
+    },
+    "Dummy (stratified) baseline": {
+      "accuracy": 0.621718,
+      "precision": 0.289125,
+      "recall": 0.291444,
+      "f1": 0.29028,
+      "roc_auc": 0.516253
+    }
+  },
+  "risk_tiers": {
+    "low_max_exclusive": 0.4,
+    "medium_max_exclusive": 0.7
+  },
+  "environment": {
+    "python": "3.11.15",
+    "scikit_learn": "1.9.0",
+    "pandas": "3.0.5",
+    "numpy": "2.4.6",
+    "joblib": "1.5.3"
+  },
+  "data_notice": "IBM Telco Customer Churn sample. Represents a fictional telecommunications company; not actual observed commercial customer data.",
+  "governance_notice": "Decision support only. Requires human review. Must not autonomously change prices, modify contracts, deny service or make customer-treatment decisions."
+}

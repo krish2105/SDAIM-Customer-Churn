@@ -1,0 +1,378 @@
+{
+  "schema_version": "1.0.0",
+  "project_name": "Customer Churn Intelligence and Retention Decision-Support Platform",
+  "target": "Churn",
+  "target_mapping": {
+    "No": 0,
+    "Yes": 1
+  },
+  "positive_class": 1,
+  "excluded_identifier": "customerID",
+  "feature_order": [
+    "gender",
+    "SeniorCitizen",
+    "Partner",
+    "Dependents",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod",
+    "tenure",
+    "MonthlyCharges",
+    "TotalCharges"
+  ],
+  "numeric_features": [
+    "tenure",
+    "MonthlyCharges",
+    "TotalCharges"
+  ],
+  "categorical_features": [
+    "gender",
+    "SeniorCitizen",
+    "Partner",
+    "Dependents",
+    "PhoneService",
+    "MultipleLines",
+    "InternetService",
+    "OnlineSecurity",
+    "OnlineBackup",
+    "DeviceProtection",
+    "TechSupport",
+    "StreamingTV",
+    "StreamingMovies",
+    "Contract",
+    "PaperlessBilling",
+    "PaymentMethod"
+  ],
+  "ui_group_order": [
+    "Customer profile",
+    "Services",
+    "Contract and billing",
+    "Charges and tenure"
+  ],
+  "dependency_rules": {
+    "phone": {
+      "controlling_feature": "PhoneService",
+      "controlling_value": "No",
+      "dependent_features": [
+        "MultipleLines"
+      ],
+      "forced_value": "No phone service"
+    },
+    "internet": {
+      "controlling_feature": "InternetService",
+      "controlling_value": "No",
+      "dependent_features": [
+        "OnlineSecurity",
+        "OnlineBackup",
+        "DeviceProtection",
+        "TechSupport",
+        "StreamingTV",
+        "StreamingMovies"
+      ],
+      "forced_value": "No internet service"
+    }
+  },
+  "risk_tiers": {
+    "low_max_exclusive": 0.4,
+    "medium_max_exclusive": 0.7,
+    "note": "Risk tiers are communication bands for human triage. They are not independently validated business thresholds."
+  },
+  "features": [
+    {
+      "name": "gender",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Gender",
+      "help_text": "Gender as recorded in the customer sample.",
+      "group": "Customer profile",
+      "categories": [
+        "Female",
+        "Male"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "Female"
+    },
+    {
+      "name": "SeniorCitizen",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Senior citizen",
+      "help_text": "Whether the customer is classified as a senior citizen.",
+      "group": "Customer profile",
+      "categories": [
+        "0",
+        "1"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "0"
+    },
+    {
+      "name": "Partner",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Has partner",
+      "help_text": "Whether the customer has a partner.",
+      "group": "Customer profile",
+      "categories": [
+        "No",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "Dependents",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Has dependents",
+      "help_text": "Whether the customer has dependents.",
+      "group": "Customer profile",
+      "categories": [
+        "No",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "PhoneService",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Phone service",
+      "help_text": "Whether the customer subscribes to phone service.",
+      "group": "Services",
+      "categories": [
+        "No",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "MultipleLines",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Multiple lines",
+      "help_text": "Forced to 'No phone service' when phone service is not held.",
+      "group": "Services",
+      "categories": [
+        "No",
+        "No phone service",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "InternetService",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Internet service",
+      "help_text": "Internet product held by the customer.",
+      "group": "Services",
+      "categories": [
+        "DSL",
+        "Fiber optic",
+        "No"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "DSL"
+    },
+    {
+      "name": "OnlineSecurity",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Online security",
+      "help_text": "Add-on requiring an internet subscription.",
+      "group": "Services",
+      "categories": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "OnlineBackup",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Online backup",
+      "help_text": "Add-on requiring an internet subscription.",
+      "group": "Services",
+      "categories": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "DeviceProtection",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Device protection",
+      "help_text": "Add-on requiring an internet subscription.",
+      "group": "Services",
+      "categories": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "TechSupport",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Technical support",
+      "help_text": "Add-on requiring an internet subscription.",
+      "group": "Services",
+      "categories": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "StreamingTV",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Streaming TV",
+      "help_text": "Add-on requiring an internet subscription.",
+      "group": "Services",
+      "categories": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "StreamingMovies",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Streaming movies",
+      "help_text": "Add-on requiring an internet subscription.",
+      "group": "Services",
+      "categories": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "Contract",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Contract term",
+      "help_text": "Contract length currently held by the customer.",
+      "group": "Contract and billing",
+      "categories": [
+        "Month-to-month",
+        "One year",
+        "Two year"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "Month-to-month"
+    },
+    {
+      "name": "PaperlessBilling",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Paperless billing",
+      "help_text": "Whether the customer receives paperless billing.",
+      "group": "Contract and billing",
+      "categories": [
+        "No",
+        "Yes"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "No"
+    },
+    {
+      "name": "PaymentMethod",
+      "kind": "categorical",
+      "dtype": "string",
+      "label": "Payment method",
+      "help_text": "Method used to settle the account.",
+      "group": "Contract and billing",
+      "categories": [
+        "Bank transfer (automatic)",
+        "Credit card (automatic)",
+        "Electronic check",
+        "Mailed check"
+      ],
+      "minimum": null,
+      "maximum": null,
+      "default": "Bank transfer (automatic)"
+    },
+    {
+      "name": "tenure",
+      "kind": "numeric",
+      "dtype": "int64",
+      "label": "Tenure (months)",
+      "help_text": "Number of months the customer has been with the company.",
+      "group": "Charges and tenure",
+      "categories": [],
+      "minimum": 0.0,
+      "maximum": 72.0,
+      "default": 29.0
+    },
+    {
+      "name": "MonthlyCharges",
+      "kind": "numeric",
+      "dtype": "float64",
+      "label": "Monthly charges",
+      "help_text": "Amount billed to the customer each month.",
+      "group": "Charges and tenure",
+      "categories": [],
+      "minimum": 18.4,
+      "maximum": 118.75,
+      "default": 70.5
+    },
+    {
+      "name": "TotalCharges",
+      "kind": "numeric",
+      "dtype": "float64",
+      "label": "Total charges",
+      "help_text": "Cumulative amount billed to the customer to date.",
+      "group": "Charges and tenure",
+      "categories": [],
+      "minimum": 18.85,
+      "maximum": 8684.8,
+      "default": 1398.125
+    }
+  ]
+}

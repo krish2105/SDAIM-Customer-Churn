@@ -1,0 +1,259 @@
+{
+  "note": "Descriptive reference statistics for context charts only. Category churn rates are computed on the training split; the score histogram is computed on the held-out test split. Neither is used to produce a prediction.",
+  "overall_training_churn_rate": 0.265353,
+  "training_rows": 5634,
+  "by_category": {
+    "gender": {
+      "Female": {
+        "churn_rate": 0.266333,
+        "customers": 2801
+      },
+      "Male": {
+        "churn_rate": 0.264384,
+        "customers": 2833
+      }
+    },
+    "SeniorCitizen": {
+      "0": {
+        "churn_rate": 0.236954,
+        "customers": 4714
+      },
+      "1": {
+        "churn_rate": 0.41087,
+        "customers": 920
+      }
+    },
+    "Partner": {
+      "No": {
+        "churn_rate": 0.327711,
+        "customers": 2905
+      },
+      "Yes": {
+        "churn_rate": 0.198974,
+        "customers": 2729
+      }
+    },
+    "Dependents": {
+      "No": {
+        "churn_rate": 0.313527,
+        "customers": 3955
+      },
+      "Yes": {
+        "churn_rate": 0.151876,
+        "customers": 1679
+      }
+    },
+    "PhoneService": {
+      "No": {
+        "churn_rate": 0.241503,
+        "customers": 559
+      },
+      "Yes": {
+        "churn_rate": 0.26798,
+        "customers": 5075
+      }
+    },
+    "MultipleLines": {
+      "No": {
+        "churn_rate": 0.250279,
+        "customers": 2685
+      },
+      "No phone service": {
+        "churn_rate": 0.241503,
+        "customers": 559
+      },
+      "Yes": {
+        "churn_rate": 0.287866,
+        "customers": 2390
+      }
+    },
+    "InternetService": {
+      "DSL": {
+        "churn_rate": 0.186887,
+        "customers": 1937
+      },
+      "Fiber optic": {
+        "churn_rate": 0.420862,
+        "customers": 2483
+      },
+      "No": {
+        "churn_rate": 0.072488,
+        "customers": 1214
+      }
+    },
+    "OnlineSecurity": {
+      "No": {
+        "churn_rate": 0.419378,
+        "customers": 2797
+      },
+      "No internet service": {
+        "churn_rate": 0.072488,
+        "customers": 1214
+      },
+      "Yes": {
+        "churn_rate": 0.144177,
+        "customers": 1623
+      }
+    },
+    "OnlineBackup": {
+      "No": {
+        "churn_rate": 0.40131,
+        "customers": 2442
+      },
+      "No internet service": {
+        "churn_rate": 0.072488,
+        "customers": 1214
+      },
+      "Yes": {
+        "churn_rate": 0.215875,
+        "customers": 1978
+      }
+    },
+    "DeviceProtection": {
+      "No": {
+        "churn_rate": 0.389563,
+        "customers": 2472
+      },
+      "No internet service": {
+        "churn_rate": 0.072488,
+        "customers": 1214
+      },
+      "Yes": {
+        "churn_rate": 0.227926,
+        "customers": 1948
+      }
+    },
+    "TechSupport": {
+      "No": {
+        "churn_rate": 0.417539,
+        "customers": 2771
+      },
+      "No internet service": {
+        "churn_rate": 0.072488,
+        "customers": 1214
+      },
+      "Yes": {
+        "churn_rate": 0.151607,
+        "customers": 1649
+      }
+    },
+    "StreamingTV": {
+      "No": {
+        "churn_rate": 0.331087,
+        "customers": 2226
+      },
+      "No internet service": {
+        "churn_rate": 0.072488,
+        "customers": 1214
+      },
+      "Yes": {
+        "churn_rate": 0.305378,
+        "customers": 2194
+      }
+    },
+    "StreamingMovies": {
+      "No": {
+        "churn_rate": 0.33604,
+        "customers": 2217
+      },
+      "No internet service": {
+        "churn_rate": 0.072488,
+        "customers": 1214
+      },
+      "Yes": {
+        "churn_rate": 0.300499,
+        "customers": 2203
+      }
+    },
+    "Contract": {
+      "Month-to-month": {
+        "churn_rate": 0.427466,
+        "customers": 3102
+      },
+      "One year": {
+        "churn_rate": 0.110827,
+        "customers": 1173
+      },
+      "Two year": {
+        "churn_rate": 0.028698,
+        "customers": 1359
+      }
+    },
+    "PaperlessBilling": {
+      "No": {
+        "churn_rate": 0.160226,
+        "customers": 2303
+      },
+      "Yes": {
+        "churn_rate": 0.338037,
+        "customers": 3331
+      }
+    },
+    "PaymentMethod": {
+      "Bank transfer (automatic)": {
+        "churn_rate": 0.161576,
+        "customers": 1244
+      },
+      "Credit card (automatic)": {
+        "churn_rate": 0.149217,
+        "customers": 1213
+      },
+      "Electronic check": {
+        "churn_rate": 0.45743,
+        "customers": 1891
+      },
+      "Mailed check": {
+        "churn_rate": 0.192846,
+        "customers": 1286
+      }
+    }
+  },
+  "test_score_histogram": {
+    "bin_edges": [
+      0.0,
+      0.05,
+      0.1,
+      0.15,
+      0.2,
+      0.25,
+      0.3,
+      0.35,
+      0.4,
+      0.45,
+      0.5,
+      0.55,
+      0.6,
+      0.65,
+      0.7,
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.95,
+      1.0
+    ],
+    "counts": [
+      206,
+      118,
+      91,
+      68,
+      65,
+      53,
+      51,
+      61,
+      48,
+      66,
+      45,
+      47,
+      50,
+      66,
+      86,
+      78,
+      92,
+      93,
+      25,
+      0
+    ],
+    "population": 1409
+  }
+}
