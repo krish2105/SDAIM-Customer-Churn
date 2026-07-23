@@ -51,10 +51,10 @@ Status is factual: **Complete** means it exists and was verified in this build.
 
 ---
 
-## C. External deliverables — pending, require you
+## C. External deliverables — six of eight verified
 
-None of these can be produced here: they need your GitHub and Hugging Face credentials, and
-each must be verified by observation rather than assumed.
+Six have now been completed and verified by direct observation on the real platforms. The
+remaining two are yours: capturing the screenshots and writing the report.
 
 | # | Deliverable | Status | How to complete | Evidence to record |
 |---|---|---|---|---|
@@ -67,23 +67,21 @@ each must be verified by observation rather than assumed.
 | 7 | Authentic screenshots | ⬜ Pending | `docs/SCREENSHOT_CHECKLIST.md` figures 23–37 | Genuine captures, checked for credentials |
 | 8 | Final PDF report | ⬜ Pending | Complete `docs/REPORT_TEMPLATE.md` | Every `<<UNRESOLVED>>` replaced |
 
-Figures **1–22** of the screenshot checklist can be captured now — the application and the
-container both run locally.
+**All 37 figures** of the screenshot checklist can now be captured: the application runs
+locally and in Docker, the repository and both workflow runs are public, and the Space is
+live at <https://krish21may-churn.hf.space>.
 
 ---
 
 ## D. Unresolved placeholders
 
-Every one of these is deliberately marked rather than invented.
+Every one of these is deliberately marked rather than invented. All deployment-related
+placeholders have now been resolved with verified values; only academic and instructor
+inputs remain.
 
 | Placeholder | Files | Needed for |
 |---|---|---|
 | Course, group number, member names, student IDs, instructor, submission date | `PROJECT_INPUTS.md`, `README.md` §17, `docs/REPORT_TEMPLATE.md` §1, §32 | Report cover and team table |
-| Hugging Face username / organisation | `PROJECT_INPUTS.md` | Space creation |
-| Space ID (`username-or-org/space-name`) | `PROJECT_INPUTS.md`, `deploy/README.md`, report §22 | `HF_SPACE_ID` variable |
-| Space visibility | `PROJECT_INPUTS.md` | Space settings |
-| GitHub repository URL (verification) | `PROJECT_INPUTS.md`, `README.md` §16, `deploy/README.md` | Report links |
-| Commit SHAs, run IDs, timestamps, Space URL | `docs/REPORT_TEMPLATE.md` §24, §25 | Deployment evidence |
 | Instructor confirmation on the fictional-data question | `PROJECT_INPUTS.md`, report §6 | Academic assurance |
 | Report format, presentation duration, repository visibility | `PROJECT_INPUTS.md` | Submission compliance |
 
