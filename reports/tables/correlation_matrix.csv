@@ -1,0 +1,5 @@
+,tenure,MonthlyCharges,TotalCharges,ChurnFlag
+tenure,1.0,0.2479,0.8259,-0.3522
+MonthlyCharges,0.2479,1.0,0.6511,0.1934
+TotalCharges,0.8259,0.6511,1.0,-0.1995
+ChurnFlag,-0.3522,0.1934,-0.1995,1.0

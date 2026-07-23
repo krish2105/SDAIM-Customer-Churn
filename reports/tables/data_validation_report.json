@@ -1,0 +1,547 @@
+{
+  "passed": true,
+  "summary": {
+    "path": "/Users/krishnamathurm4pro/Desktop/Academics/SDIAM Term 3/SDAIM FINAL PROJECT/data/raw/Telco-Customer-Churn.csv",
+    "rows": 7043,
+    "columns": 21,
+    "git_blob_sha": "3de7a612d1609f25f21a455bda77948729369002",
+    "expected_git_blob_sha": "3de7a612d1609f25f21a455bda77948729369002",
+    "target_distribution": {
+      "No": 5174,
+      "Yes": 1869
+    },
+    "blank_string_counts": {
+      "customerID": 0,
+      "gender": 0,
+      "SeniorCitizen": 0,
+      "Partner": 0,
+      "Dependents": 0,
+      "tenure": 0,
+      "PhoneService": 0,
+      "MultipleLines": 0,
+      "InternetService": 0,
+      "OnlineSecurity": 0,
+      "OnlineBackup": 0,
+      "DeviceProtection": 0,
+      "TechSupport": 0,
+      "StreamingTV": 0,
+      "StreamingMovies": 0,
+      "Contract": 0,
+      "PaperlessBilling": 0,
+      "PaymentMethod": 0,
+      "MonthlyCharges": 0,
+      "TotalCharges": 11,
+      "Churn": 0
+    },
+    "null_counts": {
+      "customerID": 0,
+      "gender": 0,
+      "SeniorCitizen": 0,
+      "Partner": 0,
+      "Dependents": 0,
+      "tenure": 0,
+      "PhoneService": 0,
+      "MultipleLines": 0,
+      "InternetService": 0,
+      "OnlineSecurity": 0,
+      "OnlineBackup": 0,
+      "DeviceProtection": 0,
+      "TechSupport": 0,
+      "StreamingTV": 0,
+      "StreamingMovies": 0,
+      "Contract": 0,
+      "PaperlessBilling": 0,
+      "PaymentMethod": 0,
+      "MonthlyCharges": 0,
+      "TotalCharges": 0,
+      "Churn": 0
+    },
+    "numeric_columns": {
+      "tenure": {
+        "blank_values": 0,
+        "non_blank_uncoercible": 0,
+        "min": 0.0,
+        "max": 72.0,
+        "median": 29.0
+      },
+      "MonthlyCharges": {
+        "blank_values": 0,
+        "non_blank_uncoercible": 0,
+        "min": 18.25,
+        "max": 118.75,
+        "median": 70.35
+      },
+      "TotalCharges": {
+        "blank_values": 11,
+        "non_blank_uncoercible": 0,
+        "min": 18.8,
+        "max": 8684.8,
+        "median": 1397.475
+      }
+    },
+    "observed_categories": {
+      "gender": [
+        "Female",
+        "Male"
+      ],
+      "SeniorCitizen": [
+        "0",
+        "1"
+      ],
+      "Partner": [
+        "No",
+        "Yes"
+      ],
+      "Dependents": [
+        "No",
+        "Yes"
+      ],
+      "PhoneService": [
+        "No",
+        "Yes"
+      ],
+      "MultipleLines": [
+        "No",
+        "No phone service",
+        "Yes"
+      ],
+      "InternetService": [
+        "DSL",
+        "Fiber optic",
+        "No"
+      ],
+      "OnlineSecurity": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "OnlineBackup": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "DeviceProtection": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "TechSupport": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "StreamingTV": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "StreamingMovies": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "Contract": [
+        "Month-to-month",
+        "One year",
+        "Two year"
+      ],
+      "PaperlessBilling": [
+        "No",
+        "Yes"
+      ],
+      "PaymentMethod": [
+        "Bank transfer (automatic)",
+        "Credit card (automatic)",
+        "Electronic check",
+        "Mailed check"
+      ]
+    },
+    "validated_at_utc": "2026-07-23T14:00:50+00:00"
+  },
+  "checks": [
+    {
+      "check": "file_exists",
+      "passed": true,
+      "expected": true,
+      "observed": true,
+      "detail": "/Users/krishnamathurm4pro/Desktop/Academics/SDIAM Term 3/SDAIM FINAL PROJECT/data/raw/Telco-Customer-Churn.csv"
+    },
+    {
+      "check": "columns_exact_and_ordered",
+      "passed": true,
+      "expected": [
+        "customerID",
+        "gender",
+        "SeniorCitizen",
+        "Partner",
+        "Dependents",
+        "tenure",
+        "PhoneService",
+        "MultipleLines",
+        "InternetService",
+        "OnlineSecurity",
+        "OnlineBackup",
+        "DeviceProtection",
+        "TechSupport",
+        "StreamingTV",
+        "StreamingMovies",
+        "Contract",
+        "PaperlessBilling",
+        "PaymentMethod",
+        "MonthlyCharges",
+        "TotalCharges",
+        "Churn"
+      ],
+      "observed": [
+        "customerID",
+        "gender",
+        "SeniorCitizen",
+        "Partner",
+        "Dependents",
+        "tenure",
+        "PhoneService",
+        "MultipleLines",
+        "InternetService",
+        "OnlineSecurity",
+        "OnlineBackup",
+        "DeviceProtection",
+        "TechSupport",
+        "StreamingTV",
+        "StreamingMovies",
+        "Contract",
+        "PaperlessBilling",
+        "PaymentMethod",
+        "MonthlyCharges",
+        "TotalCharges",
+        "Churn"
+      ],
+      "detail": "Column names and their order must match the IBM data dictionary exactly."
+    },
+    {
+      "check": "row_count",
+      "passed": true,
+      "expected": 7043,
+      "observed": 7043,
+      "detail": ""
+    },
+    {
+      "check": "no_duplicate_full_rows",
+      "passed": true,
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "check": "customer_id_unique",
+      "passed": true,
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "check": "target_domain",
+      "passed": true,
+      "expected": [
+        "No",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "senior_citizen_domain",
+      "passed": true,
+      "expected": [
+        "0",
+        "1"
+      ],
+      "observed": [
+        "0",
+        "1"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "numeric_convertible__tenure",
+      "passed": true,
+      "expected": 0,
+      "observed": 0,
+      "detail": "Non-blank values that could not be parsed as numeric."
+    },
+    {
+      "check": "no_negative_values__tenure",
+      "passed": true,
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "check": "numeric_convertible__MonthlyCharges",
+      "passed": true,
+      "expected": 0,
+      "observed": 0,
+      "detail": "Non-blank values that could not be parsed as numeric."
+    },
+    {
+      "check": "no_negative_values__MonthlyCharges",
+      "passed": true,
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "check": "numeric_convertible__TotalCharges",
+      "passed": true,
+      "expected": 0,
+      "observed": 0,
+      "detail": "Non-blank values that could not be parsed as numeric."
+    },
+    {
+      "check": "no_negative_values__TotalCharges",
+      "passed": true,
+      "expected": 0,
+      "observed": 0,
+      "detail": ""
+    },
+    {
+      "check": "categories__gender",
+      "passed": true,
+      "expected": [
+        "Female",
+        "Male"
+      ],
+      "observed": [
+        "Female",
+        "Male"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__SeniorCitizen",
+      "passed": true,
+      "expected": [
+        "0",
+        "1"
+      ],
+      "observed": [
+        "0",
+        "1"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__Partner",
+      "passed": true,
+      "expected": [
+        "No",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__Dependents",
+      "passed": true,
+      "expected": [
+        "No",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__PhoneService",
+      "passed": true,
+      "expected": [
+        "No",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__MultipleLines",
+      "passed": true,
+      "expected": [
+        "No",
+        "No phone service",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "No phone service",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__InternetService",
+      "passed": true,
+      "expected": [
+        "DSL",
+        "Fiber optic",
+        "No"
+      ],
+      "observed": [
+        "DSL",
+        "Fiber optic",
+        "No"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__OnlineSecurity",
+      "passed": true,
+      "expected": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__OnlineBackup",
+      "passed": true,
+      "expected": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__DeviceProtection",
+      "passed": true,
+      "expected": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__TechSupport",
+      "passed": true,
+      "expected": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__StreamingTV",
+      "passed": true,
+      "expected": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__StreamingMovies",
+      "passed": true,
+      "expected": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "No internet service",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__Contract",
+      "passed": true,
+      "expected": [
+        "Month-to-month",
+        "One year",
+        "Two year"
+      ],
+      "observed": [
+        "Month-to-month",
+        "One year",
+        "Two year"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__PaperlessBilling",
+      "passed": true,
+      "expected": [
+        "No",
+        "Yes"
+      ],
+      "observed": [
+        "No",
+        "Yes"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "categories__PaymentMethod",
+      "passed": true,
+      "expected": [
+        "Bank transfer (automatic)",
+        "Credit card (automatic)",
+        "Electronic check",
+        "Mailed check"
+      ],
+      "observed": [
+        "Bank transfer (automatic)",
+        "Credit card (automatic)",
+        "Electronic check",
+        "Mailed check"
+      ],
+      "detail": ""
+    },
+    {
+      "check": "git_blob_sha",
+      "passed": true,
+      "expected": "3de7a612d1609f25f21a455bda77948729369002",
+      "observed": "3de7a612d1609f25f21a455bda77948729369002",
+      "detail": "Identifies the exact official file revision."
+    }
+  ]
+}
