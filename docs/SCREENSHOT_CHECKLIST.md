@@ -183,7 +183,7 @@ make validate
 
 ### Figure 29 — First successful workflow run
 **Capture.** The completed Actions run, all steps green, run number and timestamp visible.
-**Caption.** *Figure 29: First successful automated deployment run, completed at `<<UNRESOLVED: timestamp>>` for commit `<<UNRESOLVED: SHA>>`.*
+**Caption.** *Figure 29: First successful automated deployment run, run 30020847651, commit `591d0d1a0696`.*
 **Proves.** The pipeline runs end to end on the real platform.
 **Record the real run URL, run ID, commit SHA and timestamp.**
 
@@ -203,7 +203,7 @@ make validate
 
 ### Figure 32 — Live application
 **Capture.** The running Space, `huggingface.co` URL visible.
-**Caption.** *Figure 32: The deployed application running publicly at `<<UNRESOLVED: Space URL>>`.*
+**Caption.** *Figure 32: The deployed application running publicly at https://huggingface.co/spaces/krish21may/churn.*
 **Proves.** The deployment is real and reachable.
 
 ### Figure 33 — Live prediction
@@ -222,7 +222,7 @@ make validate
 
 ### Figure 35 — Second successful workflow run
 **Capture.** The second Actions run, green, showing it is a distinct run.
-**Caption.** *Figure 35: Second automated deployment run triggered by the version change, completed at `<<UNRESOLVED: timestamp>>`.*
+**Caption.** *Figure 35: Second automated deployment run triggered by the version change, run 30023117028, commit `561ce33b724f`, triggered automatically by the push.*
 **Proves.** Deployment automation works repeatedly, not once by luck.
 
 ### Figure 36 — Version 1.1.0 live

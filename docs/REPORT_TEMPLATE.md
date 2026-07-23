@@ -313,10 +313,27 @@ evaluation. See decision D-08.
 
 ## 21. GitHub repository and version control
 
-- Repository: `<<UNRESOLVED — verified URL>>`
+- Repository: https://github.com/krish2105/SDAIM-Customer-Churn (public)
 - Default branch: `main`
 - Meaningful staged commits, each made only after tests and the secret scan passed.
-- Commit SHAs: `<<UNRESOLVED — real SHAs only>>`
+- Commit history (read from the platform, newest first):
+
+| SHA | Commit |
+|---|---|
+| `d90bf8b675bb` | Bring documentation level with the implemented work |
+| `26660b3fcad0` | Sync test plan and quality-gate records with the expanded suite |
+| `27e09b025288` | Implement improvement plan Horizons 1 and 2 |
+| `73d38f40324c` | Correct deliverables checklist status after deployment |
+| `549dc6a005e4` | Record visible-change deployment test as passed |
+| `561ce33b724f` | Release version 1.1.0 with automated deployment verification caption |
+| `91d7f8279ac4` | Record verified deployment evidence |
+| `591d0d1a0696` | Add C-level improvement implementation plan |
+| `9f5100648213` | Complete professional documentation and tests |
+| `82f7b3dc74de` | Add CI and Hugging Face deployment workflows |
+| `0ec91eb52e05` | Add Streamlit Docker deployment application |
+| `999ed6a1e844` | Train and compare churn classification models |
+| `f96beea075be` | Add reproducible EDA and data validation |
+| `d9dd086c10ef` | Initialize validated churn project structure |
 
 *Insert Figures 23, 24.*
 
@@ -324,9 +341,9 @@ evaluation. See decision D-08.
 
 ## 22. Hugging Face Space configuration
 
-- Space ID: `<<UNRESOLVED>>`
+- Space ID: `krish21may/churn`
 - SDK: Docker; `app_port: 7860`
-- Visibility: `<<UNRESOLVED>>`
+- Visibility: Public
 - Contents: only the `deploy/` package.
 
 *Insert Figures 30, 31.*
@@ -361,7 +378,7 @@ other secret or variable is referenced.
 | Space build result | Succeeded — runtime stage `RUNNING` |
 | Live Space URL | https://huggingface.co/spaces/krish21may/churn |
 | Live prediction verified | Yes — 22.9%, Low risk band |
-| Commit SHA deployed | `<<UNRESOLVED — read from the Actions run page>>` |
+| Commit SHA deployed | `591d0d1a069604dbff9daca53c22f946a051589b` |
 
 *Insert Figures 29, 32, 33.*
 
@@ -377,7 +394,7 @@ other secret or variable is referenced.
 | Space rebuild result | Succeeded |
 | Version 1.1.0 visible in the live app | Yes — header badge and caption both read 1.1.0 |
 | Predictions still working | Yes — 22.9%, Low risk band |
-| Commit SHA | `<<UNRESOLVED — read from the Actions run page>>` |
+| Commit SHA | `561ce33b724fc147678e97419115860371cbcd21` |
 
 *Insert Figures 34, 35, 36, 37.*
 
