@@ -19,5 +19,7 @@ gatherUsageStats = false
 
 [server]
 headless = true
-enableCORS = false
+# XSRF protection is kept on, which requires CORS restrictions to remain enabled.
+# Setting enableCORS = false here would conflict and Streamlit would override it
+# back to true with a warning, so it is deliberately left at its default.
 enableXsrfProtection = true
