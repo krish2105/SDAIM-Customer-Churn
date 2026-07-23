@@ -1,0 +1,18 @@
+# Keep the runtime image minimal and free of anything not needed to serve.
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.git/
+.gitignore
+README.md
+Dockerfile
+.dockerignore

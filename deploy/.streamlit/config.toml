@@ -1,0 +1,23 @@
+# Streamlit is pinned to its light base theme so widget internals render
+# predictably. The application's own light/dark palettes are applied on top by
+# deploy/theme.py, driven by the in-app toggle. Without this pin, Streamlit
+# would follow the operating system's colour scheme and fight the toggle.
+
+[theme]
+base = "light"
+primaryColor = "#1E40AF"
+backgroundColor = "#F4F6FA"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#0F172A"
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = false
+
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = true
