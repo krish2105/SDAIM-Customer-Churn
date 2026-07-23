@@ -164,7 +164,7 @@ Five of six now verified by direct observation on the real platforms.
 | GitHub Actions deployment run | ✅ **PASS** | [run 30020847651](https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30020847651) — validate + sync jobs both green |
 | Hugging Face Space build | ✅ **PASS** | `krish21may/churn` reached runtime stage `RUNNING` |
 | Live application prediction | ✅ **PASS** | https://krish21may-churn.hf.space returned 22.9%, Low risk band, 3 context charts |
-| Visible-change redeployment (1.0.0 → 1.1.0) | ⬜ **Not run** | Second run plus version 1.1.0 visible live |
+| Visible-change redeployment (1.0.0 → 1.1.0) | ✅ **PASS** | [run 30023117028](https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30023117028) — triggered automatically by the push; version 1.1.0 and the caption confirmed live |
 
 ### The configuration guard was demonstrated working
 
@@ -191,11 +191,29 @@ The same input returns **22.9%** in all three environments:
 This confirms the artifact and its pinned dependencies behave identically wherever they run,
 and is the practical justification for pinning `scikit-learn` to the training version.
 
-### Still outstanding
+### Visible-change deployment test (brief Part 4.4) — PASSED
 
-The visible-change redeployment test (brief Part 4.4) has **not** been performed. Procedure in
-`docs/DEMONSTRATION_SCRIPT.md`. Until a second workflow run and version 1.1.0 have been
-observed in the live application, that requirement is not met and is not claimed.
+Performed and verified end to end.
+
+| Step | Result |
+|---|---|
+| `MODEL_VERSION` raised 1.0.0 → 1.1.0 in `src/config.py` | Done |
+| Retrained | Held-out metrics **unchanged** (ROC-AUC 0.8414, recall 0.7834, F1 0.6130), confirming determinism at `random_state=42`. Only the version and training timestamp differ. |
+| Visible caption added | Rendered **from the artifact metadata**, not hard-coded, so it cannot disagree with the deployed model version |
+| Local verification before committing | 52 tests pass; secret scan clean; caption confirmed rendering locally |
+| Push to `main` | Deployment workflow triggered **automatically** by the `deploy/**` path filter — no manual dispatch |
+| Second workflow run | [30023117028](https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30023117028) — validate and sync jobs both green |
+| Space rebuild | Reached `RUNNING` |
+| Version live | Header badge reads **Version 1.1.0**; caption reads *"Application version 1.1.0 — automated deployment verification"* |
+| Predictions after redeployment | Still working — 22.9%, Low risk band |
+
+**What this demonstrates:** a code change pushed to `main` reached the live public application
+with no manual deployment step. That is the requirement of Part 4.4 of the brief.
+
+### All external gates now verified
+
+Six of six. Every claim above corresponds to a run, a URL or a screen that was observed
+directly. The `docs/SCREENSHOT_CHECKLIST.md` figures 23–37 can now all be captured.
 
 ---
 

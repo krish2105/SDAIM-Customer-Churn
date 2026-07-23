@@ -58,12 +58,12 @@ each must be verified by observation rather than assumed.
 
 | # | Deliverable | Status | How to complete | Evidence to record |
 |---|---|---|---|---|
-| 1 | GitHub repository URL | ⬜ Pending | Create the repository, add the remote, push `main` | The URL, opened and confirmed |
-| 2 | Real commit hashes | ⬜ Pending | Push; read the SHAs from GitHub | Full SHAs from the platform |
-| 3 | Successful CI run | ⬜ Pending | Triggered automatically by the push | Run URL, run ID, timestamp, all steps green |
-| 4 | Hugging Face Space URL | ⬜ Pending | Create a Docker Space; set `HF_SPACE_ID` | The Space URL |
-| 5 | Successful Space build | ⬜ Pending | Triggered by the deployment workflow | Build log screenshot |
-| 6 | Visible automated version update | ⬜ Pending | Follow `docs/DEMONSTRATION_SCRIPT.md` | Second run + 1.1.0 live |
+| 1 | GitHub repository URL | ✅ **Complete** | Create the repository, add the remote, push `main` | The URL, opened and confirmed |
+| 2 | Real commit hashes | ✅ **Complete** | Push; read the SHAs from GitHub | Full SHAs from the platform |
+| 3 | Successful CI run | ✅ **Complete** | Triggered automatically by the push | Run URL, run ID, timestamp, all steps green |
+| 4 | Hugging Face Space URL | ✅ **Complete** | Create a Docker Space; set `HF_SPACE_ID` | The Space URL |
+| 5 | Successful Space build | ✅ **Complete** | Triggered by the deployment workflow | Build log screenshot |
+| 6 | Visible automated version update | ✅ **Complete** | Follow `docs/DEMONSTRATION_SCRIPT.md` | Second run + 1.1.0 live |
 | 7 | Authentic screenshots | ⬜ Pending | `docs/SCREENSHOT_CHECKLIST.md` figures 23–37 | Genuine captures, checked for credentials |
 | 8 | Final PDF report | ⬜ Pending | Complete `docs/REPORT_TEMPLATE.md` | Every `<<UNRESOLVED>>` replaced |
 
@@ -99,12 +99,12 @@ Every one of these is deliberately marked rather than invented.
 | Task 1.4 — save the model with preprocessing (or the whole pipeline) | `model_pipeline.joblib` — complete pipeline | ✅ |
 | Task 2.1 — interactive UI with inputs, predict action, clear output, probability | `deploy/app.py` | ✅ |
 | Task 2.2 — install dependencies, run locally, test inputs, verify preprocessing and loading | `make app`, 52 tests, browser verification | ✅ |
-| Task 3.1 — create a Space with all required files | `deploy/` package ready | ⬜ Pending — needs your account |
-| Task 3.2 — build and test on the platform | Dockerfile verified locally | ⬜ Pending |
-| Task 4.1 — GitHub repository with application and deployment files | Local repository with staged commits | ⬜ Pending push |
-| Task 4.2 — HF token stored securely, never hard-coded | `docs/SECURITY.md`; enforced by tests | ✅ Design complete; ⬜ token creation pending |
-| Task 4.3 — workflow on push to main that syncs and updates the Space | `.github/workflows/deploy.yml` | ✅ Written; ⬜ execution pending |
-| Task 4.4 — visible change deploys automatically and is verified | Procedure in `docs/DEMONSTRATION_SCRIPT.md` | ⬜ Pending |
+| Task 3.1 — create a Space with all required files | `krish21may/churn` live | ✅ **Verified** |
+| Task 3.2 — build and test on the platform | Space built, RUNNING, prediction confirmed | ✅ **Verified** |
+| Task 4.1 — GitHub repository with application and deployment files | https://github.com/krish2105/SDAIM-Customer-Churn | ✅ **Verified** |
+| Task 4.2 — HF token stored securely, never hard-coded | Fine-grained token scoped to the single Space, stored as the `HF_TOKEN` Actions secret | ✅ **Verified** |
+| Task 4.3 — workflow on push to main that syncs and updates the Space | Runs 30020847651 and 30023117028 both green | ✅ **Verified** |
+| Task 4.4 — visible change deploys automatically and is verified | 1.0.0 → 1.1.0 confirmed live after an automatic redeploy | ✅ **Verified** |
 | Part 5 — report with all listed sections and screenshots | `docs/REPORT_TEMPLATE.md`, `docs/SCREENSHOT_CHECKLIST.md` | ✅ Scaffolded; ⬜ evidence pending |
 
 ---
