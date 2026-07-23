@@ -1,7 +1,7 @@
 # Executive Model Summary
 
 **Project:** Customer Churn Intelligence and Retention Decision-Support Platform  
-**Model version:** 1.0.0  
+**Model version:** 1.1.0  
 **Selected model:** Logistic Regression  
 **Decision threshold:** 0.5  
 **Random seed:** 42

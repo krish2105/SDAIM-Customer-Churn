@@ -304,6 +304,15 @@ code {{ font-family: {MONO_STACK}; color: var(--cci-text); background: var(--cci
   letter-spacing: 0.01em;
 }}
 .cci-badge strong {{ color: var(--cci-text); font-weight: 640; }}
+/* Deployment-verification caption. Rendered from the artifact metadata rather
+   than hard-coded, so it can never disagree with the deployed model version. */
+.cci-deployment-note {{
+  margin: var(--cci-space-md) 0 0;
+  font-family: {MONO_STACK};
+  font-size: 0.76rem;
+  color: var(--cci-accent);
+  letter-spacing: 0.01em;
+}}
 
 .cci-notice {{
   border: 1px solid var(--cci-border);

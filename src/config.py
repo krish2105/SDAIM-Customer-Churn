@@ -44,7 +44,7 @@ SOURCE_MANIFEST_PATH: Final[Path] = PROJECT_ROOT / "SOURCE_MANIFEST.json"
 PROJECT_NAME: Final[str] = (
     "Customer Churn Intelligence and Retention Decision-Support Platform"
 )
-MODEL_VERSION: Final[str] = "1.0.0"
+MODEL_VERSION: Final[str] = "1.1.0"
 
 EXPECTED_COLUMNS: Final[list[str]] = [
     "customerID",

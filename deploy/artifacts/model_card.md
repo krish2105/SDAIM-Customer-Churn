@@ -1,8 +1,8 @@
 # Model Card — Customer Churn Intelligence
 
 **Model name:** Logistic Regression  
-**Model version:** 1.0.0  
-**Trained (UTC):** 2026-07-23T14:05:31+00:00  
+**Model version:** 1.1.0  
+**Trained (UTC):** 2026-07-23T15:58:50+00:00  
 **Random seed:** 42  
 **Decision threshold:** 0.5  
 **Artifact:** `deploy/artifacts/model_pipeline.joblib` (complete preprocessing + estimator pipeline)

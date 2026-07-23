@@ -47,7 +47,7 @@ cautious suggested review action, the model version, and three context charts.
 | Split | 80 / 20 stratified, `random_state=42`, split once before any transformer was fitted |
 | Selection | Stratified 5-fold cross-validation on the training split only |
 | Decision threshold | 0.50 (documented default, not cost-optimised) |
-| Model version | 1.0.0 |
+| Model version | 1.1.0 |
 
 ## Measured performance
 

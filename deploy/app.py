@@ -648,6 +648,8 @@ def main() -> None:
     <span class="cci-badge">Dataset <strong>IBM Telco sample (fictional)</strong></span>
     <span class="cci-badge">Decision support <strong>Human review required</strong></span>
   </div>
+  <p class="cci-deployment-note">Application version
+  {escape(str(metadata.get('model_version', '—')))} — automated deployment verification</p>
 </div>
 """,
         unsafe_allow_html=True,
