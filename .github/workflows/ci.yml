@@ -1,0 +1,89 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate, test and verify deployment package
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install development dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Validate the raw dataset
+        run: python -m src.data_validation --strict-sha
+
+      - name: Compile all source and test files
+        run: python -m compileall -q src tests deploy
+
+      - name: Run the test suite
+        run: python -m pytest -q
+
+      - name: Scan for secrets
+        run: bash scripts/scan_secrets.sh
+
+      - name: Verify required deployment artifacts and files
+        run: |
+          set -euo pipefail
+          required=(
+            "deploy/app.py"
+            "deploy/theme.py"
+            "deploy/charts.py"
+            "deploy/Dockerfile"
+            "deploy/requirements.txt"
+            "deploy/README.md"
+            "deploy/.dockerignore"
+            "deploy/artifacts/model_pipeline.joblib"
+            "deploy/artifacts/model_metadata.json"
+            "deploy/artifacts/feature_schema.json"
+            "deploy/artifacts/model_card.md"
+            "data/raw/Telco-Customer-Churn.csv"
+          )
+          missing=0
+          for path in "${required[@]}"; do
+            if [ ! -f "$path" ]; then
+              echo "MISSING: $path"
+              missing=1
+            else
+              echo "present: $path"
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            echo "Required deployment files are missing." >&2
+            exit 1
+          fi
+
+      - name: Verify the Space README declares the Docker SDK on port 7860
+        run: |
+          set -euo pipefail
+          grep -q '^sdk: docker$' deploy/README.md
+          grep -q '^app_port: 7860$' deploy/README.md
+          echo "Space metadata verified."

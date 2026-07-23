@@ -1,0 +1,132 @@
+name: Deploy to Hugging Face Space
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'deploy/**'
+      - '.github/workflows/deploy.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-hugging-face-space
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate before deploying
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-dev.txt
+
+      - name: Install development dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+
+      - name: Validate the raw dataset
+        run: python -m src.data_validation --strict-sha
+
+      - name: Run the test suite
+        run: python -m pytest -q
+
+      - name: Scan for secrets
+        run: bash scripts/scan_secrets.sh
+
+  deploy:
+    name: Sync deploy/ to the Space
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          lfs: true
+
+      # Fails early with an actionable message rather than letting the sync step
+      # attempt to push to an empty repository id.
+      - name: Verify deployment configuration is present
+        env:
+          HF_SPACE_ID: ${{ vars.HF_SPACE_ID }}
+          HF_TOKEN_PRESENT: ${{ secrets.HF_TOKEN != '' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${HF_SPACE_ID}" ]; then
+            echo "::error::Repository variable HF_SPACE_ID is not configured." >&2
+            echo "Set it under Settings > Secrets and variables > Actions > Variables" >&2
+            echo "to your Space id in the form username-or-org/space-name." >&2
+            exit 1
+          fi
+          case "${HF_SPACE_ID}" in
+            */*) : ;;
+            *) echo "::error::HF_SPACE_ID must be in the form username-or-org/space-name." >&2; exit 1 ;;
+          esac
+          if [ "${HF_TOKEN_PRESENT}" != "true" ]; then
+            echo "::error::Actions secret HF_TOKEN is not configured." >&2
+            echo "Create a fine-grained Hugging Face write token scoped to the target Space" >&2
+            echo "and store it as the repository secret HF_TOKEN. Never print its value." >&2
+            exit 1
+          fi
+          # Only the destination is logged. The token is never echoed or interpolated.
+          echo "Deploying deploy/ to Space: ${HF_SPACE_ID}"
+
+      - name: Verify the deployment package is complete
+        run: |
+          set -euo pipefail
+          for path in \
+            deploy/app.py \
+            deploy/theme.py \
+            deploy/charts.py \
+            deploy/Dockerfile \
+            deploy/requirements.txt \
+            deploy/README.md \
+            deploy/artifacts/model_pipeline.joblib \
+            deploy/artifacts/model_metadata.json \
+            deploy/artifacts/feature_schema.json
+          do
+            test -f "$path" || { echo "::error::Missing $path" >&2; exit 1; }
+          done
+          echo "Deployment package verified."
+
+      # github_repo_id, huggingface_repo_id and hf_token are the action's three
+      # required inputs (verified against the v0.2.1 action definition).
+      - name: Sync deploy/ to the Hugging Face Space
+        uses: huggingface/hub-sync@v0.2.1
+        with:
+          github_repo_id: ${{ github.repository }}
+          huggingface_repo_id: ${{ vars.HF_SPACE_ID }}
+          hf_token: ${{ secrets.HF_TOKEN }}
+          repo_type: space
+          space_sdk: docker
+          subdirectory: deploy
+
+      - name: Deployment summary
+        env:
+          HF_SPACE_ID: ${{ vars.HF_SPACE_ID }}
+        run: |
+          {
+            echo "### Hugging Face Space sync completed"
+            echo ""
+            echo "- Space: \`${HF_SPACE_ID}\`"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo ""
+            echo "The Space now rebuilds its Docker image. This job reports that the files"
+            echo "were synced; confirm the build and the live application in the Space itself"
+            echo "before recording the deployment as successful."
+          } >> "$GITHUB_STEP_SUMMARY"
