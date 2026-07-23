@@ -51,7 +51,8 @@ Pro subscription. The LLM layer is capped by design and ships disabled.
 | Drift apparatus (H2-2) | **Validated both ways**: stable on unshifted holdout (0/19 flagged), alert on a simulated campaign (15/19 flagged, 7 at alert). |
 | Batch scoring (H2-3) | 1,000 customers ranked in **0.01 s**; batch and single-record paths asserted identical. |
 | GenAI brief (H2-4) | Guardrailed, provenance-labelled, **disabled by default**, deterministic fallback that passes its own language checks. |
-| Test suite | **52 → 106 tests**, all passing. |
+| Feature engineering + tuning (H1-6) | Four arms compared by CV. Best gain **+0.0022**, below the pre-declared 0.005 bar — **not adopted**. The signal is largely exhausted by the raw features. |
+| Test suite | **52 → 115 tests**, all passing. |
 
 ---
 

@@ -5,7 +5,7 @@ SHELL := /bin/bash
 PYTHON := $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap validate eda train test app docker-build docker-run secret-scan verify notebook clean fairness calibration threshold drift track mlflow-ui analysis
+.PHONY: help bootstrap validate eda train test app docker-build docker-run secret-scan verify notebook clean fairness calibration threshold drift track mlflow-ui analysis tune
 
 help: ## Show the available targets
 	@echo "Customer Churn Intelligence — available targets"
@@ -41,6 +41,9 @@ threshold: ## Cost-sensitive decision-threshold analysis (H1-3)
 
 drift: ## Drift-detection apparatus and its demonstration (H2-2)
 	$(PYTHON) -m src.drift --demo
+
+tune: ## Feature engineering and hyperparameter search experiment (H1-6)
+	$(PYTHON) -m src.tuning
 
 track: ## Train and log the run to MLflow, then register it (H2-1)
 	$(PYTHON) -m src.tracking --log-current

@@ -1,0 +1,183 @@
+{
+  "train_rows": 5634,
+  "test_rows": 1409,
+  "adoption_threshold": 0.005,
+  "engineered_features": [
+    {
+      "name": "AvgMonthlySpend",
+      "kind": "numeric",
+      "definition": "TotalCharges / max(tenure, 1)",
+      "rationale": "The customer's realised average bill. Differs from MonthlyCharges whenever pricing or the package has changed."
+    },
+    {
+      "name": "ChargesTrend",
+      "kind": "numeric",
+      "definition": "MonthlyCharges / AvgMonthlySpend",
+      "rationale": "Above 1 means the customer now pays more than their historical average. The raw columns hold levels; this is the only feature expressing change."
+    },
+    {
+      "name": "NumServices",
+      "kind": "numeric",
+      "definition": "Count of the 8 service columns equal to 'Yes'",
+      "rationale": "How embedded the customer is in the product set."
+    },
+    {
+      "name": "NumProtectiveAddons",
+      "kind": "numeric",
+      "definition": "Count of security, backup, device protection and tech support",
+      "rationale": "The EDA showed protective add-ons behave very differently from streaming extras, so they are counted separately."
+    },
+    {
+      "name": "TenureBucket",
+      "kind": "categorical",
+      "definition": "tenure banded at 6, 12, 24 and 48 months",
+      "rationale": "A linear model sees tenure as a straight line. Banding lets it capture the sharp early-life churn effect found in the EDA."
+    },
+    {
+      "name": "IsNewCustomer",
+      "kind": "categorical",
+      "definition": "tenure <= 6 months",
+      "rationale": "Isolates the highest-risk early-life window."
+    },
+    {
+      "name": "HasNoProtection",
+      "kind": "categorical",
+      "definition": "NumProtectiveAddons == 0",
+      "rationale": "Customers without technical support churn at 41.64% against 15.17% with it; this flags the compound case."
+    }
+  ],
+  "arms": {
+    "Logistic Regression": {
+      "A_raw_default": {
+        "cv_roc_auc_mean": 0.8459519022873485,
+        "cv_roc_auc_std": 0.012354036058046998,
+        "cv_f1_mean": 0.6285819778903436,
+        "cv_f1_std": 0.02324809654528785,
+        "cv_recall_mean": 0.8013377926421403,
+        "cv_recall_std": 0.037932968237479145,
+        "cv_precision_mean": 0.5173602834518597,
+        "cv_precision_std": 0.018826053879717728,
+        "cv_accuracy_mean": 0.7488478347551855,
+        "cv_accuracy_std": 0.015230762376729911
+      },
+      "B_raw_tuned": {
+        "cv_roc_auc_mean": 0.8462120823605727,
+        "cv_roc_auc_std": 0.012676073456203227,
+        "cv_f1_mean": 0.6277080483978261,
+        "cv_f1_std": 0.024292470243145025,
+        "cv_recall_mean": 0.7999999999999999,
+        "cv_recall_std": 0.03792117132590868,
+        "cv_precision_mean": 0.5166805060110874,
+        "cv_precision_std": 0.019561758262374662,
+        "cv_accuracy_mean": 0.7483152902832304,
+        "cv_accuracy_std": 0.015905290985789952,
+        "best_params": {
+          "classifier__C": 10.0,
+          "classifier__solver": "lbfgs"
+        },
+        "combinations": 8
+      },
+      "C_engineered_default": {
+        "cv_roc_auc_mean": 0.8468493847800016,
+        "cv_roc_auc_std": 0.0118231007602915,
+        "cv_f1_mean": 0.6255364522849595,
+        "cv_f1_std": 0.02100189128613157,
+        "cv_recall_mean": 0.7899665551839464,
+        "cv_recall_std": 0.035102720437195804,
+        "cv_precision_mean": 0.5179601695660191,
+        "cv_precision_std": 0.016101503115795415,
+        "cv_accuracy_mean": 0.7492041777711934,
+        "cv_accuracy_std": 0.012689001234922517
+      },
+      "D_engineered_tuned": {
+        "cv_roc_auc_mean": 0.847215395583332,
+        "cv_roc_auc_std": 0.01154959351691058,
+        "cv_f1_mean": 0.6296570656800695,
+        "cv_f1_std": 0.020589584515206847,
+        "cv_recall_mean": 0.7899665551839464,
+        "cv_recall_std": 0.03554603412865934,
+        "cv_precision_mean": 0.52360603294379,
+        "cv_precision_std": 0.014543632792851355,
+        "cv_accuracy_mean": 0.7536405773986172,
+        "cv_accuracy_std": 0.011550829299172352,
+        "best_params": {
+          "classifier__C": 0.1,
+          "classifier__solver": "liblinear"
+        },
+        "combinations": 8
+      }
+    },
+    "Random Forest": {
+      "A_raw_default": {
+        "cv_roc_auc_mean": 0.8454462894782863,
+        "cv_roc_auc_std": 0.009068070550577192,
+        "cv_f1_mean": 0.6296118728366208,
+        "cv_f1_std": 0.01437116485607108,
+        "cv_recall_mean": 0.7632107023411372,
+        "cv_recall_std": 0.024974120003470882,
+        "cv_precision_mean": 0.5360169023354343,
+        "cv_precision_std": 0.012032546704073265,
+        "cv_accuracy_mean": 0.7618052611422204,
+        "cv_accuracy_std": 0.008744435042621908
+      },
+      "B_raw_tuned": {
+        "cv_roc_auc_mean": 0.8481360799543449,
+        "cv_roc_auc_std": 0.008875219591476491,
+        "cv_f1_mean": 0.6328523451068239,
+        "cv_f1_std": 0.01807366188919529,
+        "cv_recall_mean": 0.782608695652174,
+        "cv_recall_std": 0.02364905622697486,
+        "cv_precision_mean": 0.531417090699349,
+        "cv_precision_std": 0.01800308594452367,
+        "cv_accuracy_mean": 0.758966494930662,
+        "cv_accuracy_std": 0.013541123130341746,
+        "best_params": {
+          "classifier__max_depth": 10,
+          "classifier__min_samples_leaf": 10,
+          "classifier__n_estimators": 400
+        },
+        "combinations": 18
+      },
+      "C_engineered_default": {
+        "cv_roc_auc_mean": 0.8458279775696681,
+        "cv_roc_auc_std": 0.009721450661460799,
+        "cv_f1_mean": 0.6308485126737715,
+        "cv_f1_std": 0.01965304933772106,
+        "cv_recall_mean": 0.7531772575250837,
+        "cv_recall_std": 0.029492184194044976,
+        "cv_precision_mean": 0.5427936361838744,
+        "cv_precision_std": 0.01461821433042092,
+        "cv_accuracy_mean": 0.7662419759779733,
+        "cv_accuracy_std": 0.010863217537945672
+      },
+      "D_engineered_tuned": {
+        "cv_roc_auc_mean": 0.8476297442844716,
+        "cv_roc_auc_std": 0.009876005804846039,
+        "cv_f1_mean": 0.6314733613493957,
+        "cv_f1_std": 0.014445248398481814,
+        "cv_recall_mean": 0.779933110367893,
+        "cv_recall_std": 0.020442417110282468,
+        "cv_precision_mean": 0.5306126053693808,
+        "cv_precision_std": 0.01339960172622207,
+        "cv_accuracy_mean": 0.7584331624378843,
+        "cv_accuracy_std": 0.010072722003707622,
+        "best_params": {
+          "classifier__max_depth": 10,
+          "classifier__min_samples_leaf": 10,
+          "classifier__n_estimators": 400
+        },
+        "combinations": 18
+      }
+    }
+  },
+  "decision": {
+    "best_arm": "Random Forest / B_raw_tuned",
+    "best_cv_roc_auc": 0.848136,
+    "baseline_best_cv_roc_auc": 0.845952,
+    "deployed_v1_cv_roc_auc": 0.845952,
+    "gain": 0.002184,
+    "adopt": false,
+    "rule": "Adopt only if the best arm beats the best baseline arm by at least 0.005 mean CV ROC-AUC. A smaller gain sits inside the \u00b10.0124 cross-validation standard deviation already measured and would be chasing noise while adding permanent complexity."
+  },
+  "figure": "19_tuning_experiment.png"
+}

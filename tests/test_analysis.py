@@ -277,3 +277,138 @@ def test_drift_baseline_is_built_from_the_training_split_only() -> None:
     baseline = build_baseline(save=False)
     assert baseline["source"] == "training split"
     assert baseline["rows"] == int(config.EXPECTED_ROWS * (1 - config.TEST_SIZE))
+
+
+# --------------------------------------------------------------------------
+# Feature engineering (H1-6)
+# --------------------------------------------------------------------------
+
+
+def test_engineered_features_are_added_without_mutating_input() -> None:
+    """scikit-learn may pass a slice during CV; mutating it would corrupt folds."""
+    from src.features import engineer_features
+    from src.train import load_model_frame
+
+    frame = load_model_frame().head(100)
+    before = list(frame.columns)
+    out = engineer_features(frame)
+    assert list(frame.columns) == before, "engineer_features mutated its input"
+    assert len(out.columns) > len(before)
+
+
+def test_engineered_features_are_row_wise_only() -> None:
+    """The leakage argument depends on this: no feature may depend on other rows.
+
+    Scoring one row alone must give the same values as scoring it inside a batch.
+    If it does not, the feature aggregates across rows and the split guarantee
+    would be broken.
+    """
+    from src.features import ENGINEERED_NUMERIC, engineer_features
+    from src.train import load_model_frame
+
+    frame = load_model_frame().head(200)
+    batch = engineer_features(frame)
+    for position in (0, 57, 199):
+        alone = engineer_features(frame.iloc[[position]])
+        for column in ENGINEERED_NUMERIC:
+            assert float(alone[column].iloc[0]) == pytest.approx(
+                float(batch[column].iloc[position]), abs=1e-12
+            ), f"{column} depends on other rows"
+
+
+def test_engineered_features_are_never_infinite() -> None:
+    """Infinities would survive imputation and poison the scaler. NaN would not."""
+    from src.features import ENGINEERED_NUMERIC, engineer_features
+    from src.train import load_model_frame
+
+    out = engineer_features(load_model_frame())
+    values = out[ENGINEERED_NUMERIC].to_numpy(dtype=float)
+    assert not np.isinf(values).any()
+
+
+def test_missing_average_spend_occurs_only_where_total_charges_is_missing() -> None:
+    """AvgMonthlySpend is NaN for the 11 blank-TotalCharges rows, deliberately.
+
+    Filling it inside the feature function would bake in a domain assumption.
+    Leaving it lets the pipeline's median imputer handle it exactly as it
+    already handles TotalCharges, keeping every fitted statistic inside the
+    pipeline where the leakage guarantee lives.
+    """
+    from src.features import engineer_features
+    from src.train import load_model_frame
+
+    frame = load_model_frame()
+    out = engineer_features(frame)
+    missing_spend = out["AvgMonthlySpend"].isna()
+    missing_total = frame["TotalCharges"].isna()
+    assert missing_spend.equals(missing_total)
+    assert int(missing_spend.sum()) == 11
+
+
+def test_zero_tenure_customers_do_not_divide_by_zero() -> None:
+    """The 11 documented zero-tenure rows are exactly where this would break."""
+    from src.features import engineer_features
+    from src.train import load_model_frame
+
+    frame = load_model_frame()
+    zero_tenure = frame[frame["tenure"] == 0]
+    assert len(zero_tenure) == 11, "Expected the documented zero-tenure customers"
+    out = engineer_features(zero_tenure)
+    # No infinities, and the neutral fallback applied to the trend.
+    assert not np.isinf(out["AvgMonthlySpend"].to_numpy(dtype=float)).any()
+    assert (out["ChargesTrend"] == 1.0).all()
+
+
+def test_engineered_pipeline_scores_zero_tenure_customers_end_to_end() -> None:
+    """The NaN must survive the imputer and still produce a valid probability."""
+    from src.tuning import build_pipeline
+    from src.train import load_model_frame, split_features_target
+
+    frame = load_model_frame()
+    X, y = split_features_target(frame)
+    pipeline = build_pipeline("Logistic Regression", engineered=True)
+    pipeline.fit(X, y)
+
+    zero_tenure = X[frame["tenure"] == 0]
+    proba = pipeline.predict_proba(zero_tenure)[:, 1]
+    assert len(proba) == 11
+    assert np.all((proba >= 0.0) & (proba <= 1.0))
+
+
+def test_service_counts_are_within_bounds() -> None:
+    from src.features import PROTECTIVE_ADDONS, SERVICE_COLUMNS, engineer_features
+    from src.train import load_model_frame
+
+    out = engineer_features(load_model_frame())
+    assert out["NumServices"].between(0, len(SERVICE_COLUMNS)).all()
+    assert out["NumProtectiveAddons"].between(0, len(PROTECTIVE_ADDONS)).all()
+    # The protective count is a subset of the service count by construction.
+    assert (out["NumProtectiveAddons"] <= out["NumServices"]).all()
+
+
+def test_tenure_buckets_cover_every_customer() -> None:
+    from src.features import TENURE_LABELS, engineer_features
+    from src.train import load_model_frame
+
+    out = engineer_features(load_model_frame())
+    assert set(out["TenureBucket"].unique()) <= set(TENURE_LABELS)
+    assert "nan" not in set(out["TenureBucket"].unique())
+
+
+def test_tuning_experiment_records_a_decision_against_a_fixed_bar() -> None:
+    """The adoption rule must be applied, not narrated after the fact."""
+    path = config.TABLES_DIR / "tuning_experiment.json"
+    if not path.is_file():
+        pytest.skip("Tuning experiment not run — run `make tune`.")
+    results = json.loads(path.read_text(encoding="utf-8"))
+    decision = results["decision"]
+
+    assert "adopt" in decision and isinstance(decision["adopt"], bool)
+    assert decision["adopt"] == (decision["gain"] >= results["adoption_threshold"]), (
+        "The recorded decision does not follow the stated adoption rule"
+    )
+    # All four arms must be present for both models, or the comparison is partial.
+    for arms in results["arms"].values():
+        assert set(arms) == {
+            "A_raw_default", "B_raw_tuned", "C_engineered_default", "D_engineered_tuned"
+        }

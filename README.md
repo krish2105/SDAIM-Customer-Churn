@@ -112,7 +112,7 @@ Mermaid diagrams for the training, inference and CI/CD flows are in
 │   ├── Dockerfile, requirements.txt, README.md, .dockerignore
 │   └── artifacts/                model_pipeline.joblib, model_metadata.json,
 │                                 feature_schema.json, reference_rates.json, model_card.md
-├── tests/                        106 tests
+├── tests/                        115 tests
 ├── scripts/                      bootstrap, validate, eda, train, test, app,
 │                                 docker, secret scan, release verification
 ├── docs/                         Audit trail and all supporting documentation
@@ -146,8 +146,9 @@ make eda           # Regenerate 11 figures, 13 tables and the observations docum
 make train         # Train, compare, select and export the pipeline and artifacts
 make notebook      # Regenerate and execute notebooks/01_eda_and_modeling.ipynb
 make analysis      # Fairness, calibration, threshold and drift analyses
+make tune          # Feature engineering and hyperparameter search experiment
 make track         # Train and log the run to MLflow with the registry
-make test          # Run the full pytest suite (106 tests)
+make test          # Run the full pytest suite (115 tests)
 make app           # Run the Streamlit application on http://localhost:8501
 make docker-build  # Build the deployment image
 make docker-run    # Build, run and health-check on http://localhost:7860
@@ -332,6 +333,7 @@ All three members contributed to the report, the evidence pack and the demonstra
 | [reports/threshold_analysis.md](reports/threshold_analysis.md) | Cost-ratio sensitivity curve |
 | [reports/drift_report.md](reports/drift_report.md) | Drift apparatus and its two-way validation |
 | [reports/tracking_report.md](reports/tracking_report.md) | MLflow runs, registry and rollback |
+| [reports/tuning_experiment.md](reports/tuning_experiment.md) | Feature engineering and tuning — measured, not adopted |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Eleven documented failure modes and fixes |
 | [docs/SCREENSHOT_CHECKLIST.md](docs/SCREENSHOT_CHECKLIST.md) | Every evidence screenshot, with captions |
 | [docs/DELIVERABLES_CHECKLIST.md](docs/DELIVERABLES_CHECKLIST.md) | Complete / pending status of every deliverable |

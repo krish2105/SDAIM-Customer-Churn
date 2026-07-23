@@ -293,6 +293,11 @@ These cover the improvement work. All are capturable now from `reports/` and the
 **Caption.** *Figure 47: Retention brief. AI generation is disabled by default, so the deterministic template is shown with its provenance stated explicitly.*
 **Proves.** The GenAI layer is governed: labelled, optional, and safe by default.
 
+### Figure 48 — Feature engineering and tuning experiment
+**Capture.** `reports/figures/19_tuning_experiment.png` plus the `make tune` decision block.
+**Caption.** *Figure 48: Four-arm comparison of feature engineering and hyperparameter search, cross-validated on the training split. The best arm gained +0.0022 mean CV ROC-AUC against a pre-declared adoption bar of 0.005, so the change was not adopted and the deployed model is unchanged.*
+**Proves.** Improvements were attempted and measured rather than assumed, and a disciplined negative result was accepted instead of adopting complexity for noise. **Strong viva material.**
+
 ---
 
 ## Completion tracker
@@ -305,7 +310,7 @@ These cover the improvement work. All are capturable now from `reports/` and the
 | GitHub | 23–29 | Capturable now — repo public, runs green |
 | Hugging Face | 30–33 | Capturable now — Space live |
 | Visible-change test | 34–37 | Capturable now — the test has been performed |
-| Horizon 1 and 2 evidence | 38–47 | Capturable now |
+| Horizon 1 and 2 evidence | 38–48 | Capturable now |
 
-**All 47 figures are capturable now.** The repository, both workflow runs, the Space and the
+**All 48 figures are capturable now.** The repository, both workflow runs, the Space and the
 visible-change test are all complete and public; the analysis figures are in `reports/`.

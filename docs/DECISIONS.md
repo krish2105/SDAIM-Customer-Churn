@@ -449,3 +449,51 @@ revision via the logged blob SHA.
 **Rollback is deliberately manual.** Re-pointing production at a different model has
 customer-facing consequences and should require a human, consistent with the governance
 position taken everywhere else.
+
+---
+
+## D-29 — Feature engineering and tuning were tried, measured, and not adopted
+
+**Decision.** Build seven engineered features and grid-search both models, compare four arms
+by cross-validation, and **keep the existing model** because the gain did not clear a
+pre-declared bar.
+
+**Why the experiment was run.** Version 1.1.0 used the 19 raw columns with hand-set
+hyperparameters. Task 1.2 of the brief lists feature engineering explicitly, and "we did not
+try" is a weaker answer than "we tried and here is what happened".
+
+**Design.** Four arms so each change is separable rather than confounded:
+
+| Arm | Features | Hyperparameters | Best CV ROC-AUC |
+|---|---|---|---:|
+| A | Raw 19 | Hand-set (deployed) | 0.8460 |
+| B | Raw 19 | Grid-searched | 0.8481 |
+| C | Raw + 7 engineered | Hand-set | 0.8468 |
+| D | Raw + 7 engineered | Grid-searched | 0.8476 |
+
+**Adoption rule, fixed before the results were read.** Adopt only on a gain of at least
+**0.005** mean CV ROC-AUC. Anything smaller sits inside the ±0.0124 cross-validation standard
+deviation already measured for this model.
+
+**Outcome.** Best arm was Random Forest with tuned hyperparameters on raw features, at 0.8481
+— a gain of **+0.0022**, less than half the bar. **Not adopted. The deployed model is
+unchanged.**
+
+**Why this is a result rather than a failure.** It says something specific: the signal in this
+dataset is largely exhausted by the raw features and sensible defaults. The engineered
+features — spend trajectory, service counts, tenure bands — encode information the model was
+already extracting, and the hyperparameters were already near optimal. Adopting a change this
+small would add a permanent second transformation to keep consistent between training and
+serving, a larger surface to explain, and more to maintain, all to chase a difference
+indistinguishable from noise.
+
+Adopting it anyway because the work had been done is precisely the sunk-cost reasoning the
+project's selection rule exists to prevent.
+
+**Methodological cost, stated plainly.** The held-out test set has now been consulted twice
+across the project's lifetime. Two things limit the damage: no decision in this experiment
+used test data — every arm, hyperparameter and the adoption call came from cross-validated
+training performance — and the outcome was not to change the model, so the published v1.1.0
+metrics remain a single-use evaluation of the deployed artifact. Had the experiment
+recommended adoption, the new metrics would have had to be reported as a mildly optimistic
+second-look estimate rather than an untouched holdout result.
