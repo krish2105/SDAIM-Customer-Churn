@@ -334,6 +334,7 @@ All three members contributed to the report, the evidence pack and the demonstra
 | [reports/drift_report.md](reports/drift_report.md) | Drift apparatus and its two-way validation |
 | [reports/tracking_report.md](reports/tracking_report.md) | MLflow runs, registry and rollback |
 | [reports/tuning_experiment.md](reports/tuning_experiment.md) | Feature engineering and tuning — measured, not adopted |
+| [Customer_Churn_Intelligence_Final_Report.docx](Customer_Churn_Intelligence_Final_Report.docx) | The full submission report — all 14 required items, 29 figures |
 | [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) | Eleven documented failure modes and fixes |
 | [docs/SCREENSHOT_CHECKLIST.md](docs/SCREENSHOT_CHECKLIST.md) | Every evidence screenshot, with captions |
 | [docs/DELIVERABLES_CHECKLIST.md](docs/DELIVERABLES_CHECKLIST.md) | Complete / pending status of every deliverable |

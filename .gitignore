@@ -80,7 +80,10 @@ scratch/
 # Local screenshots not intended for version control.
 # Evidence screenshots for the report belong in docs/screenshots/.
 # ---------------------------------------------------------------------------
+# Ad-hoc local screenshots are ignored, but the report's deliberate evidence
+# pack under docs/screenshots/ is versioned — see the negation below.
 screenshots/
+!docs/screenshots/
 *.screenshot.png
 Screenshot*.png
 
