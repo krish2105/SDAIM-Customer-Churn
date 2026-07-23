@@ -141,6 +141,62 @@ def segment_reference_chart(
     return fig
 
 
+def contribution_chart(
+    explanation: Any,
+    active_theme: str,
+    top_n: int = 5,
+) -> plt.Figure | None:
+    """Diverging bar chart of the strongest log-odds contributions.
+
+    Red bars push the score up, blue bars push it down. Direction is also stated
+    in the axis label and in every bar's text, so the chart never relies on
+    colour alone to carry its meaning.
+    """
+    tokens = theme_module.tokens_for(active_theme)
+    increases, decreases = explanation.top(top_n)
+    selected = [*reversed(decreases), *reversed(increases)]
+    if not selected:
+        return None
+
+    labels = [f"{c.display_name}\n{c.value}" for c in selected]
+    values = [c.contribution for c in selected]
+    colours = [
+        tokens["risk_high"] if value > 0 else tokens["chart_series"] for value in values
+    ]
+
+    with plt.rc_context(theme_module.matplotlib_rc(active_theme)):
+        fig, ax = plt.subplots(figsize=(6.8, 0.45 * len(selected) + 1.9))
+        ax.set_axisbelow(True)
+        positions = range(len(selected))
+        ax.barh(list(positions), values, color=colours, height=0.62)
+        ax.axvline(0, color=tokens["text_muted"], linewidth=1.1)
+
+        span = max(abs(min(values)), abs(max(values))) or 1.0
+        for y, value in enumerate(values):
+            offset = span * 0.03
+            ax.text(
+                value + (offset if value > 0 else -offset),
+                y,
+                f"{value:+.3f}",
+                va="center",
+                ha="left" if value > 0 else "right",
+                fontsize=8.5,
+                color=tokens["text_muted"],
+            )
+
+        ax.set_yticks(list(positions), labels, fontsize=8.5)
+        ax.set_xlim(-span * 1.35, span * 1.35)
+        ax.set_xlabel("← decreases score        contribution to log-odds        increases score →")
+        ax.set_title(
+            "What moved this model's score\n(association within the training sample, not causes)",
+            fontsize=10,
+            loc="left",
+        )
+        ax.grid(axis="y", visible=False)
+        fig.tight_layout()
+    return fig
+
+
 def score_distribution_chart(
     probability: float,
     reference: dict[str, Any],

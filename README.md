@@ -270,9 +270,11 @@ No credential exists anywhere in this repository. Full detail in
 - The 0.50 threshold is a documented default. No cost matrix was supplied, so no
   cost-sensitive optimisation was performed.
 - Risk bands are communication aids for triage, not validated business thresholds.
-- `gender` and `SeniorCitizen` are predictors and **no formal fairness audit has been
-  carried out**. One is required before any operational use.
-- The model produces no explanation of an individual prediction.
+- `gender` and `SeniorCitizen` are predictors. A fairness audit **has now been performed**:
+  no material disparity on `gender`; a material disparity on `SeniorCitizen` driven largely by
+  a genuine base-rate difference. Removing both was measured to cost +0.0008 ROC-AUC and is
+  recommended before operational use. See `reports/fairness_report.md`.
+- Per-prediction contributions are now shown and are exact for this linear model, but they describe association within the training sample, not causation.
 - Predictions describe association within the sample, never causation.
 
 ## 15. Governance
@@ -301,16 +303,15 @@ behave identically wherever they run.
 
 ## 17. Team contributions
 
-| Member | Student ID | Contribution | Sign-off |
-|---|---|---|---|
-| `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | |
-| `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | |
-| `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | |
-| `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | |
+| Member | Student ID | Primary contribution |
+|---|---|---|
+| Krishna Mathur | `AS25DXB018` | Platform, deployment, CI/CD and security |
+| Yash Petkar | `AS25DXB021` | Modelling rigour: fairness, calibration and tracking |
+| Atharva Soundankar | `AS25DXB020` | Application, explainability and batch scoring |
 
-Complete this table before submission. Suggested contribution areas: data validation and
-EDA; preprocessing and modelling; application and front end; Docker and CI/CD; security and
-documentation; report and demonstration.
+**Instructor:** JP Aggarwal · **Module:** SDAIM (Term 3)
+
+All three members contributed to the report, the evidence pack and the demonstration.
 
 ## 18. Documentation index
 

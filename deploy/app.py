@@ -22,7 +22,10 @@ import joblib
 import pandas as pd
 import streamlit as st
 
+import batch as batch_module
 import charts
+import explain as explain_module
+import rationale as rationale_module
 import theme as theme_module
 
 APP_DIR = Path(__file__).resolve().parent
@@ -165,6 +168,17 @@ def load_artifacts() -> dict[str, Any]:
 
 def active_theme() -> str:
     return "dark" if st.session_state.get("dark_mode", False) else "light"
+
+
+def active_threshold(metadata: dict[str, Any]) -> float:
+    """Current decision threshold: the user's choice, or the documented default.
+
+    Exposed in the interface because `reports/threshold_analysis.md` shows the
+    optimum depends entirely on a business cost ratio that was never supplied.
+    Hiding the assumption behind a constant would misrepresent it as a finding.
+    """
+    default = float(metadata.get("decision_threshold", 0.5))
+    return float(st.session_state.get("decision_threshold", default))
 
 
 def risk_tier(probability: float, schema: dict[str, Any]) -> str:
@@ -429,7 +443,12 @@ def render_result(
 ) -> None:
     tier = risk_tier(probability, schema)
     foreground, background = theme_module.risk_colours(active_theme(), tier)
-    threshold = float(metadata.get("decision_threshold", 0.5))
+    threshold = active_threshold(metadata)
+    default_threshold = float(metadata.get("decision_threshold", 0.5))
+    threshold_note = (
+        f"{threshold:.2f}" if abs(threshold - default_threshold) < 1e-9
+        else f"{threshold:.2f} (adjusted from {default_threshold:.2f})"
+    )
     class_label = "Likely to churn" if prediction == 1 else "Not likely to churn"
 
     st.markdown(
@@ -444,7 +463,7 @@ def render_result(
   <div class="cci-result-body">
     <dl>
       <div class="cci-result-row"><dt>Predicted class</dt><dd>{escape(class_label)}</dd></div>
-      <div class="cci-result-row"><dt>Decision threshold</dt><dd>{threshold:.2f}</dd></div>
+      <div class="cci-result-row"><dt>Decision threshold</dt><dd>{threshold_note}</dd></div>
       <div class="cci-result-row"><dt>Risk band</dt><dd>{tier}</dd></div>
       <div class="cci-result-row"><dt>Contract</dt><dd>{escape(str(values['Contract']))}</dd></div>
       <div class="cci-result-row"><dt>Tenure</dt><dd>{float(values['tenure']):.0f} months</dd></div>
@@ -460,8 +479,11 @@ def render_result(
     )
 
     st.caption(
-        "Risk bands are communication aids for triage. They have not been independently "
-        "validated as business thresholds, and no cost-sensitive optimisation was performed."
+        "Risk bands are communication aids for triage, not independently validated business "
+        "thresholds. **This probability is a model score, not a validated frequency:** "
+        "calibration analysis shows the model is over-confident about churn because it was "
+        "trained with balanced class weights to favour recall. Use the ranking with more "
+        "confidence than the magnitude."
     )
 
 
@@ -470,11 +492,39 @@ def render_context_charts(
     values: dict[str, Any],
     schema: dict[str, Any],
     reference: dict[str, Any],
+    explanation: Any | None = None,
 ) -> None:
     tiers = schema.get("risk_tiers", {})
-    tab_position, tab_segments, tab_population = st.tabs(
-        ["Risk position", "Segment context", "Scored population"]
+    tab_why, tab_position, tab_segments, tab_population = st.tabs(
+        ["Why this score", "Risk position", "Segment context", "Scored population"]
     )
+
+    with tab_why:
+        if explanation is None:
+            st.info("Contribution analysis is not available for this prediction.")
+        elif not explanation.supported:
+            st.info(
+                "This model type has no additive contribution decomposition, so none is "
+                "shown. Showing an approximation without saying so would be misleading."
+            )
+        else:
+            figure = charts.contribution_chart(explanation, active_theme())
+            if figure is None:
+                st.info("No attribute moved this score materially.")
+            else:
+                st.pyplot(figure, width="stretch")
+                st.caption(explain_module.CAUSAL_DISCLAIMER)
+                with st.expander("How this is calculated", expanded=False):
+                    st.markdown(
+                        "For a logistic regression the contribution of each encoded feature to "
+                        "the log-odds is exactly `coefficient x transformed value`. This is not "
+                        "an approximation of the model — it **is** the model, and the "
+                        "contributions plus the intercept reconstruct the score exactly. A test "
+                        "asserts that reconstruction on every run.\n\n"
+                        f"Intercept `{explanation.intercept:+.4f}` + contributions = "
+                        f"log-odds `{explanation.total_log_odds:+.4f}` -> probability "
+                        f"`{explanation.probability:.4f}`."
+                    )
 
     with tab_position:
         st.pyplot(
@@ -548,11 +598,15 @@ F1 {metrics.get('f1', 0):.4f} · ROC-AUC {metrics.get('roc_auc', 0):.4f}
 - A single cross-section with no time dimension, so drift and seasonality cannot be assessed.
 - The positive class is a minority, which limits the precision attainable at high recall.
 - The 0.5 threshold is a documented default, not a cost-optimised operating point.
-- `gender` and `SeniorCitizen` are among the predictors and **no formal fairness audit has
-  been carried out**. One is required before operational use.
+- `gender` and `SeniorCitizen` are among the predictors. **A fairness audit has been
+  performed** (`reports/fairness_report.md`), optimising for equal opportunity. No material
+  disparity was found on `gender`. A material disparity was found on `SeniorCitizen`, driven
+  largely by a genuine base-rate difference between the groups. Removing both attributes was
+  measured to cost almost no accuracy and is recommended before operational use.
 - The model shows association within the sample, never causation. It cannot say what would
   happen if this customer's contract or services were changed.
-- No explanation of an individual prediction is produced.
+- Per-prediction contributions are shown and are exact for this linear model, but they
+  describe association within the training sample, not causation.
 
 #### Governance
 
@@ -599,6 +653,11 @@ def main() -> None:
     reference = artifacts["reference"]
     initialise_state(schema)
 
+    if "decision_threshold" not in st.session_state:
+        st.session_state["decision_threshold"] = float(
+            metadata.get("decision_threshold", 0.5)
+        )
+
     st.markdown(theme_module.build_css(active_theme()), unsafe_allow_html=True)
 
     # ---------------- Sidebar ----------------
@@ -610,6 +669,33 @@ def main() -> None:
             key="dark_mode",
             help="Switches the interface and charts between the light and dark palettes.",
         )
+        st.divider()
+
+        st.markdown("**Decision threshold**")
+        default_threshold = float(metadata.get("decision_threshold", 0.5))
+        st.slider(
+            "Flag a customer at or above",
+            min_value=0.05,
+            max_value=0.95,
+            step=0.01,
+            key="decision_threshold",
+            help=(
+                "The threshold that converts a probability into a flag. The cost-optimal "
+                "value depends on how many unnecessary reviews one missed churner is worth "
+                "— a business input this project was never given. Move it to see the "
+                "sensitivity."
+            ),
+        )
+        if abs(st.session_state["decision_threshold"] - default_threshold) > 1e-9:
+            st.caption(
+                f"Adjusted from the documented default of {default_threshold:.2f}. "
+                "Lower catches more churners and creates more unnecessary reviews."
+            )
+        else:
+            st.caption(
+                f"Documented default ({default_threshold:.2f}) — an assumption, not an optimum."
+            )
+
         st.divider()
 
         st.markdown("**Demonstration cases**")
@@ -673,6 +759,24 @@ def main() -> None:
     st.write("")
 
     # ---------------- Body ----------------
+    single_tab, batch_tab = st.tabs(
+        ["Single customer assessment", "Batch scoring — retention work queue"]
+    )
+
+    with batch_tab:
+        render_batch_page(artifacts, metadata, schema)
+
+    with single_tab:
+        render_single_assessment(artifacts, metadata, schema, reference)
+
+
+def render_single_assessment(
+    artifacts: dict[str, Any],
+    metadata: dict[str, Any],
+    schema: dict[str, Any],
+    reference: dict[str, Any],
+) -> None:
+    """One customer at a time: form, result, and contribution analysis."""
     input_column, result_column = st.columns([1.55, 1], gap="large")
 
     with input_column:
@@ -697,8 +801,15 @@ def main() -> None:
         try:
             frame = build_input_frame(values, schema)
             probability = float(artifacts["pipeline"].predict_proba(frame)[0, 1])
-            threshold = float(metadata.get("decision_threshold", 0.5))
-            prediction = int(probability >= threshold)
+            prediction = int(probability >= active_threshold(metadata))
+            explanation = explain_module.explain_prediction(
+                artifacts["pipeline"], frame, schema
+            )
+            if explanation.supported and not explanation.reconstructs():
+                # The decomposition must equal the model exactly. If it does not,
+                # something is wrong and showing it would mislead.
+                logger.error("Contribution decomposition failed to reconstruct the score")
+                explanation = None
         except Exception:  # noqa: BLE001
             logger.exception("Prediction failed for one submitted record")
             st.session_state.pop("last_assessment", None)
@@ -711,6 +822,7 @@ def main() -> None:
                 "probability": probability,
                 "prediction": prediction,
                 "values": dict(values),
+                "explanation": explanation,
             }
 
     assessment = st.session_state.get("last_assessment")
@@ -726,7 +838,7 @@ def main() -> None:
                 )
             render_result(
                 assessment["probability"],
-                assessment["prediction"],
+                int(assessment["probability"] >= active_threshold(metadata)),
                 assessment["values"],
                 metadata,
                 schema,
@@ -744,12 +856,20 @@ def main() -> None:
                 unsafe_allow_html=True,
             )
 
+    if assessment and not failed:
+        st.write("")
+        render_retention_brief(assessment, metadata, schema, reference)
+
     # Context charts sit full width beneath both columns: inside the narrow
     # result column the axis labels become unreadable.
     if assessment and not failed:
         st.write("")
         render_context_charts(
-            assessment["probability"], assessment["values"], schema, reference
+            assessment["probability"],
+            assessment["values"],
+            schema,
+            reference,
+            assessment.get("explanation"),
         )
 
     st.write("")
@@ -767,6 +887,193 @@ def main() -> None:
 </div>
 """,
         unsafe_allow_html=True,
+    )
+
+
+def render_retention_brief(
+    assessment: dict[str, Any],
+    metadata: dict[str, Any],
+    schema: dict[str, Any],
+    reference: dict[str, Any],
+) -> None:
+    """Written brief for the specialist, generated or templated."""
+    probability = assessment["probability"]
+    tier = risk_tier(probability, schema)
+    threshold = active_threshold(metadata)
+    contributions = rationale_module.contributions_from_explanation(
+        assessment.get("explanation")
+    )
+    overall = reference.get("overall_training_churn_rate") if reference else None
+
+    with st.expander("Retention review brief", expanded=False):
+        try:
+            brief = rationale_module.generate_brief(
+                probability, tier, threshold, contributions, overall
+            )
+        except Exception:  # noqa: BLE001
+            logger.exception("Retention brief generation failed")
+            st.error(USER_SAFE_ERROR)
+            return
+
+        if brief.generated:
+            st.caption(
+                "⚠️ **AI-generated** from pre-computed model outputs. The model that wrote this "
+                "text made no inference about the customer — it only rendered numbers this "
+                "application had already calculated. Verify before use."
+            )
+        else:
+            st.caption(
+                f"Deterministic template — no AI generation. {brief.fallback_reason}"
+            )
+
+        st.markdown(brief.text)
+
+        st.caption(
+            "This brief supports a human review. It is not an instruction, it recommends no "
+            "commercial action, and it must not be shown to a customer."
+        )
+
+
+# --------------------------------------------------------------------------
+# Batch scoring — retention work queue
+# --------------------------------------------------------------------------
+
+
+def render_batch_page(
+    artifacts: dict[str, Any],
+    metadata: dict[str, Any],
+    schema: dict[str, Any],
+) -> None:
+    """Score a whole customer book and return a prioritised review queue."""
+    st.markdown(
+        """
+<div class="cci-notice">
+  <strong>Retention work queue.</strong> Upload a customer file to score every record at once
+  and receive a queue ranked by estimated churn risk. The ranking is decision support for
+  prioritising human review — it is not an instruction to contact anyone, and no customer
+  should be acted on without a specialist confirming the account first.
+  <br><br>
+  Uploaded data is scored in memory and <strong>never written to disk or retained</strong>
+  after your session ends.
+</div>
+""",
+        unsafe_allow_html=True,
+    )
+
+    threshold = active_threshold(metadata)
+    tiers = schema.get("risk_tiers", {})
+    bands = (
+        float(tiers.get("low_max_exclusive", 0.40)),
+        float(tiers.get("medium_max_exclusive", 0.70)),
+    )
+
+    with st.expander("Required file format", expanded=False):
+        st.markdown(
+            f"A CSV containing one row per customer and every model predictor as a column, "
+            f"named exactly as below. A `{schema.get('excluded_identifier', 'customerID')}` "
+            f"column is optional but recommended — it is carried through for traceability and "
+            f"is **never** used as a predictor. Maximum {batch_module.MAX_ROWS:,} rows."
+        )
+        st.code(", ".join(schema["feature_order"]), language="text")
+        st.caption(
+            "The raw project dataset `data/raw/Telco-Customer-Churn.csv` already has this "
+            "shape and can be uploaded directly to see the queue populated."
+        )
+
+    uploaded = st.file_uploader(
+        "Customer file (CSV)",
+        type=["csv"],
+        help="Scored in memory. Nothing is stored.",
+    )
+
+    if uploaded is None:
+        st.markdown(
+            """
+<div class="cci-empty">
+  <strong>No file uploaded</strong>
+  Upload a customer CSV to produce a ranked retention work queue.
+</div>
+""",
+            unsafe_allow_html=True,
+        )
+        return
+
+    try:
+        frame = pd.read_csv(uploaded, dtype=str, keep_default_na=False)
+    except Exception:  # noqa: BLE001
+        logger.exception("Uploaded file could not be parsed as CSV")
+        st.error(
+            "That file could not be read as a CSV. Check that it is comma-separated and "
+            "has a header row."
+        )
+        return
+
+    validation = batch_module.validate_batch(frame, schema)
+    for message in validation.warnings:
+        st.warning(message)
+    if not validation.ok:
+        for message in validation.errors:
+            st.error(message)
+        st.info("Fix the issues above and upload the file again. Nothing was scored.")
+        return
+
+    try:
+        with st.spinner(f"Scoring {len(frame):,} customers…"):
+            queue = batch_module.score_batch(
+                artifacts["pipeline"],
+                frame,
+                schema,
+                threshold,
+                validation.identifier_column,
+                bands,
+            )
+    except Exception:  # noqa: BLE001
+        logger.exception("Batch scoring failed")
+        st.error(USER_SAFE_ERROR)
+        return
+
+    summary = batch_module.queue_summary(queue, threshold)
+    logger.info(
+        "Batch scored: rows=%d flagged=%d threshold=%.2f",
+        summary["total"], summary["flagged"], threshold,
+    )
+
+    cards = [
+        ("Customers scored", f"{summary['total']:,}", "In this upload"),
+        ("Flagged for review", f"{summary['flagged']:,}",
+         f"{summary['flagged_share'] * 100:.1f}% at threshold {threshold:.2f}"),
+        ("High risk band", f"{summary['high']:,}", "Probability ≥ 0.70"),
+        ("Medium risk band", f"{summary['medium']:,}", "0.40 ≤ probability < 0.70"),
+    ]
+    html = ['<div class="cci-kpis">']
+    for label, value, note in cards:
+        html.append(
+            f'<div class="cci-kpi"><div class="cci-kpi-label">{escape(label)}</div>'
+            f'<div class="cci-kpi-value">{escape(value)}</div>'
+            f'<div class="cci-kpi-note">{escape(note)}</div></div>'
+        )
+    html.append("</div>")
+    st.markdown("".join(html), unsafe_allow_html=True)
+    st.write("")
+
+    display = queue.copy()
+    display["Churn probability"] = display["Churn probability"].map(lambda v: f"{v:.1%}")
+    st.dataframe(display, width="stretch", hide_index=True, height=460)
+
+    st.download_button(
+        "Download the ranked queue (CSV)",
+        data=queue.to_csv(index=False).encode("utf-8"),
+        file_name="retention_work_queue.csv",
+        mime="text/csv",
+        width="stretch",
+    )
+
+    st.caption(
+        "Ranked by estimated churn probability at the current decision threshold. Adjust the "
+        "threshold in the sidebar to change how many accounts are flagged. Every account in "
+        "this queue requires human review before any customer is contacted, and the ranking "
+        "reflects association within a fictional training sample rather than certainty about "
+        "any individual."
     )
 
 

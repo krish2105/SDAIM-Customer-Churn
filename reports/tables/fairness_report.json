@@ -1,0 +1,201 @@
+{
+  "decision_threshold": 0.5,
+  "materiality_threshold": 0.1,
+  "test_rows": 1409,
+  "attributes": {
+    "gender": {
+      "groups": [
+        {
+          "attribute": "gender",
+          "level": "Female",
+          "label": "Female",
+          "n": 687,
+          "base_rate": 0.28093158660844253,
+          "selection_rate": 0.413391557496361,
+          "recall": 0.7772020725388601,
+          "precision": 0.528169014084507,
+          "false_positive_rate": 0.27125506072874495,
+          "false_negative_rate": 0.22279792746113988,
+          "accuracy": 0.74235807860262,
+          "true_negative": 360,
+          "false_positive": 134,
+          "false_negative": 43,
+          "true_positive": 150
+        },
+        {
+          "attribute": "gender",
+          "level": "Male",
+          "label": "Male",
+          "n": 722,
+          "base_rate": 0.25069252077562326,
+          "selection_rate": 0.41274238227146814,
+          "recall": 0.7900552486187845,
+          "precision": 0.4798657718120805,
+          "false_positive_rate": 0.28650646950092423,
+          "false_negative_rate": 0.20994475138121546,
+          "accuracy": 0.7326869806094183,
+          "true_negative": 386,
+          "false_positive": 155,
+          "false_negative": 38,
+          "true_positive": 143
+        }
+      ],
+      "disparities": {
+        "demographic_parity": {
+          "max": 0.413392,
+          "min": 0.412742,
+          "gap": 0.000649,
+          "ratio": 0.99843
+        },
+        "equal_opportunity": {
+          "max": 0.790055,
+          "min": 0.777202,
+          "gap": 0.012853,
+          "ratio": 0.983731
+        },
+        "predictive_parity": {
+          "max": 0.528169,
+          "min": 0.479866,
+          "gap": 0.048303,
+          "ratio": 0.908546
+        },
+        "false_positive_rate": {
+          "max": 0.286506,
+          "min": 0.271255,
+          "gap": 0.015251,
+          "ratio": 0.946768
+        },
+        "base_rate": {
+          "max": 0.280932,
+          "min": 0.250693,
+          "gap": 0.030239,
+          "ratio": 0.892361
+        }
+      },
+      "assessment": {
+        "demographic_parity": {
+          "gap": 0.000649,
+          "material": false,
+          "passes_four_fifths": true
+        },
+        "equal_opportunity": {
+          "gap": 0.012853,
+          "material": false,
+          "passes_four_fifths": true
+        },
+        "predictive_parity": {
+          "gap": 0.048303,
+          "material": false,
+          "passes_four_fifths": true
+        },
+        "false_positive_rate": {
+          "gap": 0.015251,
+          "material": false,
+          "passes_four_fifths": true
+        }
+      },
+      "figure": "15_fairness_gender.png"
+    },
+    "SeniorCitizen": {
+      "groups": [
+        {
+          "attribute": "SeniorCitizen",
+          "level": "0",
+          "label": "Not senior",
+          "n": 1187,
+          "base_rate": 0.2325189553496209,
+          "selection_rate": 0.36141533277169335,
+          "recall": 0.7318840579710145,
+          "precision": 0.47086247086247085,
+          "false_positive_rate": 0.2491767288693743,
+          "false_negative_rate": 0.26811594202898553,
+          "accuracy": 0.7464195450716091,
+          "true_negative": 684,
+          "false_positive": 227,
+          "false_negative": 74,
+          "true_positive": 202
+        },
+        {
+          "attribute": "SeniorCitizen",
+          "level": "1",
+          "label": "Senior citizen",
+          "n": 222,
+          "base_rate": 0.44144144144144143,
+          "selection_rate": 0.6891891891891891,
+          "recall": 0.9285714285714286,
+          "precision": 0.5947712418300654,
+          "false_positive_rate": 0.5,
+          "false_negative_rate": 0.07142857142857142,
+          "accuracy": 0.6891891891891891,
+          "true_negative": 62,
+          "false_positive": 62,
+          "false_negative": 7,
+          "true_positive": 91
+        }
+      ],
+      "disparities": {
+        "demographic_parity": {
+          "max": 0.689189,
+          "min": 0.361415,
+          "gap": 0.327774,
+          "ratio": 0.524407
+        },
+        "equal_opportunity": {
+          "max": 0.928571,
+          "min": 0.731884,
+          "gap": 0.196687,
+          "ratio": 0.788183
+        },
+        "predictive_parity": {
+          "max": 0.594771,
+          "min": 0.470862,
+          "gap": 0.123909,
+          "ratio": 0.79167
+        },
+        "false_positive_rate": {
+          "max": 0.5,
+          "min": 0.249177,
+          "gap": 0.250823,
+          "ratio": 0.498353
+        },
+        "base_rate": {
+          "max": 0.441441,
+          "min": 0.232519,
+          "gap": 0.208922,
+          "ratio": 0.526727
+        }
+      },
+      "assessment": {
+        "demographic_parity": {
+          "gap": 0.327774,
+          "material": true,
+          "passes_four_fifths": false
+        },
+        "equal_opportunity": {
+          "gap": 0.196687,
+          "material": true,
+          "passes_four_fifths": false
+        },
+        "predictive_parity": {
+          "gap": 0.123909,
+          "material": true,
+          "passes_four_fifths": false
+        },
+        "false_positive_rate": {
+          "gap": 0.250823,
+          "material": true,
+          "passes_four_fifths": false
+        }
+      },
+      "figure": "15_fairness_seniorcitizen.png"
+    }
+  },
+  "counterfactual_without_protected_attributes": {
+    "roc_auc_without": 0.8405642098736726,
+    "recall_without": 0.7807486631016043,
+    "f1_without": 0.6102403343782654,
+    "roc_auc_with": 0.841406,
+    "recall_with": 0.783422,
+    "f1_with": 0.612971
+  }
+}

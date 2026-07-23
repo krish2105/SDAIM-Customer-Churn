@@ -9,6 +9,14 @@ joblib
 matplotlib
 streamlit
 
+# Statistical tests for drift detection (chi-squared)
+scipy
+
+# Experiment tracking and model registry (H2-1). Development only —
+# deliberately absent from deploy/requirements.txt so the runtime image stays
+# small. A test asserts the application never imports it.
+mlflow
+
 # Testing
 pytest
 

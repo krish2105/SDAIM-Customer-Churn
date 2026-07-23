@@ -1,9 +1,10 @@
 # Customer Churn Intelligence — Improvement Implementation Plan
 
 **Prepared for:** Chief Customer Officer, Chief Data & Analytics Officer, Model Risk & Governance
-**Prepared by:** Project team (group of 4)
-**Baseline version:** 1.0.0 · **Date:** 2026-07-23
-**Horizon:** 3–4 weeks to submission, with a documented path beyond
+**Prepared by:** Krishna Mathur (AS25DXB018) · Yash Petkar (AS25DXB021) · Atharva Soundankar (AS25DXB020)
+**Module:** SDAIM (Term 3) · **Instructor:** JP Aggarwal
+**Baseline version:** 1.0.0 → **delivered at 1.1.0**
+**Status:** Horizons 1 and 2 **complete**. Horizon 3 documented and deliberately not scheduled.
 
 ---
 
@@ -27,18 +28,30 @@ discovered late:
 3. **The unit of work is one customer at a time.** A retention manager needs a ranked book of
    accounts, not a form.
 
-This plan closes those three gaps across three horizons, sized to a group of four over 3–4
-weeks. **Horizon 1 is what earns marks. Horizon 2 is what a hiring manager sees. Horizon 3 is
-what a telco would actually need.** Nothing in Horizon 1 depends on Horizon 2 or 3, so the
-plan degrades safely if time runs short.
+This plan closed those three gaps across three horizons. **Horizon 1 is what earns marks.
+Horizon 2 is what a hiring manager sees. Horizon 3 is what a telco would actually need.**
 
-**Investment:** ~160 person-hours across four people over four weeks. **Direct cost: £0** —
-every recommended component is open-source or covered by the existing Hugging Face Pro
-subscription. The only non-zero cost is optional LLM inference, capped by design.
+**Horizons 1 and 2 have been implemented and are in the repository.** Every item below is
+marked with its delivered state and the measured result. Horizon 3 remains documented and
+unscheduled, which is a deliberate decision rather than an omission.
 
-**The single most important recommendation:** do the fairness audit and the calibration work
-(H1-1 and H1-2) before anything else. They are cheap, they are the two gaps most likely to be
-challenged in the viva, and they are the two a real model-risk committee would block on.
+**Direct cost: £0.** Every component is open-source or covered by the existing Hugging Face
+Pro subscription. The LLM layer is capped by design and ships disabled.
+
+### Headline outcomes
+
+| Delivered | Measured result |
+|---|---|
+| Fairness audit (H1-1) | No material disparity on `gender`. Material disparity on `SeniorCitizen`, driven largely by a genuine base-rate gap (0.4414 vs 0.2325). **Removing both protected attributes costs only +0.0008 ROC-AUC** — removal now recommended. |
+| Calibration (H1-2) | Model is **over-confident by 0.15** (mean predicted 0.4157 vs base rate 0.2654); ECE 0.1503. Isotonic calibration cuts ECE to 0.0194 with ROC-AUC unchanged. |
+| Threshold analysis (H1-3) | Optimal threshold published as a curve against cost ratio: 0.73 at 1:1 down to 0.12 at 20:1. The deployed 0.50 is optimal at roughly 3:1. |
+| Explainability (H1-4) | Exact log-odds decomposition — reconstructs the model to float precision, asserted by test on 25 customers. |
+| Deployment (H1-5) | Live at <https://krish21may-churn.hf.space>, with the visible-change test passed. |
+| MLflow (H2-1) | 3 runs tracked, model registered with a `production` alias and a documented rollback. |
+| Drift apparatus (H2-2) | **Validated both ways**: stable on unshifted holdout (0/19 flagged), alert on a simulated campaign (15/19 flagged, 7 at alert). |
+| Batch scoring (H2-3) | 1,000 customers ranked in **0.01 s**; batch and single-record paths asserted identical. |
+| GenAI brief (H2-4) | Guardrailed, provenance-labelled, **disabled by default**, deterministic fallback that passes its own language checks. |
+| Test suite | **52 → 106 tests**, all passing. |
 
 ---
 
@@ -427,20 +440,23 @@ honest ceiling of the current evidence, and stating it is a strength rather than
 
 ## 7. Team allocation and schedule
 
-| Member | Workstream | H1 | H2 | Total |
-|---|---|---:|---:|---:|
-| **A** | Modelling rigour | Fairness, calibration | MLflow | 24 h |
-| **B** | Business analysis & monitoring | Threshold optimisation | Drift apparatus | 16 h |
-| **C** | Application | Explainability | Batch scoring | 22 h |
-| **D** | Platform & GenAI | Space deployment | LLM layer | 15 h |
-| All | Report, evidence, integration | 12 h | 15 h | 27 h |
+The team is **three people**, so the four workstreams are distributed as follows.
 
-| Week | Milestone | Gate |
-|---|---|---|
-| 1 | Space live; fairness + calibration complete | **Deployment verified end-to-end** |
-| 2 | Threshold + explainability shipped; v1.1.0 visible-change test | All H1 acceptance criteria met |
-| 3 | MLflow + drift + batch scoring | 52+ tests still green; `make verify` clean |
-| 4 | GenAI layer; report; rehearsal | Full evidence pack captured |
+| Member | Student ID | Workstream | Horizon 1 | Horizon 2 |
+|---|---|---|---|---|
+| **Krishna Mathur** | AS25DXB018 | Platform, CI/CD, security | Space deployment, visible-change test | GenAI brief and its guardrails |
+| **Yash Petkar** | AS25DXB021 | Modelling rigour | Fairness audit, calibration | MLflow tracking and registry |
+| **Atharva Soundankar** | AS25DXB020 | Application and analysis | Explainability, threshold analysis | Batch scoring work queue, drift apparatus |
+
+All three contributed to the report, the evidence pack and the demonstration.
+
+| Milestone | Status |
+|---|---|
+| Space live; deployment verified end to end | ✅ Complete |
+| Visible-change test (1.0.0 → 1.1.0) | ✅ Complete |
+| Fairness, calibration, threshold, explainability | ✅ Complete |
+| MLflow, drift, batch scoring, GenAI brief | ✅ Complete |
+| Report, screenshots, rehearsal | ⬜ Outstanding — the team's remaining work |
 
 **Hard rule carried over from v1.0.0:** no commit without `make test` and `make secret-scan`
 passing. Every new feature ships with tests, or it does not ship.
@@ -547,33 +563,32 @@ table as a starting point to check, not a citation.
 
 ## 10. Success criteria
 
-**Horizon 1 — complete when:**
+**Horizon 1 — all met:**
 
-- [ ] Space is live and a prediction works on it
-- [ ] Visible-change test verified with a second workflow run
-- [ ] Fairness audit published; the model card no longer says "no fairness audit"
-- [ ] Calibration measured; a decision documented
-- [ ] Threshold sensitivity curve published; the app exposes an adjustable threshold
-- [ ] Per-prediction contributions render with causal-language guardrails
-- [ ] All tests green; `make verify` clean
+- [x] Space is live and a prediction works on it
+- [x] Visible-change test verified with a second workflow run
+- [x] Fairness audit published; the model card now states the finding, not its absence
+- [x] Calibration measured; decision documented with the benefit quantified
+- [x] Threshold sensitivity curve published; the app exposes an adjustable threshold
+- [x] Per-prediction contributions render with causal-language guardrails
+- [x] All tests green; `make verify` clean
 
-**Horizon 2 — complete when:**
+**Horizon 2 — all met:**
 
-- [ ] Three or more MLflow runs comparable; a model registered with a rollback procedure
-- [ ] Drift detector **demonstrated firing** on a synthetic shift
-- [ ] 1,000-row batch file scores and exports in under 10 seconds
-- [ ] LLM layer passes the prohibited-language test and works correctly when disabled
-- [ ] Runtime image size materially unchanged
+- [x] Three MLflow runs comparable; model registered with a documented rollback
+- [x] Drift detector demonstrated firing on a shift **and staying quiet on the control**
+- [x] 1,000-row batch scores in 0.01 s and exports
+- [x] LLM layer passes the prohibited-language test and works correctly when disabled
+- [x] Runtime image unchanged — MLflow, scipy and the analysis stack stay in dev only
 
 **Programme-level:**
 
-| Metric | Baseline | Target |
-|---|---|---|
-| Test count | 52 | 75+ |
-| Documented limitations *closed* | 0 of 8 | 4 of 8 |
-| Local quality gates | 10/10 | 12/12 |
-| External gates verified | 1 of 6 (CI) | 6 of 6 |
-| Direct cost | £0 | £0 |
+| Metric | Baseline | Target | **Delivered** |
+|---|---|---|---|
+| Test count | 52 | 75+ | **106** |
+| Documented limitations closed | 0 of 8 | 4 of 8 | **5 of 8** |
+| External gates verified | 1 of 6 | 6 of 6 | **6 of 6** |
+| Direct cost | £0 | £0 | **£0** |
 
 ---
 

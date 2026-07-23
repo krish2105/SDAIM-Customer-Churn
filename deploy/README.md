@@ -35,7 +35,17 @@ locked to `No phone service`, and with no internet service every internet add-on
 to `No internet service` — the only combinations present in the training data.
 
 **Outputs** — predicted churn class, churn probability, a Low / Medium / High risk band, a
-cautious suggested review action, the model version, and three context charts.
+cautious suggested review action, the model version, and four context charts including an
+exact per-prediction contribution breakdown.
+
+**Also available**
+
+- **Adjustable decision threshold** — the cost-optimal threshold depends on a business cost
+  ratio this project was never given, so the assumption is exposed rather than hidden.
+- **Batch scoring** — upload a customer CSV and receive a ranked retention work queue with a
+  CSV export. Data is scored in memory and never written to disk.
+- **Retention review brief** — a written brief for a specialist. AI generation is **disabled
+  by default**; the deterministic template is the shipped behaviour.
 
 ## Model summary
 
@@ -80,13 +90,25 @@ whereas an unnecessary review costs specialist time and is recoverable.
 ## Limitations
 
 - Trained on a fictional sample; performance on any live population is unknown.
-- A single cross-section with no time dimension, so drift cannot be assessed.
+- A single cross-section with no time dimension, so **no real drift can be observed**. The
+  detection apparatus exists and is validated against a simulated shift, but it has never
+  seen live data.
 - The positive class is a minority (26.54%), which limits precision at high recall.
+- **Probabilities are not calibrated.** Measured mean prediction is 0.4157 against an actual
+  base rate of 0.2654 — the model is over-confident about churn because it was trained with
+  balanced class weights to favour recall. Ranking is reliable; magnitude is inflated. See
+  `reports/calibration_report.md`.
 - Risk bands are communication aids for triage, not validated business thresholds.
-- `gender` and `SeniorCitizen` are predictors and **no formal fairness audit has been carried
-  out**. One is required before any operational use.
+- The decision threshold is adjustable and defaults to 0.50, which is an assumption rather
+  than an optimum. The cost-optimal value depends on a business cost ratio that was never
+  supplied; see `reports/threshold_analysis.md`.
+- `gender` and `SeniorCitizen` are predictors. A fairness audit **has been performed**: no
+  material disparity on `gender`; a material disparity on `SeniorCitizen`, driven largely by
+  a genuine base-rate difference between the groups. Removing both was measured to cost only
+  +0.0008 ROC-AUC and is recommended before operational use.
+- Per-prediction contributions are shown and are **exact** for this linear model, but they
+  describe association within the training sample, not causation.
 - Predictions describe association within the sample, never causation.
-- No explanation of an individual prediction is produced.
 
 ## Governance notice
 
@@ -103,4 +125,4 @@ fine-grained Hugging Face token held as the repository secret `HF_TOKEN`. The ta
 is configured as the repository variable `HF_SPACE_ID`. No credential appears in this
 repository.
 
-GitHub repository: `<<UNRESOLVED: add the verified repository URL once it exists>>`
+GitHub repository: <https://github.com/krish2105/SDAIM-Customer-Churn>

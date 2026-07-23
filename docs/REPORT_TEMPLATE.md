@@ -13,13 +13,15 @@ come from the actual training run and must not be altered. Anything marked
 
 - **Title:** Customer Churn Intelligence and Retention Decision-Support Platform
 - **Subtitle:** End-to-End ML Model Deployment using Hugging Face and GitHub Actions
-- **Course / module:** `<<UNRESOLVED>>`
-- **Group number:** `<<UNRESOLVED>>`
-- **Members and student IDs:** `<<UNRESOLVED>>`
-- **Instructor:** `<<UNRESOLVED>>`
-- **Submission date:** `<<UNRESOLVED>>`
-- **GitHub repository:** `<<UNRESOLVED — verified URL only>>`
-- **Hugging Face Space:** `<<UNRESOLVED — verified URL only>>`
+- **Course / module:** SDAIM (Term 3)
+- **Instructor:** JP Aggarwal
+- **Members and student IDs:**
+  - Krishna Mathur — `AS25DXB018`
+  - Yash Petkar — `AS25DXB021`
+  - Atharva Soundankar — `AS25DXB020`
+- **GitHub repository:** https://github.com/krish2105/SDAIM-Customer-Churn
+- **Hugging Face Space:** https://huggingface.co/spaces/krish21may/churn
+- **Live application:** https://krish21may-churn.hf.space
 
 ---
 
@@ -354,12 +356,12 @@ other secret or variable is referenced.
 
 | Item | Value |
 |---|---|
-| Commit SHA deployed | `<<UNRESOLVED>>` |
-| Workflow run URL | `<<UNRESOLVED>>` |
-| Run ID and timestamp | `<<UNRESOLVED>>` |
-| Space build result | `<<UNRESOLVED>>` |
-| Live Space URL | `<<UNRESOLVED>>` |
-| Live prediction verified | `<<UNRESOLVED>>` |
+| Workflow run URL | https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30020847651 |
+| Run ID | `30020847651` (validate + sync jobs both green) |
+| Space build result | Succeeded — runtime stage `RUNNING` |
+| Live Space URL | https://huggingface.co/spaces/krish21may/churn |
+| Live prediction verified | Yes — 22.9%, Low risk band |
+| Commit SHA deployed | `<<UNRESOLVED — read from the Actions run page>>` |
 
 *Insert Figures 29, 32, 33.*
 
@@ -370,11 +372,12 @@ other secret or variable is referenced.
 | Item | Value |
 |---|---|
 | Change made | Application version 1.0.0 → 1.1.0 plus a visible caption |
-| Commit SHA | `<<UNRESOLVED>>` |
-| Second run URL and timestamp | `<<UNRESOLVED>>` |
-| Space rebuild result | `<<UNRESOLVED>>` |
-| Version 1.1.0 visible in the live app | `<<UNRESOLVED>>` |
-| Predictions still working | `<<UNRESOLVED>>` |
+| Second run URL | https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30023117028 |
+| Trigger | **Automatic** — the `deploy/**` path filter, no manual dispatch |
+| Space rebuild result | Succeeded |
+| Version 1.1.0 visible in the live app | Yes — header badge and caption both read 1.1.0 |
+| Predictions still working | Yes — 22.9%, Low risk band |
+| Commit SHA | `<<UNRESOLVED — read from the Actions run page>>` |
 
 *Insert Figures 34, 35, 36, 37.*
 
@@ -467,15 +470,13 @@ feasibility and may support prioritisation for human review.
 
 ## 32. Team contribution table
 
-| Member | Student ID | Contribution | Approx. share | Sign-off |
-|---|---|---|---|---|
-| `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | | |
-| `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | | |
-| `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | | |
-| `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | `<<UNRESOLVED>>` | | |
+| Member | Student ID | Primary contribution | Sign-off |
+|---|---|---|---|
+| Krishna Mathur | `AS25DXB018` | Platform, deployment, CI/CD and security | |
+| Yash Petkar | `AS25DXB021` | Modelling rigour: fairness, calibration and tracking | |
+| Atharva Soundankar | `AS25DXB020` | Application, explainability and batch scoring | |
 
-Suggested areas: data validation and EDA; preprocessing and modelling; application and front
-end; Docker and CI/CD; security and documentation; report and demonstration.
+All three members contributed to the report, the evidence pack and the demonstration.
 
 ---
 

@@ -9,12 +9,15 @@ No token, key or password may ever be written in this file.
 
 | Field | Value |
 |---|---|
-| Course / module | `<<UNRESOLVED>>` |
-| Group number | `<<UNRESOLVED>>` |
-| Group member names | `<<UNRESOLVED>>` |
-| Student IDs | `<<UNRESOLVED>>` |
-| Instructor | `<<UNRESOLVED>>` |
-| Submission date | `<<UNRESOLVED>>` |
+| Course / module | SDAIM (Term 3) |
+| Instructor | JP Aggarwal |
+| Team size | 3 |
+
+| Member | Student ID | Primary workstream |
+|---|---|---|
+| Krishna Mathur | `AS25DXB018` | Platform, deployment, CI/CD and security |
+| Yash Petkar | `AS25DXB021` | Modelling rigour: fairness, calibration and tracking |
+| Atharva Soundankar | `AS25DXB020` | Application, explainability and batch scoring |
 
 ## Repository and deployment
 
@@ -54,7 +57,7 @@ was never verified. It is superseded by the repository above.
 | Does the IBM **fictional** telco sample satisfy the brief's "real-world dataset" wording? | **Pending.** The dataset is officially published by IBM and widely used, but represents a fictional company. This project describes it accurately throughout. See `docs/DECISIONS.md`, decision D-01. |
 | Required final report format (PDF / DOCX / both) | `<<UNRESOLVED>>` |
 | Required presentation duration | `<<UNRESOLVED>>` — `docs/DEMONSTRATION_SCRIPT.md` is written for five minutes |
-| Required repository visibility | `<<UNRESOLVED>>` |
+| Required repository visibility | Public (set) |
 
 ## Secret handling
 

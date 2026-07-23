@@ -150,14 +150,20 @@ verify_required_files() {
     requirements-dev.txt SOURCE_MANIFEST.json PROJECT_INPUTS.md
     data/raw/Telco-Customer-Churn.csv
     src/config.py src/data_validation.py src/eda.py src/train.py src/evaluate.py src/schemas.py
+    src/analysis_base.py src/fairness.py src/calibration.py src/threshold.py
+    src/drift.py src/tracking.py
     notebooks/01_eda_and_modeling.ipynb
     reports/model_comparison.csv reports/executive_model_summary.md reports/eda_observations.md
-    deploy/app.py deploy/theme.py deploy/charts.py deploy/Dockerfile
+    reports/fairness_report.md reports/calibration_report.md reports/threshold_analysis.md
+    reports/drift_report.md reports/tracking_report.md
+    deploy/app.py deploy/theme.py deploy/charts.py deploy/explain.py deploy/batch.py
+    deploy/rationale.py deploy/Dockerfile
     deploy/requirements.txt deploy/README.md deploy/.dockerignore
     deploy/artifacts/model_pipeline.joblib deploy/artifacts/model_metadata.json
     deploy/artifacts/feature_schema.json deploy/artifacts/model_card.md
     tests/conftest.py tests/test_data_validation.py tests/test_model_artifact.py
     tests/test_prediction.py tests/test_deployment_files.py
+    tests/test_analysis.py tests/test_app_features.py
     .github/workflows/ci.yml .github/workflows/deploy.yml
     docs/INPUT_AUDIT.md docs/IMPLEMENTATION_PLAN.md docs/IMPLEMENTATION_LOG.md
     docs/DECISIONS.md docs/ARCHITECTURE.md docs/SECURITY.md docs/TEST_PLAN.md
@@ -173,7 +179,7 @@ verify_required_files() {
   local figures
   figures="$(find reports/figures -name '*.png' 2>/dev/null | wc -l | tr -d ' ')"
   echo "Figures present: ${figures}"
-  [ "$figures" -ge 11 ] || { echo "Expected at least 11 EDA figures"; missing=$((missing + 1)); }
+  [ "$figures" -ge 18 ] || { echo "Expected at least 18 figures"; missing=$((missing + 1)); }
   if [ "$missing" -ne 0 ]; then
     echo "${missing} required file(s) missing." >&2
     return 1

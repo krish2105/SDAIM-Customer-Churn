@@ -5,7 +5,7 @@ SHELL := /bin/bash
 PYTHON := $(if $(wildcard .venv/bin/python),.venv/bin/python,python3)
 
 .DEFAULT_GOAL := help
-.PHONY: help bootstrap validate eda train test app docker-build docker-run secret-scan verify notebook clean
+.PHONY: help bootstrap validate eda train test app docker-build docker-run secret-scan verify notebook clean fairness calibration threshold drift track mlflow-ui analysis
 
 help: ## Show the available targets
 	@echo "Customer Churn Intelligence — available targets"
@@ -29,6 +29,26 @@ train: ## Train, compare, select and export the model pipeline
 
 notebook: ## Regenerate and execute the EDA/modelling notebook
 	$(PYTHON) scripts/build_notebook.py
+
+fairness: ## Fairness audit across protected attributes (H1-1)
+	$(PYTHON) -m src.fairness
+
+calibration: ## Probability calibration analysis (H1-2)
+	$(PYTHON) -m src.calibration
+
+threshold: ## Cost-sensitive decision-threshold analysis (H1-3)
+	$(PYTHON) -m src.threshold
+
+drift: ## Drift-detection apparatus and its demonstration (H2-2)
+	$(PYTHON) -m src.drift --demo
+
+track: ## Train and log the run to MLflow, then register it (H2-1)
+	$(PYTHON) -m src.tracking --log-current
+
+mlflow-ui: ## Browse tracked runs at http://127.0.0.1:5000
+	$(PYTHON) -m mlflow ui --backend-store-uri sqlite:///mlruns/mlflow.db --port 5000
+
+analysis: fairness calibration threshold drift ## Run every post-training analysis
 
 test: ## Run the full pytest suite
 	$(PYTHON) -m pytest -q

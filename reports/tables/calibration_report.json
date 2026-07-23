@@ -1,0 +1,247 @@
+{
+  "n_bins": 10,
+  "test_rows": 1409,
+  "variants": {
+    "Uncalibrated (deployed)": {
+      "brier_score": 0.16875,
+      "expected_calibration_error": 0.150278,
+      "maximum_calibration_error": 0.3163,
+      "roc_auc": 0.841406,
+      "mean_predicted": 0.415714,
+      "observed_base_rate": 0.265436,
+      "bins": [
+        {
+          "bin": "0.0\u20130.1",
+          "n": 324,
+          "mean_predicted": 0.04245,
+          "observed_frequency": 0.012346,
+          "gap": -0.030105
+        },
+        {
+          "bin": "0.1\u20130.2",
+          "n": 159,
+          "mean_predicted": 0.146029,
+          "observed_frequency": 0.062893,
+          "gap": -0.083136
+        },
+        {
+          "bin": "0.2\u20130.3",
+          "n": 118,
+          "mean_predicted": 0.24713,
+          "observed_frequency": 0.110169,
+          "gap": -0.136961
+        },
+        {
+          "bin": "0.3\u20130.4",
+          "n": 112,
+          "mean_predicted": 0.354864,
+          "observed_frequency": 0.205357,
+          "gap": -0.149507
+        },
+        {
+          "bin": "0.4\u20130.5",
+          "n": 114,
+          "mean_predicted": 0.45243,
+          "observed_frequency": 0.27193,
+          "gap": -0.1805
+        },
+        {
+          "bin": "0.5\u20130.6",
+          "n": 92,
+          "mean_predicted": 0.546411,
+          "observed_frequency": 0.315217,
+          "gap": -0.231194
+        },
+        {
+          "bin": "0.6\u20130.7",
+          "n": 116,
+          "mean_predicted": 0.652507,
+          "observed_frequency": 0.336207,
+          "gap": -0.3163
+        },
+        {
+          "bin": "0.7\u20130.8",
+          "n": 164,
+          "mean_predicted": 0.748231,
+          "observed_frequency": 0.463415,
+          "gap": -0.284816
+        },
+        {
+          "bin": "0.8\u20130.9",
+          "n": 185,
+          "mean_predicted": 0.847452,
+          "observed_frequency": 0.702703,
+          "gap": -0.144749
+        },
+        {
+          "bin": "0.9\u20131.0",
+          "n": 25,
+          "mean_predicted": 0.913461,
+          "observed_frequency": 0.76,
+          "gap": -0.153461
+        }
+      ]
+    },
+    "Isotonic": {
+      "brier_score": 0.138839,
+      "expected_calibration_error": 0.019417,
+      "maximum_calibration_error": 0.197382,
+      "roc_auc": 0.841302,
+      "mean_predicted": 0.267108,
+      "observed_base_rate": 0.265436,
+      "bins": [
+        {
+          "bin": "0.0\u20130.1",
+          "n": 559,
+          "mean_predicted": 0.039972,
+          "observed_frequency": 0.041145,
+          "gap": 0.001173
+        },
+        {
+          "bin": "0.1\u20130.2",
+          "n": 177,
+          "mean_predicted": 0.150545,
+          "observed_frequency": 0.19209,
+          "gap": 0.041545
+        },
+        {
+          "bin": "0.2\u20130.3",
+          "n": 142,
+          "mean_predicted": 0.249082,
+          "observed_frequency": 0.260563,
+          "gap": 0.011481
+        },
+        {
+          "bin": "0.3\u20130.4",
+          "n": 119,
+          "mean_predicted": 0.349553,
+          "observed_frequency": 0.369748,
+          "gap": 0.020195
+        },
+        {
+          "bin": "0.4\u20130.5",
+          "n": 128,
+          "mean_predicted": 0.452902,
+          "observed_frequency": 0.382812,
+          "gap": -0.070089
+        },
+        {
+          "bin": "0.5\u20130.6",
+          "n": 76,
+          "mean_predicted": 0.548572,
+          "observed_frequency": 0.552632,
+          "gap": 0.00406
+        },
+        {
+          "bin": "0.6\u20130.7",
+          "n": 93,
+          "mean_predicted": 0.645079,
+          "observed_frequency": 0.634409,
+          "gap": -0.01067
+        },
+        {
+          "bin": "0.7\u20130.8",
+          "n": 81,
+          "mean_predicted": 0.738878,
+          "observed_frequency": 0.740741,
+          "gap": 0.001863
+        },
+        {
+          "bin": "0.8\u20130.9",
+          "n": 17,
+          "mean_predicted": 0.855145,
+          "observed_frequency": 0.764706,
+          "gap": -0.090439
+        },
+        {
+          "bin": "0.9\u20131.0",
+          "n": 17,
+          "mean_predicted": 0.962088,
+          "observed_frequency": 0.764706,
+          "gap": -0.197382
+        }
+      ]
+    },
+    "Sigmoid": {
+      "brier_score": 0.138271,
+      "expected_calibration_error": 0.025365,
+      "maximum_calibration_error": 0.141,
+      "roc_auc": 0.841595,
+      "mean_predicted": 0.267752,
+      "observed_base_rate": 0.265436,
+      "bins": [
+        {
+          "bin": "0.0\u20130.1",
+          "n": 525,
+          "mean_predicted": 0.036143,
+          "observed_frequency": 0.03619,
+          "gap": 4.7e-05
+        },
+        {
+          "bin": "0.1\u20130.2",
+          "n": 192,
+          "mean_predicted": 0.14895,
+          "observed_frequency": 0.166667,
+          "gap": 0.017717
+        },
+        {
+          "bin": "0.2\u20130.3",
+          "n": 147,
+          "mean_predicted": 0.245867,
+          "observed_frequency": 0.251701,
+          "gap": 0.005833
+        },
+        {
+          "bin": "0.3\u20130.4",
+          "n": 103,
+          "mean_predicted": 0.347291,
+          "observed_frequency": 0.349515,
+          "gap": 0.002223
+        },
+        {
+          "bin": "0.4\u20130.5",
+          "n": 126,
+          "mean_predicted": 0.450524,
+          "observed_frequency": 0.309524,
+          "gap": -0.141
+        },
+        {
+          "bin": "0.5\u20130.6",
+          "n": 121,
+          "mean_predicted": 0.549533,
+          "observed_frequency": 0.586777,
+          "gap": 0.037244
+        },
+        {
+          "bin": "0.6\u20130.7",
+          "n": 120,
+          "mean_predicted": 0.65392,
+          "observed_frequency": 0.708333,
+          "gap": 0.054413
+        },
+        {
+          "bin": "0.7\u20130.8",
+          "n": 66,
+          "mean_predicted": 0.738406,
+          "observed_frequency": 0.712121,
+          "gap": -0.026285
+        },
+        {
+          "bin": "0.8\u20130.9",
+          "n": 9,
+          "mean_predicted": 0.812364,
+          "observed_frequency": 0.888889,
+          "gap": 0.076525
+        },
+        {
+          "bin": "0.9\u20131.0",
+          "n": 0,
+          "mean_predicted": null,
+          "observed_frequency": null,
+          "gap": null
+        }
+      ]
+    }
+  },
+  "figure": "16_calibration_curve.png"
+}

@@ -323,6 +323,68 @@ def write_reference_rates(
     return config.REFERENCE_RATES_PATH
 
 
+def _fairness_section() -> list[str]:
+    """Fairness paragraph for the model card, reflecting the audit if it exists.
+
+    The card must never claim an audit is missing once it has been performed, and
+    must never imply one exists before it has. Reading the report keeps the two in
+    step automatically instead of relying on someone remembering to edit both.
+    """
+    report_path = config.TABLES_DIR / "fairness_report.json"
+    if not report_path.is_file():
+        return [
+            "- `gender` and `SeniorCitizen` are included as predictors and **no fairness audit",
+            "  has been performed**. One is required before any operational use. Run",
+            "  `make fairness` to produce it.",
+        ]
+
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):  # pragma: no cover - defensive
+        return ["- Fairness audit results could not be read; re-run `make fairness`."]
+
+    lines = [
+        "- `gender` and `SeniorCitizen` are included as predictors and **a fairness audit has",
+        "  been performed** — see `reports/fairness_report.md`. The audit optimises for **equal",
+        "  opportunity** (equal recall across groups), because the harm that matters here is an",
+        "  at-risk customer being missed entirely.",
+    ]
+
+    for attribute, payload in report.get("attributes", {}).items():
+        material = [c for c, flag in payload["assessment"].items() if flag["material"]]
+        if not material:
+            lines.append(
+                f"  - `{attribute}`: no disparity exceeded the "
+                f"{report['materiality_threshold']:.2f} materiality convention."
+            )
+        else:
+            gaps = payload["disparities"]
+            lines.append(
+                f"  - `{attribute}`: **material disparity** on "
+                f"{', '.join(c.replace('_', ' ') for c in material)}. Equal-opportunity gap "
+                f"{gaps['equal_opportunity']['gap']:.4f}. The groups also differ in actual "
+                f"churn rate by {gaps['base_rate']['gap']:.4f}, which is what makes the "
+                "fairness criteria mutually exclusive."
+            )
+
+    costs = report.get("counterfactual_without_protected_attributes")
+    if costs:
+        delta = costs["roc_auc_with"] - costs["roc_auc_without"]
+        lines += [
+            f"  - Removing both attributes costs only {delta:+.4f} ROC-AUC "
+            f"({costs['roc_auc_with']:.4f} to {costs['roc_auc_without']:.4f}), inside the "
+            "cross-validation standard deviation. **Removal is recommended before operational",
+            "    use**; they are retained in this version only to preserve the published",
+            "    evidence trail for the academic submission.",
+        ]
+
+    lines.append(
+        "  - A group-specific decision threshold was considered and **rejected outright** as "
+        "direct differential treatment by protected characteristic."
+    )
+    return lines
+
+
 def write_model_card(
     selected_model: str,
     justification: str,
@@ -442,16 +504,15 @@ def write_model_card(
         "",
         "## Ethical and governance considerations",
         "",
-        "- `gender` and `SeniorCitizen` are included as predictors. **No formal fairness audit**",
-        "  (equalised odds, demographic parity or subgroup error analysis) has been carried out.",
-        "  One is required before any operational use, and removing or auditing these attributes",
-        "  should be considered explicitly.",
+        *_fairness_section(),
         "- Outputs may support prioritisation. They are not a judgement about any person and must",
         "  not be presented to a customer as a fact about them.",
         "- Retention offers driven by a risk score can create differential treatment between",
         "  customers. Any such use needs review by model-risk and governance functions first.",
-        "- The model produces no explanation of an individual prediction. Where a customer-facing",
-        "  reason is required, this model alone does not supply one.",
+        "- The application now shows a per-prediction contribution breakdown (`deploy/explain.py`),",
+        "  which is exact for this linear model rather than an approximation. It describes",
+        "  **association within the training sample, not causation**, so it does not by itself",
+        "  constitute a customer-facing reason for a decision.",
         "",
         "## Human review requirement",
         "",

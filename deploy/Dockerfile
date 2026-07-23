@@ -24,7 +24,7 @@ RUN python -m pip install --upgrade pip \
 
 # Only the runtime files. Training code, raw data, notebooks, tests and reports
 # are deliberately excluded — see .dockerignore.
-COPY --chown=appuser:appuser app.py theme.py charts.py /app/
+COPY --chown=appuser:appuser app.py theme.py charts.py explain.py batch.py rationale.py /app/
 COPY --chown=appuser:appuser .streamlit /app/.streamlit
 COPY --chown=appuser:appuser artifacts /app/artifacts
 

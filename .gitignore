@@ -62,6 +62,13 @@ data/processed/*
 !data/processed/.gitkeep
 
 # ---------------------------------------------------------------------------
+# MLflow tracking store. Experiment history is local to each machine; the
+# artifacts that matter are committed under deploy/artifacts/.
+# ---------------------------------------------------------------------------
+mlruns/
+mlflow.db
+
+# ---------------------------------------------------------------------------
 # Logs and local scratch
 # ---------------------------------------------------------------------------
 *.log

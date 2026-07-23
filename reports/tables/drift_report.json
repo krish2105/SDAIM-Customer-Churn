@@ -1,0 +1,485 @@
+{
+  "baseline_rows": 5634,
+  "control": {
+    "rows_checked": 1409,
+    "features_checked": 19,
+    "drifted_count": 0,
+    "alert_count": 0,
+    "overall_status": "stable",
+    "features": [
+      {
+        "feature": "MonthlyCharges",
+        "kind": "numeric",
+        "psi": 0.012492,
+        "status": "stable",
+        "chi2_p_value": null,
+        "detail": {
+          "baseline_mean": 64.93,
+          "observed_mean": 64.0889,
+          "baseline_median": 70.5,
+          "observed_median": 69.95
+        }
+      },
+      {
+        "feature": "TotalCharges",
+        "kind": "numeric",
+        "psi": 0.008265,
+        "status": "stable",
+        "chi2_p_value": null,
+        "detail": {
+          "baseline_mean": 2302.6043,
+          "observed_mean": 2206.0577,
+          "baseline_median": 1398.125,
+          "observed_median": 1395.525
+        }
+      },
+      {
+        "feature": "tenure",
+        "kind": "numeric",
+        "psi": 0.006653,
+        "status": "stable",
+        "chi2_p_value": null,
+        "detail": {
+          "baseline_mean": 32.4851,
+          "observed_mean": 31.9155,
+          "baseline_median": 29.0,
+          "observed_median": 28.0
+        }
+      },
+      {
+        "feature": "OnlineBackup",
+        "kind": "categorical",
+        "psi": 0.004434,
+        "status": "stable",
+        "chi2_p_value": 0.046734,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "MultipleLines",
+        "kind": "categorical",
+        "psi": 0.003021,
+        "status": "stable",
+        "chi2_p_value": 0.125022,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "StreamingTV",
+        "kind": "categorical",
+        "psi": 0.002794,
+        "status": "stable",
+        "chi2_p_value": 0.142768,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "PhoneService",
+        "kind": "categorical",
+        "psi": 0.001683,
+        "status": "stable",
+        "chi2_p_value": 0.13438,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Yes",
+          "observed_top": "Yes"
+        }
+      },
+      {
+        "feature": "StreamingMovies",
+        "kind": "categorical",
+        "psi": 0.001028,
+        "status": "stable",
+        "chi2_p_value": 0.487379,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "TechSupport",
+        "kind": "categorical",
+        "psi": 0.000777,
+        "status": "stable",
+        "chi2_p_value": 0.581931,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "DeviceProtection",
+        "kind": "categorical",
+        "psi": 0.000445,
+        "status": "stable",
+        "chi2_p_value": 0.731567,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "PaymentMethod",
+        "kind": "categorical",
+        "psi": 0.000404,
+        "status": "stable",
+        "chi2_p_value": 0.90462,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Electronic check",
+          "observed_top": "Electronic check"
+        }
+      },
+      {
+        "feature": "gender",
+        "kind": "categorical",
+        "psi": 0.000367,
+        "status": "stable",
+        "chi2_p_value": 0.471997,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Male",
+          "observed_top": "Male"
+        }
+      },
+      {
+        "feature": "OnlineSecurity",
+        "kind": "categorical",
+        "psi": 0.000338,
+        "status": "stable",
+        "chi2_p_value": 0.788054,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "Dependents",
+        "kind": "categorical",
+        "psi": 0.000295,
+        "status": "stable",
+        "chi2_p_value": 0.517902,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "SeniorCitizen",
+        "kind": "categorical",
+        "psi": 0.000244,
+        "status": "stable",
+        "chi2_p_value": 0.560251,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "0",
+          "observed_top": "0"
+        }
+      },
+      {
+        "feature": "InternetService",
+        "kind": "categorical",
+        "psi": 0.000236,
+        "status": "stable",
+        "chi2_p_value": 0.845926,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Fiber optic",
+          "observed_top": "Fiber optic"
+        }
+      },
+      {
+        "feature": "Partner",
+        "kind": "categorical",
+        "psi": 0.000182,
+        "status": "stable",
+        "chi2_p_value": 0.612855,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "Contract",
+        "kind": "categorical",
+        "psi": 0.000144,
+        "status": "stable",
+        "chi2_p_value": 0.902772,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Month-to-month",
+          "observed_top": "Month-to-month"
+        }
+      },
+      {
+        "feature": "PaperlessBilling",
+        "kind": "categorical",
+        "psi": 0.000101,
+        "status": "stable",
+        "chi2_p_value": 0.706274,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Yes",
+          "observed_top": "Yes"
+        }
+      }
+    ]
+  },
+  "shifted": {
+    "rows_checked": 400,
+    "features_checked": 19,
+    "drifted_count": 15,
+    "alert_count": 7,
+    "overall_status": "alert",
+    "features": [
+      {
+        "feature": "tenure",
+        "kind": "numeric",
+        "psi": 7.849583,
+        "status": "alert",
+        "chi2_p_value": null,
+        "detail": {
+          "baseline_mean": 32.4851,
+          "observed_mean": 4.0425,
+          "baseline_median": 29.0,
+          "observed_median": 3.0
+        }
+      },
+      {
+        "feature": "InternetService",
+        "kind": "categorical",
+        "psi": 7.487194,
+        "status": "alert",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Fiber optic",
+          "observed_top": "Fiber optic"
+        }
+      },
+      {
+        "feature": "TotalCharges",
+        "kind": "numeric",
+        "psi": 6.571985,
+        "status": "alert",
+        "chi2_p_value": null,
+        "detail": {
+          "baseline_mean": 2302.6043,
+          "observed_mean": 239.5607,
+          "baseline_median": 1398.125,
+          "observed_median": 147.55
+        }
+      },
+      {
+        "feature": "Contract",
+        "kind": "categorical",
+        "psi": 5.807318,
+        "status": "alert",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Month-to-month",
+          "observed_top": "Month-to-month"
+        }
+      },
+      {
+        "feature": "MonthlyCharges",
+        "kind": "numeric",
+        "psi": 0.384436,
+        "status": "alert",
+        "chi2_p_value": null,
+        "detail": {
+          "baseline_mean": 64.93,
+          "observed_mean": 56.7064,
+          "baseline_median": 70.5,
+          "observed_median": 64.5
+        }
+      },
+      {
+        "feature": "OnlineBackup",
+        "kind": "categorical",
+        "psi": 0.372681,
+        "status": "alert",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "Partner",
+        "kind": "categorical",
+        "psi": 0.325006,
+        "status": "alert",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "OnlineSecurity",
+        "kind": "categorical",
+        "psi": 0.248148,
+        "status": "warning",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "DeviceProtection",
+        "kind": "categorical",
+        "psi": 0.247094,
+        "status": "warning",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "TechSupport",
+        "kind": "categorical",
+        "psi": 0.226027,
+        "status": "warning",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "PaymentMethod",
+        "kind": "categorical",
+        "psi": 0.212378,
+        "status": "warning",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Electronic check",
+          "observed_top": "Electronic check"
+        }
+      },
+      {
+        "feature": "StreamingTV",
+        "kind": "categorical",
+        "psi": 0.20314,
+        "status": "warning",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "StreamingMovies",
+        "kind": "categorical",
+        "psi": 0.16741,
+        "status": "warning",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "Dependents",
+        "kind": "categorical",
+        "psi": 0.163122,
+        "status": "warning",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "MultipleLines",
+        "kind": "categorical",
+        "psi": 0.111046,
+        "status": "warning",
+        "chi2_p_value": 0.0,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "No",
+          "observed_top": "No"
+        }
+      },
+      {
+        "feature": "PaperlessBilling",
+        "kind": "categorical",
+        "psi": 0.021765,
+        "status": "stable",
+        "chi2_p_value": 0.003739,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Yes",
+          "observed_top": "Yes"
+        }
+      },
+      {
+        "feature": "SeniorCitizen",
+        "kind": "categorical",
+        "psi": 0.003343,
+        "status": "stable",
+        "chi2_p_value": 0.260535,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "0",
+          "observed_top": "0"
+        }
+      },
+      {
+        "feature": "PhoneService",
+        "kind": "categorical",
+        "psi": 0.000993,
+        "status": "stable",
+        "chi2_p_value": 0.537401,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Yes",
+          "observed_top": "Yes"
+        }
+      },
+      {
+        "feature": "gender",
+        "kind": "categorical",
+        "psi": 0.00086,
+        "status": "stable",
+        "chi2_p_value": 0.557598,
+        "detail": {
+          "unseen_categories": [],
+          "baseline_top": "Male",
+          "observed_top": "Male"
+        }
+      }
+    ]
+  },
+  "figure": "18_drift_detection.png",
+  "detector_validated": true
+}

@@ -2,7 +2,7 @@
 
 **Model name:** Logistic Regression  
 **Model version:** 1.1.0  
-**Trained (UTC):** 2026-07-23T15:58:50+00:00  
+**Trained (UTC):** 2026-07-23T16:49:04+00:00  
 **Random seed:** 42  
 **Decision threshold:** 0.5  
 **Artifact:** `deploy/artifacts/model_pipeline.joblib` (complete preprocessing + estimator pipeline)
@@ -98,16 +98,24 @@ Full comparison including the reference baseline:
 
 ## Ethical and governance considerations
 
-- `gender` and `SeniorCitizen` are included as predictors. **No formal fairness audit**
-  (equalised odds, demographic parity or subgroup error analysis) has been carried out.
-  One is required before any operational use, and removing or auditing these attributes
-  should be considered explicitly.
+- `gender` and `SeniorCitizen` are included as predictors and **a fairness audit has
+  been performed** — see `reports/fairness_report.md`. The audit optimises for **equal
+  opportunity** (equal recall across groups), because the harm that matters here is an
+  at-risk customer being missed entirely.
+  - `gender`: no disparity exceeded the 0.10 materiality convention.
+  - `SeniorCitizen`: **material disparity** on demographic parity, equal opportunity, predictive parity, false positive rate. Equal-opportunity gap 0.1967. The groups also differ in actual churn rate by 0.2089, which is what makes the fairness criteria mutually exclusive.
+  - Removing both attributes costs only +0.0008 ROC-AUC (0.8414 to 0.8406), inside the cross-validation standard deviation. **Removal is recommended before operational
+    use**; they are retained in this version only to preserve the published
+    evidence trail for the academic submission.
+  - A group-specific decision threshold was considered and **rejected outright** as direct differential treatment by protected characteristic.
 - Outputs may support prioritisation. They are not a judgement about any person and must
   not be presented to a customer as a fact about them.
 - Retention offers driven by a risk score can create differential treatment between
   customers. Any such use needs review by model-risk and governance functions first.
-- The model produces no explanation of an individual prediction. Where a customer-facing
-  reason is required, this model alone does not supply one.
+- The application now shows a per-prediction contribution breakdown (`deploy/explain.py`),
+  which is exact for this linear model rather than an approximation. It describes
+  **association within the training sample, not causation**, so it does not by itself
+  constitute a customer-facing reason for a decision.
 
 ## Human review requirement
 
@@ -123,4 +131,4 @@ make validate
 make train
 ```
 
-Environment used for this artifact: Python 3.11.15, scikit-learn 1.9.0, pandas 3.0.5, numpy 2.4.6.
+Environment used for this artifact: Python 3.11.15, scikit-learn 1.9.0, pandas 2.3.3, numpy 2.4.6.
