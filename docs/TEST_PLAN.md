@@ -1,6 +1,6 @@
 # Test Plan
 
-52 tests across four modules, all passing. Run with `make test`.
+**106 tests across six modules, all passing.** Run with `make test`.
 
 ## Strategy
 
@@ -111,6 +111,31 @@ list would go stale; this cannot.
 The secret-pattern test reports the file path and category only. A test that printed the
 match would leak the secret into CI output.
 
+## 5. `tests/test_analysis.py` — 23 tests
+
+Covers the Horizon 1 and 2 analysis modules.
+
+| Test group | Guards against |
+|---|---|
+| Evaluation context | An analysis run against a different split than the model was fitted on |
+| Fairness | Subgroups not summing to the test set; rates outside [0,1]; a report that omits its decision |
+| Model card currency | The card still claiming no fairness audit exists after one has been run |
+| Calibration | ECE that fails to detect known over-confidence; bins that lose rows; calibration silently changing the ranking |
+| Threshold | Recall rising as the threshold rises; the core economic claim (higher miss cost → lower threshold) failing |
+| Drift | PSI non-zero on identical distributions; the detector firing on unshifted data, or failing to fire on shifted data; a baseline built from anything but the training split |
+
+## 6. `tests/test_app_features.py` — 31 tests
+
+Imports from `deploy/` exactly as the running container does, so a broken import path fails
+here rather than in the Space.
+
+| Test group | Guards against |
+|---|---|
+| Explainability | A decomposition that does not reconstruct the model; encoded names leaking into the interface; a missing causal disclaimer |
+| Batch validation | Missing columns, negative values or oversized uploads being accepted; unknown categories wrongly blocking |
+| Batch scoring | Queue not ranked by risk; batch disagreeing with single-record scoring; risk bands not matching the schema; scoring too slow for the interface |
+| Retention brief | The LLM layer being enabled by default; prohibited phrasing passing the filter; the deterministic fallback failing its own checks; raw customer data reaching the prompt |
+
 ---
 
 ## Deliberately not tested, and why
@@ -121,14 +146,14 @@ match would leak the secret into CI output.
 | Streamlit UI rendering | No browser driver in CI. Covered by the `verify_release.sh` smoke test, which starts the real server and requires HTTP 200 from `/_stcore/health`, and by manual verification in both themes. |
 | Docker build in CI | Would add several minutes to every run for a configuration already asserted statically and built locally. The Space build is the real integration test. |
 | Live Hugging Face deployment | Requires credentials that must not exist in CI. Verified by observing the platform. |
-| Model fairness across `gender` / `SeniorCitizen` | **A genuine gap, not an oversight.** A meaningful fairness audit needs agreed metrics and thresholds from governance stakeholders. Recorded in the model card, `docs/SECURITY.md` and the README as required before operational use. |
+| Live LLM generation | Calling a real inference provider in CI would need a token in the test environment and would make the suite depend on an external service. The guardrails, the fallback and the disabled-by-default behaviour are all tested; only the network call is not. |
 
 ---
 
 ## Latest run
 
 ```
-52 passed in 2.16s
+106 passed
 ```
 
 Recorded results and timestamps are in `docs/QUALITY_GATE_RESULTS.md`.

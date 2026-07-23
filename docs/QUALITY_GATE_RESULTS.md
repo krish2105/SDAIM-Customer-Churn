@@ -9,6 +9,7 @@ Actual recorded output from `bash scripts/verify_release.sh`.
 | Host | macOS (Darwin 25.5.0), Apple silicon |
 | Python | 3.11.15 (`.venv`) |
 | Result | **10 PASS · 0 FAIL · 0 NOT RUN** — script exit code 0 |
+| Test suite | **106 tests**, all passing |
 
 > Total wall time is short because the Docker layer cache was warm from an earlier build in
 > the same session. Every gate executed; the per-gate evidence below is quoted from the run.
@@ -66,7 +67,20 @@ COMMAND: .venv/bin/python -m pytest -q
 | `test_model_artifact.py` | 12 |
 | `test_prediction.py` | 11 |
 | `test_deployment_files.py` | 16 |
-| **Total** | **52** |
+| `test_analysis.py` | 23 |
+| `test_app_features.py` | 31 |
+| **Total** | **106** |
+
+The suite grew from 52 to 106 with the Horizon 1 and 2 work. Notable additions:
+
+- The contribution decomposition is asserted to reconstruct the model **exactly** across 25
+  real customers — if it ever drifts, the chart is lying and must not be displayed.
+- The drift detector is tested **both ways**: it must fire on a shifted sample *and* stay
+  silent on the unshifted holdout.
+- Batch and single-record scoring paths are asserted identical, so the work queue cannot
+  disagree with the form.
+- The deterministic retention brief must pass the same prohibited-language filter it enforces
+  on generated text.
 
 ### 5. Streamlit smoke test — PASS
 
