@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Customer Churn Intelligence: Project Explained Simply</title>
+<style>
+  @page { size: Letter; margin: 12mm 16mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Calibri", "Helvetica Neue", Arial, sans-serif;
+    font-size: 9.9pt; line-height: 1.4; color: #14213D; margin: 0;
+  }
+  .title { font-size: 18pt; font-weight: 800; color: #1E40AF; margin: 0 0 1px 0; }
+  .subtitle { font-size: 10.5pt; color: #475569; margin: 0 0 3px 0; }
+  .meta { font-size: 8.3pt; color: #64748B; margin: 0 0 8px 0; }
+  .rule { border: none; border-top: 2px solid #1E40AF; margin: 4px 0 9px 0; }
+  h2 { font-size: 11.5pt; color: #1E3A8A; margin: 11px 0 4px 0; border-bottom: 1px solid #DBE3F0; padding-bottom: 2px; }
+  p { margin: 0 0 6px 0; }
+  .lead { font-size: 10.3pt; }
+  strong { color: #14213D; }
+  .box {
+    background: #F3F6FB; border-left: 4px solid #1E40AF; border-radius: 4px;
+    padding: 7px 11px; margin: 6px 0 9px 0;
+  }
+  .box.amber { background: #FBF6EE; border-left-color: #B45309; }
+  .box.green { background: #EEF6F0; border-left-color: #15803D; }
+  ul { margin: 3px 0 7px 0; padding-left: 19px; }
+  li { margin-bottom: 2px; }
+  table { border-collapse: collapse; width: 100%; margin: 5px 0 9px 0; font-size: 9.3pt; }
+  th { background: #EEF3FB; color: #1E3A8A; text-align: left; padding: 4px 7px; border: 1px solid #CBD5E1; }
+  td { padding: 3px 7px; border: 1px solid #E2E8F0; }
+  tr:nth-child(even) td { background: #F8FAFC; }
+  .num { text-align: right; }
+  .links { font-size: 9.4pt; }
+  .links a { color: #1E40AF; text-decoration: none; }
+  .foot { margin-top: 9px; padding-top: 6px; border-top: 1px solid #CBD5E1; font-size: 8pt; color: #64748B; text-align: center; }
+  .pagebreak { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="title">Customer Churn Intelligence</div>
+<div class="subtitle">The whole project, explained in plain English</div>
+<div class="meta">SDAIM Term 3 &nbsp;·&nbsp; Krishna Mathur (AS25DXB018), Yash Petkar (AS25DXB021), Atharva Soundankar (AS25DXB020) &nbsp;·&nbsp; Instructor: JP Aggarwal</div>
+<hr class="rule">
+
+<p class="lead">We built a tool that helps a phone company work out which customers are most likely to leave, so staff can look at those accounts first. The tool is finished, it is live online, and anyone can try it right now.</p>
+
+<h2>The problem we set out to solve</h2>
+<p>Phone companies lose customers every month. This is called <strong>churn</strong>. The staff whose job is to keep customers have limited time, so they cannot phone everyone. The question is simple: <strong>which customers should they look at first?</strong></p>
+<p>Right now that choice usually comes down to gut feeling, which is inconsistent and hard to check later. Our tool gives a clear, repeatable answer instead: it looks at a customer's details and says how likely they are to leave, and whether they are worth a closer look.</p>
+
+<div class="box">
+<strong>One thing we were careful about all the way through.</strong> The tool only <em>suggests</em> who to review. It never decides anything on its own. It does not change prices, cancel contracts, or take any action. A person always makes the final call. We treated that as a rule, not an afterthought.
+</div>
+
+<h2>The data we used</h2>
+<p>We used a well-known public dataset from IBM. It has <strong>7,043 customers</strong> and <strong>21 pieces of information</strong> about each one, such as how long they have been a customer, what they pay each month, what services they have, and whether they ended up leaving.</p>
+<p>Two honest points about this data:</p>
+<ul>
+  <li><strong>It is a made-up company.</strong> The dataset is realistic and widely used for learning, but it does not come from a real business. We say this clearly everywhere, because pretending otherwise would be dishonest.</li>
+  <li><strong>We proved we had the exact right file.</strong> Every file has a unique fingerprint. We check that fingerprint automatically every time the project runs, so nobody can quietly swap in a different file and get different results.</li>
+</ul>
+<p>Out of the 7,043 customers, about <strong>27% had left</strong>. That number matters, and it shaped how we measured success later.</p>
+
+<h2>What we found when we looked at the data</h2>
+<p>Before building anything, we explored the data to see what actually drives people to leave. A few patterns stood out clearly:</p>
+<table>
+  <tr><th>What we looked at</th><th>What we found</th></tr>
+  <tr><td>Type of contract</td><td>People on rolling month-to-month contracts leave far more often (about 43%) than people locked into a two-year deal (under 3%).</td></tr>
+  <tr><td>How they pay</td><td>People paying by electronic cheque leave much more often than people on automatic card payments.</td></tr>
+  <tr><td>How long they have been a customer</td><td>New customers leave much more than long-standing ones. Loyalty builds over time.</td></tr>
+  <tr><td>Internet type</td><td>Fibre customers leave more often than people with slower or no internet.</td></tr>
+</table>
+<p>One caution we kept front of mind: these are <strong>patterns, not causes</strong>. The fact that month-to-month customers leave more does not prove the contract type is the reason. We were careful never to overstate what the numbers show.</p>
+
+<div class="foot">Customer Churn Intelligence &nbsp;·&nbsp; Plain-English summary &nbsp;·&nbsp; Page 1 of 3</div>
+
+<!-- PAGE 2 -->
+<div class="pagebreak"></div>
+
+<h2>The model, and why we trust it</h2>
+<p>A <strong>model</strong> is just a formula that learns from past customers and then makes a guess about a new one. We trained two different kinds and compared them fairly, plus a very basic one as a sanity check.</p>
+<p>The winner was a model called <strong>Logistic Regression</strong>. Here is how well it did, tested on customers it had never seen before:</p>
+<table>
+  <tr><th>Question</th><th>Answer</th></tr>
+  <tr><td>Out of everyone who actually left, how many did it catch?</td><td class="num"><strong>78%</strong> (293 of 374)</td></tr>
+  <tr><td>How good is it overall at telling leavers from stayers?</td><td class="num"><strong>0.84 out of 1.0</strong></td></tr>
+  <tr><td>When it flags someone, how often is it right?</td><td class="num">About half</td></tr>
+</table>
+<p>We deliberately tuned the model to <strong>catch as many leavers as possible</strong>, even if that means a few false alarms. The reasoning is practical: if we miss a customer who was about to leave, nobody ever reviews them and they are gone for good. A false alarm just costs a staff member a few minutes. Missing someone is the worse mistake, so we built the tool to avoid it.</p>
+
+<div class="box green">
+<strong>The part we are most proud of.</strong> We decided the rule for picking the winning model <em>before</em> we looked at the final test results. This sounds small, but it is what makes our result honest. If you pick the winner after seeing the scores, you are really just choosing the luckiest one. We wrote our rule down in code first, then ran the test once. We even admit in our report that the other model was slightly ahead on a couple of measures, and we still did not switch, because switching after the fact would have broken the whole point.
+</div>
+
+<h2>Checking the model is fair and honest</h2>
+<p>We went further than the assignment asked, because a tool that affects customers should be checked properly. Three examples:</p>
+<ul>
+  <li><strong>Fairness.</strong> We checked whether the model treats different groups of people evenly. It was even across gender. For senior citizens it behaved differently, but mostly because seniors genuinely leave more often in this data. We measured what would happen if we removed age and gender entirely, and found it barely changed the results, so we recommend removing them.</li>
+  <li><strong>Honest probabilities.</strong> The model tends to sound a bit more certain than it should. We measured exactly how much, and we say so plainly in the tool, so nobody reads too much into the exact percentage.</li>
+  <li><strong>Explaining each answer.</strong> For any single customer, the tool shows which details pushed the score up and which pushed it down. So a staff member does not just get a number, they get a reason to look at.</li>
+</ul>
+
+<h2>The dashboard people actually use</h2>
+<p>We built a clean web page where someone can use the model without needing to understand any of the maths. It does a few things:</p>
+<ul>
+  <li><strong>Check one customer.</strong> Fill in their details, press a button, and get the risk level, a probability, and a suggested action.</li>
+  <li><strong>Check a whole list.</strong> Upload a file of many customers and get them back sorted from most to least at risk, ready to work through. It handles a thousand customers in a fraction of a second.</li>
+  <li><strong>See why.</strong> A chart shows what moved each score.</li>
+  <li><strong>Adjust the sensitivity.</strong> A slider lets the user decide how cautious to be, and everything updates live.</li>
+  <li><strong>Light and dark mode.</strong> A simple toggle, because it is nicer to use.</li>
+</ul>
+
+<div class="foot">Customer Churn Intelligence &nbsp;·&nbsp; Plain-English summary &nbsp;·&nbsp; Page 2 of 3</div>
+
+<!-- PAGE 3 -->
+<div class="pagebreak"></div>
+
+<h2>Getting it online, automatically</h2>
+<p>A model sitting on a laptop is not much use. We packaged the whole tool so it can run anywhere, and put it online on <strong>Hugging Face</strong>, a popular free hosting service for this kind of app. Anyone can open the link and use it.</p>
+<p>The clever part is that we do not update it by hand. We set up an <strong>automatic pipeline</strong>. When we make a change and save it to our code, the following happens on its own:</p>
+<ul>
+  <li>The system runs all our checks to make sure nothing is broken.</li>
+  <li>If everything passes, it copies the new version up to the live website.</li>
+  <li>The website rebuilds itself and starts serving the new version.</li>
+</ul>
+<p>We tested this end to end by changing the version number, saving it, and watching the live site update itself with no manual step. It worked. We have the records to prove each run really happened.</p>
+
+<div class="box amber">
+<strong>We kept it secure.</strong> Connecting our code to the website needs a password-like key. We never put that key in our code, where anyone could see it. It is stored safely in a locked settings area, and we even built a scanner that automatically checks nobody accidentally left a key lying around. We tested the scanner by planting fake keys to make sure it actually catches them.
+</div>
+
+<h2>How we made sure it all works</h2>
+<p>We did not just hope the tool was correct. We wrote <strong>115 automatic tests</strong> that check everything, from whether the data is right to whether the app gives sensible answers. They all pass. We also run a full set of checks before we ever call anything finished. If something breaks, we find out straight away.</p>
+<p>Along the way the tests caught several real mistakes that we then fixed, which is exactly what they are for. We would rather show that our safety net actually catches things than pretend we never made an error.</p>
+
+<h2>What it does not do, honestly</h2>
+<p>We think being clear about the limits is part of doing this well.</p>
+<ul>
+  <li>The data is from a made-up company, so we cannot promise it would work the same on a real one.</li>
+  <li>We have not proven it saves money. To do that properly you would need to try it on real customers with a comparison group, which is beyond this project.</li>
+  <li>It spots patterns, it does not prove causes. And a person must always review its suggestions.</li>
+</ul>
+<p>So what we can honestly say is this: the tool works, it is live, it is well built and well checked, and it could help a team decide who to look at first. We are careful not to claim more than that.</p>
+
+<h2>Try it yourself</h2>
+<div class="box links">
+<strong>Live app:</strong> <a href="https://krish21may-churn.hf.space">https://krish21may-churn.hf.space</a><br>
+<strong>Hugging Face Space:</strong> <a href="https://huggingface.co/spaces/krish21may/churn">https://huggingface.co/spaces/krish21may/churn</a><br>
+<strong>All the code:</strong> <a href="https://github.com/krish2105/SDAIM-Customer-Churn">https://github.com/krish2105/SDAIM-Customer-Churn</a>
+</div>
+
+<div class="foot">Customer Churn Intelligence &nbsp;·&nbsp; Plain-English summary &nbsp;·&nbsp; Page 3 of 3</div>
+
+</body>
+</html>

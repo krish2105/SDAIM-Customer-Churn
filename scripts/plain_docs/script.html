@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Customer Churn Intelligence: Presentation Script</title>
+<style>
+  @page { size: Letter; margin: 15mm 17mm; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Calibri", "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.7pt; line-height: 1.55; color: #14213D; margin: 0;
+  }
+  .title { font-size: 19pt; font-weight: 800; color: #1E40AF; margin: 0 0 2px; }
+  .subtitle { font-size: 10.5pt; color: #475569; margin: 0 0 4px; }
+  .meta { font-size: 8.6pt; color: #64748B; margin: 0 0 10px; }
+  hr.rule { border: none; border-top: 2px solid #1E40AF; margin: 6px 0 12px; }
+  .howto {
+    background: #F3F6FB; border-left: 4px solid #1E40AF; border-radius: 4px;
+    padding: 8px 12px; margin: 0 0 14px; font-size: 9.6pt;
+  }
+  h2 {
+    font-size: 12pt; color: #1E3A8A; margin: 16px 0 4px;
+    border-bottom: 1px solid #DBE3F0; padding-bottom: 3px;
+  }
+  .who { font-size: 8.8pt; color: #64748B; margin: 0 0 8px; font-style: italic; }
+  .line { margin: 0 0 9px; }
+  .speaker { font-weight: 700; color: #1E40AF; }
+  .speaker.y { color: #B45309; }
+  .speaker.a { color: #15803D; }
+  .stage {
+    display: block; font-size: 9pt; color: #64748B; background: #F6F7F9;
+    border: 1px solid #E2E8F0; border-radius: 3px; padding: 3px 8px;
+    margin: 4px 0 8px; font-style: italic;
+  }
+  .foot {
+    margin-top: 14px; padding-top: 8px; border-top: 1px solid #CBD5E1;
+    font-size: 8.4pt; color: #64748B; text-align: center;
+  }
+  .pagebreak { page-break-before: always; }
+  .tag {
+    display: inline-block; font-size: 8pt; color: #fff; background: #1E40AF;
+    border-radius: 3px; padding: 1px 6px; margin-left: 6px; vertical-align: middle;
+  }
+  .tag.y { background: #B45309; } .tag.a { background: #15803D; }
+</style>
+</head>
+<body>
+
+<div class="title">Customer Churn Intelligence</div>
+<div class="subtitle">Presentation script for three speakers, walking through the live dashboard</div>
+<div class="meta">Krishna Mathur, Yash Petkar, Atharva Soundankar &nbsp;·&nbsp; SDAIM Term 3 &nbsp;·&nbsp; Instructor: JP Aggarwal &nbsp;·&nbsp; Roughly 7 minutes</div>
+<hr class="rule">
+
+<div class="howto">
+<strong>How to use this.</strong> Anything in a grey box is a stage direction, telling you what to do on screen. It is not read aloud. The rest is what you say. Have the live app open before you start: <strong>krish21may-churn.hf.space</strong>. Speak slowly, look up from the page, and it is fine to say it in your own words. This is a guide, not a wall you have to recite.
+</div>
+
+<h2>Part 1. The problem and what we built</h2>
+<div class="who">Speaker: Krishna &nbsp;·&nbsp; about 90 seconds</div>
+
+<span class="stage">Have the app home screen up on the projector.</span>
+
+<p class="line"><span class="speaker">Krishna:</span> Good morning. We are Krishna, Yash and Atharva, and our project is about customer churn, which is just a fancy word for customers leaving. We picked a phone company because it is a problem every phone company has, and it is one where the data actually lets you do something useful.</p>
+
+<p class="line"><span class="speaker">Krishna:</span> Here is the situation. A phone company loses some customers every month. It has a small team whose whole job is to keep customers, but they cannot call everyone. So the question we tried to answer is a simple one. Out of thousands of customers, which ones should the team look at first?</p>
+
+<p class="line"><span class="speaker">Krishna:</span> What we built is this tool on the screen. You give it a customer, it tells you how likely that person is to leave, and whether they are worth a closer look. And I want to be clear about one thing up front, because it shaped everything we did. This tool never decides anything by itself. It does not cancel contracts or change prices. It just points a human in the right direction, and a person always makes the actual call.</p>
+
+<p class="line"><span class="speaker">Krishna:</span> I am going to hand over to Yash, who will explain what is going on behind the screen, and then Atharva will actually show you the tool working.</p>
+
+<h2>Part 2. The data and the model <span class="tag y">Yash</span></h2>
+<div class="who">Speaker: Yash &nbsp;·&nbsp; about 2 minutes</div>
+
+<p class="line"><span class="speaker y">Yash:</span> Thanks. So my part is what is actually inside the tool. We used a public dataset from IBM. It has about seven thousand customers, and for each one we know things like how long they have been with the company, what they pay, what services they have, and whether they ended up leaving.</p>
+
+<p class="line"><span class="speaker y">Yash:</span> Two honest things about this data before I go on. First, it is a made-up company, not a real one. It is realistic, but we do not pretend it is real, and we say that everywhere. Second, we made sure we had the exact right file. Every file has a kind of fingerprint, and we check it automatically every time, so nobody can quietly swap the data and get different numbers.</p>
+
+<p class="line"><span class="speaker y">Yash:</span> When we looked at the data, some clear patterns came out. Customers on a rolling monthly contract leave far more than customers tied into a two-year deal. New customers leave more than long-standing ones. People paying by electronic cheque leave more than people on automatic card payments. None of that is shocking, but it is good to see the data agree with common sense.</p>
+
+<span class="stage">Optional: if you have a slide with the churn-by-contract chart, show it here. If not, just keep the app up.</span>
+
+<p class="line"><span class="speaker y">Yash:</span> Then we trained the actual model. A model is just a formula that learns from the old customers and makes a guess about a new one. We tried two proper ones and compared them fairly. The one we went with catches about seventy-eight percent of the people who really do leave. That was the number we cared about most, and I will explain why.</p>
+
+<p class="line"><span class="speaker y">Yash:</span> If we miss someone who was about to leave, nobody reviews them, and we lose them. If we raise a false alarm, a staff member wastes a few minutes. Missing someone is the worse mistake. So we tuned the model to catch as many real leavers as it can, and we accept a few false alarms as the price of that.</p>
+
+<p class="line"><span class="speaker y">Yash:</span> One more thing I am a little proud of. We wrote down the rule for picking the winning model before we looked at the final scores. That matters, because if you choose the winner after seeing the results, you are really just picking the luckiest one. We even found that the other model was slightly ahead on a couple of measures, and we did not switch, because switching afterwards would have defeated the whole point. It is all written up honestly in the report.</p>
+
+<p class="line"><span class="speaker y">Yash:</span> We also checked the model for fairness, and whether its confidence is trustworthy, but I will let those come up naturally when Atharva shows the tool. Over to you.</p>
+
+<div class="foot">Presentation script &nbsp;·&nbsp; Krishna opens, then Yash on the data and model</div>
+
+<!-- PAGE 2 -->
+<div class="pagebreak"></div>
+
+<h2>Part 3. The live dashboard <span class="tag a">Atharva</span></h2>
+<div class="who">Speaker: Atharva &nbsp;·&nbsp; about 2 to 3 minutes. This is the main demo.</div>
+
+<p class="line"><span class="speaker a">Atharva:</span> Right, let me actually show you the thing. This is the real app, running live on the internet. Anyone here could open it on their phone right now.</p>
+
+<span class="stage">In the sidebar, pick a demonstration profile from the dropdown, then press "Load this profile".</span>
+
+<p class="line"><span class="speaker a">Atharva:</span> Instead of typing everything out, I will load one of our example customers. This one is a long-standing customer on a two-year contract. Now I press the button.</p>
+
+<span class="stage">Press "Generate churn assessment". Point at the result card on the right.</span>
+
+<p class="line"><span class="speaker a">Atharva:</span> And there it is. It gives a percentage, a risk band, and a plain suggestion for what to do. This customer comes out as low risk, which makes sense, because they are settled and locked into a long contract. If I load our other example, a brand-new customer on a monthly contract, you would see the risk jump right up.</p>
+
+<span class="stage">Open the "Why this score" tab so the contribution chart shows.</span>
+
+<p class="line"><span class="speaker a">Atharva:</span> Now this next part is my favourite, because it answers the obvious question. Why should anyone trust the number? This chart breaks down the score. The red bars are the things pushing this customer towards leaving, and the blue bars are the things keeping them. So a staff member does not just get a number they have to take on faith. They get reasons they can actually look at.</p>
+
+<p class="line"><span class="speaker a">Atharva:</span> And notice the wording under the chart. It says these are things linked to the score, not the reasons the person will leave. We were careful about that. The model spots patterns, it does not read minds, and the tool never pretends otherwise.</p>
+
+<span class="stage">Move the "Decision threshold" slider in the sidebar and let the result update.</span>
+
+<p class="line"><span class="speaker a">Atharva:</span> This slider lets the team decide how cautious to be. Slide it one way and the tool flags more people, so you catch more leavers but do more work. Slide it the other way and it flags fewer. There is no single right setting. It depends on how much a lost customer is worth to the business, and that is their call, not ours. We just make the trade-off visible instead of hiding it.</p>
+
+<span class="stage">Click the "Batch scoring" tab.</span>
+
+<p class="line"><span class="speaker a">Atharva:</span> Checking one customer is nice, but a real team has thousands. So this second tab takes a whole list. You upload a file of customers and it hands them back sorted, most at risk at the top, ready to work down. It does a thousand customers almost instantly, and it never saves anyone's data, it just scores it and forgets it.</p>
+
+<span class="stage">Flip the dark mode toggle on and off once.</span>
+
+<p class="line"><span class="speaker a">Atharva:</span> And a small thing, but people notice it. There is a dark mode. The charts follow along too, not just the page. It is a little detail, but it is the kind of detail that makes something feel finished. I will hand back to Krishna for how all of this actually gets online.</p>
+
+<h2>Part 4. Deployment, automation and wrapping up</h2>
+<div class="who">Speaker: Krishna &nbsp;·&nbsp; about 90 seconds</div>
+
+<p class="line"><span class="speaker">Krishna:</span> Thanks. So a tool sitting on a laptop is useless to anyone. The last piece was getting it online and keeping it updated without a load of manual work.</p>
+
+<p class="line"><span class="speaker">Krishna:</span> We packaged the whole thing so it can run anywhere, and put it on Hugging Face, which is a free hosting service a lot of people use for this. The good part is that we do not update it by hand. We set it up so that when we save a change to our code, a pipeline runs on its own. It checks that nothing is broken, and only if everything passes does it push the new version live, and then the site rebuilds itself.</p>
+
+<p class="line"><span class="speaker">Krishna:</span> We actually tested that end to end. We changed the version number, saved it, and watched the live site update itself with nobody touching it. And we have the records showing each run really happened, so it is not just us claiming it.</p>
+
+<p class="line"><span class="speaker">Krishna:</span> On security, connecting to the site needs a secret key, and we never put that in our code where someone could copy it. It is locked away in settings, and we even wrote a scanner that checks nobody left a key lying around by accident. We tested the scanner by planting fake keys to be sure it catches them.</p>
+
+<p class="line"><span class="speaker">Krishna:</span> To finish, I want to be honest about the limits, because we think that is part of doing this properly. The data is a made-up company, so we cannot promise the exact numbers on a real one. And we have not proven it saves money. To do that you would need to trial it on real customers, which is beyond this project. What we can say is that the tool works, it is live, it is properly built and properly tested, and it could genuinely help a team decide who to look at first. That is what we set out to do, and it is done. Thank you. We are happy to take any questions.</p>
+
+<div class="foot">Presentation script &nbsp;·&nbsp; Atharva demos the app, then Krishna closes &nbsp;·&nbsp; Live app: krish21may-churn.hf.space</div>
+
+</body>
+</html>
