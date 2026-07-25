@@ -236,7 +236,7 @@ make train
 make notebook
 make analysis       # fairness + calibration + threshold + drift
 make track          # MLflow tracking and registry
-make test           # 106 tests
+make test           # 115 tests
 make secret-scan
 make app            # http://localhost:8501
 make docker-run     # http://localhost:7860

@@ -1,6 +1,6 @@
 # Test Plan
 
-**106 tests across six modules, all passing.** Run with `make test`.
+**115 tests across six modules, all passing.** Run with `make test`.
 
 ## Strategy
 

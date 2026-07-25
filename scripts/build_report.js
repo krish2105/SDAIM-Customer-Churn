@@ -769,6 +769,8 @@ children.push(
   bullet("Both themes verified in a browser, including the locked-dependency behaviour and the adjustable threshold."),
   bullet("A Streamlit smoke test in the release gate starts the real server and requires HTTP 200 from its health endpoint."),
   bullet("The Docker image built and run locally, confirmed to answer its health check and to reproduce the local prediction exactly."),
+  h2("8.8 A note on the evidence screenshots"),
+  p("Figures 16 to 19 were captured by scripts/capture_screenshots.py, which drives a headless browser to https://krish21may-churn.hf.space. The equivalent local captures held in docs/screenshots/ are byte-for-byte identical to them. This is expected rather than suspicious. The Space runs the same container image at the same viewport and device scale factor, against the same pinned dependencies and the same deterministic pipeline, so the rendered page is pixel-identical. The identity is itself evidence that the deployed application reproduces the local one exactly. Because a page screenshot excludes the browser address bar, the capture script — which is committed to the repository — is the record of which URL each image was taken from."),
   pageBreak()
 );
 
@@ -918,7 +920,7 @@ children.push(
   table(
     ["Gate", "Status", "Evidence"],
     [
-      ["Repository pushed", "PASS", "Public, 15 commits"],
+      ["Repository pushed", "PASS", "Public, main branch, 19 commits at the time of writing"],
       ["CI run", "PASS", "Run 30019016553, all ten steps green"],
       ["Deployment run", "PASS", "Run 30020847651, both jobs green"],
       ["Space build", "PASS", "Reached runtime stage RUNNING"],
@@ -1018,8 +1020,8 @@ children.push(
       ["test_model_artifact.py", "12", "Artifact integrity, metadata realism, fresh-process loading"],
       ["test_prediction.py", "11", "Prediction behaviour, column-order enforcement, determinism"],
       ["test_deployment_files.py", "16", "Deployment configuration, workflow scope, secret hygiene"],
-      ["test_analysis.py", "27", "Fairness, calibration, threshold, drift and feature engineering"],
-      ["test_app_features.py", "36", "Explainability, batch scoring, retention-brief guardrails"],
+      ["test_analysis.py", "33", "Fairness, calibration, threshold, drift and feature engineering"],
+      ["test_app_features.py", "30", "Explainability, batch scoring, retention-brief guardrails"],
       ["Total", "115", "All passing"],
     ],
     [30, 10, 60], ["l", "r", "l"]
@@ -1159,6 +1161,18 @@ const doc = new Document({
     default: {
       document: { run: { font: "Calibri", size: 21, color: INK } },
     },
+    // The docx library's built-in heading styles omit w:outlineLvl. Without it a
+    // Word TOC field ("TOC \\o 1-3") matches nothing and renders empty, and the
+    // document outline / navigation pane stays blank. Declaring the outline level
+    // explicitly is what makes the table of contents populate.
+    paragraphStyles: [
+      { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", quickFormat: true,
+        paragraph: { outlineLevel: 0 } },
+      { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", quickFormat: true,
+        paragraph: { outlineLevel: 1 } },
+      { id: "Heading3", name: "Heading 3", basedOn: "Normal", next: "Normal", quickFormat: true,
+        paragraph: { outlineLevel: 2 } },
+    ],
   },
   sections: [
     {

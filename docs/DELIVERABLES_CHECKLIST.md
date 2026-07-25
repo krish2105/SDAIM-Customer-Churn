@@ -24,7 +24,7 @@ Status is factual: **Complete** means it exists and was verified in this build.
 | 13 | Runtime requirements | `deploy/requirements.txt` | ✅ Complete | Pinned; coverage of every runtime import asserted by test |
 | 14 | Dockerfile | `deploy/Dockerfile` | ✅ Complete | Built, run, health check passed |
 | 15 | Space README | `deploy/README.md` | ✅ Complete | Valid front matter: `sdk: docker`, `app_port: 7860` |
-| 16 | Automated tests | `tests/` | ✅ Complete | **52 passed** |
+| 16 | Automated tests | `tests/` | ✅ Complete | **115 passed** |
 | 17 | CI workflow | `.github/workflows/ci.yml` | ✅ Complete | All eight required steps |
 | 18 | Deployment workflow | `.github/workflows/deploy.yml` | ✅ Complete | Validation gate, least privilege, concurrency, config checks |
 | 19 | Security and secret-scan controls | `scripts/scan_secrets.sh`, `docs/SECURITY.md`, `.gitignore` | ✅ Complete | Scanner verified against synthetic credentials |
@@ -61,7 +61,7 @@ Status is factual: **Complete** means it exists and was verified in this build.
 | Design decisions | `docs/DECISIONS.md` | ✅ Complete — 20 decisions |
 | Architecture with Mermaid diagrams | `docs/ARCHITECTURE.md` | ✅ Complete — training, inference, CI/CD |
 | Security documentation | `docs/SECURITY.md` | ✅ Complete |
-| Test plan | `docs/TEST_PLAN.md` | ✅ Complete — 106 tests across six modules |
+| Test plan | `docs/TEST_PLAN.md` | ✅ Complete — 115 tests across six modules |
 | Improvement plan | `docs/IMPROVEMENT_PLAN.md` | ✅ Complete — H1 and H2 delivered |
 
 ---
@@ -111,27 +111,27 @@ inputs remain.
 | Task 1.3 — train and compare ≥ 2 models, justify metrics and selection | `src/train.py`, `reports/model_comparison.csv`, D-06/D-08 | ✅ |
 | Task 1.4 — save the model with preprocessing (or the whole pipeline) | `model_pipeline.joblib` — complete pipeline | ✅ |
 | Task 2.1 — interactive UI with inputs, predict action, clear output, probability | `deploy/app.py` | ✅ |
-| Task 2.2 — install dependencies, run locally, test inputs, verify preprocessing and loading | `make app`, 52 tests, browser verification | ✅ |
+| Task 2.2 — install dependencies, run locally, test inputs, verify preprocessing and loading | `make app`, 115 tests, browser verification | ✅ |
 | Task 3.1 — create a Space with all required files | `krish21may/churn` live | ✅ **Verified** |
 | Task 3.2 — build and test on the platform | Space built, RUNNING, prediction confirmed | ✅ **Verified** |
 | Task 4.1 — GitHub repository with application and deployment files | https://github.com/krish2105/SDAIM-Customer-Churn | ✅ **Verified** |
 | Task 4.2 — HF token stored securely, never hard-coded | Fine-grained token scoped to the single Space, stored as the `HF_TOKEN` Actions secret | ✅ **Verified** |
 | Task 4.3 — workflow on push to main that syncs and updates the Space | Runs 30020847651 and 30023117028 both green | ✅ **Verified** |
 | Task 4.4 — visible change deploys automatically and is verified | 1.0.0 → 1.1.0 confirmed live after an automatic redeploy | ✅ **Verified** |
-| Part 5 — report with all listed sections and screenshots | `docs/REPORT_TEMPLATE.md`, `docs/SCREENSHOT_CHECKLIST.md` | ✅ Scaffolded; ⬜ evidence pending |
+| Part 5 — report with all listed sections and screenshots | `Customer_Churn_Intelligence_Final_Report.docx` / `.pdf` | ✅ Delivered — all 14 required items, 29 figures |
 
 ---
 
 ## F. Final pre-submission gate
 
-- [ ] All `<<UNRESOLVED>>` placeholders replaced with verified values
-- [ ] Repository pushed; commit SHAs recorded from the platform
-- [ ] CI run green, URL recorded
-- [ ] Space created, built and live; URL recorded
-- [ ] Visible-change test completed and verified in the live app
+- [x] All deployment `<<UNRESOLVED>>` placeholders replaced with verified values (presentation duration remains an instructor input)
+- [x] Repository pushed; commit SHAs recorded from the platform
+- [x] CI run green, URL recorded
+- [x] Space created, built and live; URL recorded
+- [x] Visible-change test completed and verified in the live app
 - [ ] All 37 screenshots captured and checked for credentials
-- [ ] Report completed and exported
+- [x] Report completed and exported (DOCX + PDF; PDF rebuilt with a populated table of contents)
 - [ ] `make verify` re-run and `docs/QUALITY_GATE_RESULTS.md` refreshed
-- [ ] Team contribution table completed and signed
-- [ ] No claim of measured revenue, churn reduction or ROI anywhere
-- [ ] Dataset described as fictional everywhere it appears
+- [x] Team contribution table completed (§18)
+- [x] No claim of measured revenue, churn reduction or ROI anywhere
+- [x] Dataset described as fictional everywhere it appears

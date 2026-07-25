@@ -12,6 +12,7 @@ No token, key or password may ever be written in this file.
 | Course / module | SDAIM (Term 3) |
 | Instructor | JP Aggarwal |
 | Team size | 3 |
+| Submission date | 28 July 2026 |
 
 | Member | Student ID | Primary workstream |
 |---|---|---|
@@ -23,7 +24,7 @@ No token, key or password may ever be written in this file.
 
 | Field | Value | Verified? |
 |---|---|---|
-| GitHub repository | `https://github.com/krish2105/SDAIM-Customer-Churn` | ✅ **Verified** — public, 7 commits pushed, CI green |
+| GitHub repository | `https://github.com/krish2105/SDAIM-Customer-Churn` | ✅ **Verified** — public, 19 commits pushed, CI green |
 | GitHub username | `krish2105` | ✅ Verified |
 | GitHub default branch | `main` | ✅ Verified |
 | Hugging Face username | `krish21may` (Pro plan) | ✅ Verified |
@@ -55,7 +56,7 @@ was never verified. It is superseded by the repository above.
 | Question | Status |
 |---|---|
 | Does the IBM **fictional** telco sample satisfy the brief's "real-world dataset" wording? | **Pending.** The dataset is officially published by IBM and widely used, but represents a fictional company. This project describes it accurately throughout. See `docs/DECISIONS.md`, decision D-01. |
-| Required final report format (PDF / DOCX / both) | `<<UNRESOLVED>>` |
+| Required final report format (PDF / DOCX / both) | Both produced — `Customer_Churn_Intelligence_Final_Report.docx` and `.pdf` |
 | Required presentation duration | `<<UNRESOLVED>>` — `docs/DEMONSTRATION_SCRIPT.md` is written for five minutes |
 | Required repository visibility | Public (set) |
 

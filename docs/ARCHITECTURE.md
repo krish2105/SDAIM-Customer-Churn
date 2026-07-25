@@ -218,7 +218,7 @@ deterministically, and the deterministic template is the default rather than a d
 | `deploy/batch.py` | Batch validation, scoring and work-queue construction (H2-3). |
 | `deploy/rationale.py` | Guardrailed retention brief, disabled by default (H2-4). |
 | `deploy/` | Exactly what ships to the Space: app, theme, charts, Dockerfile, artifacts. |
-| `tests/` | 52 tests over the data contract, the artifact, prediction behaviour and deployment config. |
+| `tests/` | 115 tests over the data contract, the artifact, prediction behaviour and deployment config. |
 | `.github/workflows/` | CI and deployment. |
 | `docs/` | Audit trail, decisions, architecture, security, report scaffolding. |
 
