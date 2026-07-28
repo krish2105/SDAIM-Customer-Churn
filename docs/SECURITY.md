@@ -173,5 +173,11 @@ Recorded honestly rather than omitted:
 - No signed commits or signed container images.
 - The secret scanner uses pattern matching; a credential in an unusual format could evade
   it. It reduces risk, it does not eliminate it.
-- No fairness audit has been performed on the model, which is a governance gap as well as
-  an ethical one. See `deploy/artifacts/model_card.md`.
+- A fairness audit **has** been performed (`reports/fairness_report.md`, `src/fairness.py`).
+  It found no material disparity on `gender`. It found a material disparity on
+  `SeniorCitizen`, driven largely by a genuine base-rate difference between the groups
+  (0.4414 vs 0.2325 actual churn rate). Removing both attributes was measured to cost only
+  +0.0008 ROC-AUC — inside cross-validation noise — so removal is now recommended, though
+  both are retained in version 1.1.0 to preserve the already-published evidence trail. See
+  `deploy/artifacts/model_card.md` and `docs/DECISIONS.md` (D-21, D-22) for the full
+  reasoning and the governance gap this closes.
