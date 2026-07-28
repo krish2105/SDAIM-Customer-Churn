@@ -33,7 +33,12 @@ import pandas as pd  # noqa: E402
 from sklearn.metrics import confusion_matrix  # noqa: E402
 
 from src import config  # noqa: E402
-from src.analysis_base import EvaluationContext, load_evaluation_context  # noqa: E402
+from src.analysis_base import (  # noqa: E402
+    BOOTSTRAP_RESAMPLES,
+    EvaluationContext,
+    bootstrap_percentile_ci,
+    load_evaluation_context,
+)
 
 FIGURE_DPI = 200
 
@@ -141,6 +146,90 @@ def compute_disparities(groups: list[GroupMetrics]) -> dict[str, Any]:
     }
 
 
+DISPARITY_CRITERIA: tuple[str, ...] = (
+    "demographic_parity", "equal_opportunity", "predictive_parity", "false_positive_rate",
+)
+
+
+def _group_rate(
+    groups: np.ndarray, actual: np.ndarray, predicted: np.ndarray, level: str, criterion: str
+) -> float:
+    """One subgroup's rate for *criterion*, or NaN if the resample has no such row."""
+    mask = groups == level
+    if criterion == "demographic_parity":
+        subset = predicted[mask]
+        return float(subset.mean()) if subset.size else float("nan")
+    if criterion == "equal_opportunity":
+        subset = mask & (actual == 1)
+        return float((predicted[subset] == 1).mean()) if subset.any() else float("nan")
+    if criterion == "predictive_parity":
+        subset = mask & (predicted == 1)
+        return float((actual[subset] == 1).mean()) if subset.any() else float("nan")
+    if criterion == "false_positive_rate":
+        subset = mask & (actual == 0)
+        return float((predicted[subset] == 1).mean()) if subset.any() else float("nan")
+    raise ValueError(f"Unknown criterion: {criterion}")  # pragma: no cover - guarded by caller
+
+
+def bootstrap_disparity_ci(
+    context: EvaluationContext,
+    attribute: str,
+    threshold: float,
+    n_resamples: int = BOOTSTRAP_RESAMPLES,
+    seed: int = config.RANDOM_STATE,
+) -> dict[str, dict[str, float]]:
+    """95% bootstrap CI for each disparity gap, resampling test-set rows jointly.
+
+    Rows are resampled together (group, actual outcome and prediction as one
+    unit) so the pairing that makes a confusion matrix meaningful is preserved
+    in every resample — resampling the three arrays independently would answer
+    a different, meaningless question.
+
+    **Bootstraps the signed difference, not ``max - min``.** A gap defined as
+    ``max(rates) - min(rates)`` cannot go negative in any resample, so its
+    bootstrap distribution is biased away from zero even when the true gap is
+    zero — the interval would almost always "exclude zero" regardless of
+    whether the disparity is real. Both audited attributes have exactly two
+    levels (by design — see the module docstring), so the signed difference
+    ``rate(level[1]) - rate(level[0])`` is well-defined, can straddle zero, and
+    its absolute value at the 2.5th/97.5th percentiles gives the same
+    magnitude the point estimate reports.
+    """
+    groups = context.X_test[attribute].astype(str).to_numpy()
+    actual = context.y_test.to_numpy()
+    predicted = context.predictions_at(threshold)
+    levels = sorted(set(groups))
+    if len(levels) != 2:
+        raise ValueError(
+            f"bootstrap_disparity_ci assumes exactly two levels; '{attribute}' has {levels}"
+        )
+    n = len(groups)
+
+    def make_statistic(criterion: str):
+        def statistic(indices: np.ndarray) -> float:
+            g, a, p = groups[indices], actual[indices], predicted[indices]
+            high = _group_rate(g, a, p, levels[1], criterion)
+            low = _group_rate(g, a, p, levels[0], criterion)
+            return high - low
+
+        return statistic
+
+    intervals: dict[str, dict[str, float]] = {}
+    for criterion in DISPARITY_CRITERIA:
+        signed = bootstrap_percentile_ci(n, make_statistic(criterion), n_resamples, seed=seed)
+        # Report as a magnitude interval (matching the unsigned point-estimate
+        # gap already shown), but zero-exclusion is judged on the signed
+        # interval *before* taking the absolute value — see the docstring.
+        crosses_zero = signed["low"] <= 0.0 <= signed["high"]
+        intervals[criterion] = {
+            "estimate": abs(signed["estimate"]),
+            "low": min(abs(signed["low"]), abs(signed["high"])) if not crosses_zero else 0.0,
+            "high": max(abs(signed["low"]), abs(signed["high"])),
+            "excludes_zero": bool(not crosses_zero),
+        }
+    return intervals
+
+
 def assess(disparities: dict[str, Any]) -> dict[str, Any]:
     """Flag whether any criterion exceeds the materiality convention."""
     findings = {}
@@ -222,6 +311,9 @@ def run_audit(threshold: float | None = None, *, with_counterfactual: bool = Tru
         results["attributes"][attribute] = {
             "groups": [asdict(g) for g in groups],
             "disparities": disparities,
+            "disparity_confidence_intervals": bootstrap_disparity_ci(
+                context, attribute, decision_threshold
+            ),
             "assessment": assess(disparities),
             "figure": plot_attribute(groups, attribute),
         }
@@ -284,6 +376,7 @@ def _write_markdown(results: dict[str, Any]) -> None:
         groups = payload["groups"]
         disparities = payload["disparities"]
         assessment = payload["assessment"]
+        confidence_intervals = payload.get("disparity_confidence_intervals", {})
 
         lines += [
             f"## {attribute}",
@@ -316,8 +409,8 @@ def _write_markdown(results: dict[str, Any]) -> None:
             "",
             "### Disparities",
             "",
-            "| Criterion | Max | Min | Gap | Ratio (min/max) | Material? | Passes 4/5 screen |",
-            "|---|---:|---:|---:|---:|---|---|",
+            "| Criterion | Max | Min | Gap | 95% CI (gap) | Ratio (min/max) | Material? | Passes 4/5 screen |",
+            "|---|---:|---:|---:|---:|---:|---|---|",
         ]
         for criterion in ("demographic_parity", "equal_opportunity", "predictive_parity",
                           "false_positive_rate"):
@@ -325,10 +418,40 @@ def _write_markdown(results: dict[str, Any]) -> None:
             flag = assessment.get(criterion, {})
             material = "**YES**" if flag.get("material") else "no"
             four_fifths = "yes" if flag.get("passes_four_fifths") else "**NO**"
+            ci = confidence_intervals.get(criterion)
+            ci_text = f"[{ci['low']:.4f}, {ci['high']:.4f}]" if ci else "—"
             lines.append(
                 f"| {criterion.replace('_', ' ')} | {values['max']:.4f} | {values['min']:.4f} | "
-                f"{values['gap']:.4f} | {values['ratio']:.4f} | {material} | {four_fifths} |"
+                f"{values['gap']:.4f} | {ci_text} | {values['ratio']:.4f} | {material} | {four_fifths} |"
             )
+
+        excludes_zero = [
+            criterion for criterion in ("demographic_parity", "equal_opportunity",
+                                        "predictive_parity", "false_positive_rate")
+            if confidence_intervals.get(criterion, {}).get("excludes_zero", False)
+        ]
+        lines += [
+            "",
+            f"95% confidence intervals from a {BOOTSTRAP_RESAMPLES:,}-resample paired bootstrap "
+            "over the held-out test set, computed on the **signed** difference between the two",
+            "groups and reported here as a magnitude (see `src.fairness.bootstrap_disparity_ci`).",
+            "Bootstrapping `max - min` directly would bias the interval away from zero regardless",
+            "of whether a real disparity exists, because that statistic cannot go negative in any",
+            "resample. A gap whose signed interval excludes zero is distinguishable from sampling",
+            "noise at this sample size; one whose interval includes zero could plausibly be zero in",
+            "a repeated sample of the same size, however large the point estimate looks.",
+        ]
+        if excludes_zero:
+            lines.append(
+                "Distinguishable from zero at the 95% level here: "
+                + ", ".join(f"`{c.replace('_', ' ')}`" for c in excludes_zero) + "."
+            )
+        else:
+            lines.append(
+                "None of this attribute's gaps are distinguishable from zero at the 95% level — "
+                "every interval includes zero."
+            )
+        lines.append("")
 
         base = disparities["base_rate"]
         lines += [

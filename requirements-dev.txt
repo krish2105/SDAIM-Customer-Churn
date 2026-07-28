@@ -12,6 +12,11 @@ streamlit
 # Statistical tests for drift detection (chi-squared)
 scipy
 
+# Survival analysis (time-to-churn by contract, expected-remaining-tenure
+# lookup for revenue-at-risk valuation). Development only — the runtime
+# application consumes a plain JSON lookup, never lifelines itself.
+lifelines
+
 # Experiment tracking and model registry (H2-1). Development only —
 # deliberately absent from deploy/requirements.txt so the runtime image stays
 # small. A test asserts the application never imports it.

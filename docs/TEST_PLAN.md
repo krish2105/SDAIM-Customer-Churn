@@ -1,6 +1,6 @@
 # Test Plan
 
-**115 tests across six modules, all passing.** Run with `make test`.
+**146 tests across six modules, all passing.** Run with `make test`.
 
 ## Strategy
 
@@ -82,7 +82,7 @@ still run and still return a plausible number, just a wrong one.
 The smoke fixture is built from five real dataset rows with `Churn` and `customerID`
 dropped, so the predictors are genuine and no label can leak into them.
 
-## 4. `tests/test_deployment_files.py` — 16 tests
+## 4. `tests/test_deployment_files.py` — 17 tests
 
 | Test | Guards against |
 |---|---|
@@ -102,6 +102,7 @@ dropped, so the predictors are genuine and no label can leak into them.
 | `test_no_secret_patterns_in_project_files` | Any committed credential |
 | `test_gitignore_covers_sensitive_paths` | Weakened ignore rules |
 | `test_no_env_file_is_committed_to_the_repository` | A `.env` appearing in the tree |
+| `test_dockerfile_copies_every_local_python_module` | A module the app imports but the image's `COPY` line omits — builds locally, fails in the container |
 
 `test_deployment_requirements_cover_every_runtime_import` parses each runtime module's AST
 and checks every third-party import against the pinned requirements, mapping import names
@@ -111,9 +112,10 @@ list would go stale; this cannot.
 The secret-pattern test reports the file path and category only. A test that printed the
 match would leak the secret into CI output.
 
-## 5. `tests/test_analysis.py` — 23 tests
+## 5. `tests/test_analysis.py` — 48 tests
 
-Covers the Horizon 1 and 2 analysis modules.
+Covers the Horizon 1 and 2 analysis modules, plus the survival, revenue and bootstrap-CI
+extensions.
 
 | Test group | Guards against |
 |---|---|
@@ -123,8 +125,11 @@ Covers the Horizon 1 and 2 analysis modules.
 | Calibration | ECE that fails to detect known over-confidence; bins that lose rows; calibration silently changing the ranking |
 | Threshold | Recall rising as the threshold rises; the core economic claim (higher miss cost → lower threshold) failing |
 | Drift | PSI non-zero on identical distributions; the detector firing on unshifted data, or failing to fire on shifted data; a baseline built from anything but the training split |
+| Survival | Non-monotonic survival curves; expected remaining tenure exceeding the horizon or not floored at it; segments missing from the persisted reference |
+| Revenue | Measured revenue churn silently using a model output instead of the actual label; net revenue churn quietly reported as a number instead of "not computable" |
+| Bootstrap CI | A `max - min` gap statistic biased away from zero regardless of the true disparity; SeniorCitizen's material gap not excluding zero while gender's does; non-reproducible intervals for a fixed seed; a three-level attribute silently accepted instead of raising |
 
-## 6. `tests/test_app_features.py` — 31 tests
+## 6. `tests/test_app_features.py` — 45 tests
 
 Imports from `deploy/` exactly as the running container does, so a broken import path fails
 here rather than in the Space.
@@ -135,6 +140,8 @@ here rather than in the Space.
 | Batch validation | Missing columns, negative values or oversized uploads being accepted; unknown categories wrongly blocking |
 | Batch scoring | Queue not ranked by risk; batch disagreeing with single-record scoring; risk bands not matching the schema; scoring too slow for the interface |
 | Retention brief | The LLM layer being enabled by default; prohibited phrasing passing the filter; the deterministic fallback failing its own checks; raw customer data reaching the prompt |
+| Revenue-at-risk valuation | Expected remaining tenure not decreasing as tenure increases; an unrecognised contract silently valued instead of returning `None`; the batch queue adding the column without a survival reference supplied |
+| Batch-alert webhook | The alert firing by default; firing without a webhook URL configured; a customer row reaching the payload; a network failure propagating instead of being swallowed; firing again on a Streamlit rerun of the same result |
 
 ---
 
@@ -153,7 +160,7 @@ here rather than in the Space.
 ## Latest run
 
 ```
-106 passed
+146 passed
 ```
 
 Recorded results and timestamps are in `docs/QUALITY_GATE_RESULTS.md`.

@@ -330,6 +330,12 @@ code {{ font-family: {MONO_STACK}; color: var(--cci-text); background: var(--cci
 .cci-kpis {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--cci-space-md); }}
 @media (max-width: 900px) {{ .cci-kpis {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
 @media (max-width: 520px) {{ .cci-kpis {{ grid-template-columns: 1fr; }} }}
+
+/* For KPI rows placed inside a narrow column (e.g. the result column next to
+   the input form): a viewport-width media query cannot see how narrow the
+   *container* actually is, so this variant sizes columns from their own
+   content instead of the page width. */
+.cci-kpis-narrow {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--cci-space-md); }}
 .cci-kpi {{
   background: var(--cci-surface);
   border: 1px solid var(--cci-border);

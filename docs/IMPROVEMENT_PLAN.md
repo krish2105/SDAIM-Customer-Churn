@@ -8,6 +8,42 @@
 
 ---
 
+## 0. Addendum (v1.2.0) — executive/revenue extensions, delivered
+
+A further pass beyond Horizon 2, aimed squarely at the audience this plan was written for —
+turning measured model performance into a dollar-denominated, C-level narrative without
+overstating what has actually been validated.
+
+| Delivered | Measured result |
+|---|---|
+| **Survival analysis** (`src/survival.py`) | Kaplan-Meier retention curves by `Contract`. Month-to-month restricted-mean survival 36.3 months vs. Two year 71.5; log-rank test statistic 2352.87 (p ≈ 0) — the three curves differ far beyond sampling noise. |
+| **Revenue-at-risk valuation** (`deploy/valuation.py`) | Probability × `MonthlyCharges` × expected remaining tenure (from the survival curve). Surfaced per customer and per batch work queue. Not a forecast of realised loss — a transparent multiplication of disclosed numbers. |
+| **Revenue-weighted churn metrics** (`src/revenue.py`) | Gross revenue churn **30.14%** vs. logo churn **26.54%** on the held-out test set. Net revenue churn explicitly reported as **not computable** — this is a single cross-section with no expansion/contraction revenue series, and the honest response is to say so rather than approximate it. |
+| **Bootstrap confidence intervals** (`src.analysis_base.bootstrap_percentile_ci`) | Added to the fairness audit and calibration analysis. `gender`'s disparity intervals include zero (not distinguishable from noise); `SeniorCitizen`'s do not. Calibration over-confidence 0.15, 95% CI [0.1317, 0.1703] — not a sampling artefact. |
+| **Batch-alert webhook** (`deploy/alerts.py`) | Optional Slack notification on a scored queue containing High-risk accounts. Aggregate counts and revenue at risk only, never a customer row; off by default; a network failure never blocks scoring. |
+| Test suite | **115 → 146 tests**, all passing. |
+
+**Why this addendum exists rather than a fourth horizon.** These five items are not new
+modelling capability in the Horizon 3 sense (a FastAPI service, a feature store, live
+monitoring) — they are extensions of governance rigour already established in Horizon 1
+(confidence intervals sharpen the fairness/calibration findings) and of the retention
+work-queue already delivered in Horizon 2 (revenue-at-risk and the alert webhook make that
+queue prioritisable by commercial stake, not only by probability). They were scoped and
+delivered together because each is independently small, each closes a specific gap a C-level
+reviewer would ask about first ("so what's the dollar exposure?", "is that disparity real or
+noise?"), and none of them required touching the deployed model itself — `model_pipeline.joblib`
+is unchanged; only the application version moved to reflect new capability
+(`MODEL_VERSION` in `src/config.py`, now `1.2.0`).
+
+**What remains honestly unresolved.** Revenue-at-risk and the revenue-weighted metrics are
+still built on a fictional, single-cross-section dataset: no live population has been
+observed, and no retention intervention's return has been measured. Horizon 3's central
+point stands unchanged — an A/B evaluation is the only way to make a genuine ROI claim, and
+until one exists this addendum improves the *prioritisation* story, not the *proof of impact*
+story.
+
+---
+
 ## 1. Executive summary
 
 Version 1.0.0 is delivered, verified and deployed to source control. It does what it claims:

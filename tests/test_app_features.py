@@ -54,6 +54,13 @@ def raw_customers() -> pd.DataFrame:
     return pd.read_csv(config.RAW_DATASET_PATH, dtype=str, keep_default_na=False)
 
 
+@pytest.fixture(scope="module")
+def survival_reference() -> dict:
+    if not config.SURVIVAL_REFERENCE_PATH.is_file():
+        pytest.skip("Survival reference missing — run `make survival`.")
+    return json.loads(config.SURVIVAL_REFERENCE_PATH.read_text(encoding="utf-8"))
+
+
 # --------------------------------------------------------------------------
 # Explainability
 # --------------------------------------------------------------------------
@@ -324,3 +331,162 @@ def test_brief_reports_its_provenance() -> None:
     brief = rationale.Brief(text="x", generated=False)
     assert "no ai generation" in brief.provenance.lower()
     assert rationale.Brief(text="x", generated=True).provenance.lower().startswith("ai-generated")
+
+
+# --------------------------------------------------------------------------
+# Revenue-at-risk valuation
+# --------------------------------------------------------------------------
+
+
+def test_expected_remaining_tenure_is_within_the_survival_horizon(survival_reference) -> None:
+    import valuation
+
+    for contract in ("Month-to-month", "One year", "Two year"):
+        remaining = valuation.expected_remaining_tenure(0.0, contract, survival_reference)
+        tau = survival_reference["tau_months"]
+        assert 0.0 < remaining <= tau
+
+
+def test_expected_remaining_tenure_decreases_as_current_tenure_increases(survival_reference) -> None:
+    """A customer already further along has, on average, less commercial life left."""
+    import valuation
+
+    early = valuation.expected_remaining_tenure(1.0, "Month-to-month", survival_reference)
+    late = valuation.expected_remaining_tenure(60.0, "Month-to-month", survival_reference)
+    assert late < early
+
+
+def test_expected_remaining_tenure_is_floored_at_the_horizon(survival_reference) -> None:
+    import valuation
+
+    tau = survival_reference["tau_months"]
+    remaining = valuation.expected_remaining_tenure(tau, "Two year", survival_reference)
+    assert remaining == survival_reference["floor_remaining_months"]
+
+
+def test_expected_remaining_tenure_returns_none_for_an_unrecognised_contract(
+    survival_reference,
+) -> None:
+    import valuation
+
+    assert valuation.expected_remaining_tenure is not None  # sanity: module imported
+    result = valuation.revenue_at_risk(0.5, 70.0, 12.0, "Lifetime", survival_reference)
+    assert result is None
+
+
+def test_revenue_at_risk_matches_manual_multiplication(survival_reference) -> None:
+    import valuation
+
+    probability, monthly_charges, tenure, contract = 0.42, 80.0, 10.0, "Month-to-month"
+    result = valuation.revenue_at_risk(probability, monthly_charges, tenure, contract, survival_reference)
+    remaining = valuation.expected_remaining_tenure(tenure, contract, survival_reference)
+    assert result["revenue_at_risk"] == pytest.approx(probability * monthly_charges * remaining, abs=0.01)
+
+
+def test_batch_scoring_adds_revenue_at_risk_when_reference_supplied(
+    pipeline, schema, raw_customers, survival_reference
+) -> None:
+    import batch
+
+    queue = batch.score_batch(
+        pipeline, raw_customers.head(50), schema, 0.5, config.ID_COLUMN,
+        survival_reference=survival_reference,
+    )
+    assert "Revenue at risk" in queue.columns
+    assert queue["Revenue at risk"].notna().all()
+    assert (queue["Revenue at risk"] >= 0).all()
+
+
+def test_batch_scoring_omits_revenue_at_risk_without_a_reference(pipeline, schema, raw_customers) -> None:
+    import batch
+
+    queue = batch.score_batch(pipeline, raw_customers.head(20), schema, 0.5, config.ID_COLUMN)
+    assert "Revenue at risk" not in queue.columns
+
+
+# --------------------------------------------------------------------------
+# Batch-scoring alert webhook
+# --------------------------------------------------------------------------
+
+
+def test_alerts_disabled_by_default(monkeypatch) -> None:
+    import alerts
+
+    monkeypatch.delenv(alerts.ENABLE_ENV_VAR, raising=False)
+    assert alerts.is_enabled() is False
+
+
+def test_alerts_stay_disabled_without_a_webhook_url(monkeypatch) -> None:
+    import alerts
+
+    monkeypatch.setenv(alerts.ENABLE_ENV_VAR, "true")
+    monkeypatch.delenv(alerts.WEBHOOK_ENV_VAR, raising=False)
+    assert alerts.is_enabled() is False
+
+
+def test_alerts_enabled_only_with_both_flag_and_url(monkeypatch) -> None:
+    import alerts
+
+    monkeypatch.setenv(alerts.ENABLE_ENV_VAR, "true")
+    monkeypatch.setenv(alerts.WEBHOOK_ENV_VAR, "https://hooks.slack.example/T000/B000/xxx")
+    assert alerts.is_enabled() is True
+
+
+def test_alert_message_contains_only_aggregate_counts_never_a_customer_row() -> None:
+    """The batch page promises uploaded data is never persisted or forwarded."""
+    import alerts
+
+    summary = {
+        "total": 100, "flagged": 12, "flagged_share": 0.12, "high": 5, "medium": 7, "low": 88,
+        "total_revenue_at_risk": 1234.0, "flagged_revenue_at_risk": 900.0,
+    }
+    message = alerts.build_message(summary, 0.5)
+    assert "customerID" not in message["text"]
+    assert "7590-VHVEG" not in message["text"]
+    assert "human review" in message["text"].lower()
+    assert "900" in message["text"]
+
+
+def test_send_alert_returns_false_without_a_webhook_configured(monkeypatch) -> None:
+    import alerts
+
+    monkeypatch.delenv(alerts.WEBHOOK_ENV_VAR, raising=False)
+    assert alerts.send_alert({"text": "test"}) is False
+
+
+def test_send_alert_catches_a_network_failure_and_returns_false(monkeypatch) -> None:
+    """A webhook outage must never break batch scoring."""
+    import alerts
+
+    monkeypatch.setenv(alerts.WEBHOOK_ENV_VAR, "https://hooks.slack.example/T000/B000/xxx")
+
+    def _raise(*args, **kwargs):
+        raise ConnectionError("simulated network failure")
+
+    monkeypatch.setattr("requests.post", _raise)
+    assert alerts.send_alert({"text": "test"}) is False
+
+
+def test_maybe_send_batch_alert_is_a_no_op_when_disabled(monkeypatch) -> None:
+    import alerts
+
+    monkeypatch.delenv(alerts.ENABLE_ENV_VAR, raising=False)
+    calls = []
+    monkeypatch.setattr(alerts, "send_alert", lambda payload: calls.append(payload) or True)
+    alerts.maybe_send_batch_alert(
+        object(), {"total": 10, "flagged": 5, "high": 3, "medium": 1, "low": 6}, 0.5
+    )
+    assert calls == []
+
+
+def test_maybe_send_batch_alert_skips_results_with_no_high_risk_accounts(monkeypatch) -> None:
+    import alerts
+
+    monkeypatch.setenv(alerts.ENABLE_ENV_VAR, "true")
+    monkeypatch.setenv(alerts.WEBHOOK_ENV_VAR, "https://hooks.slack.example/T000/B000/xxx")
+    calls = []
+    monkeypatch.setattr(alerts, "send_alert", lambda payload: calls.append(payload) or True)
+    alerts.maybe_send_batch_alert(
+        object(), {"total": 10, "flagged": 0, "high": 0, "medium": 0, "low": 10}, 0.5
+    )
+    assert calls == []

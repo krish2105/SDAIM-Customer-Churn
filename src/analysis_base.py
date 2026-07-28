@@ -89,3 +89,48 @@ def encoded_feature_names(pipeline: Pipeline) -> list[str]:
     """Feature names after the ColumnTransformer, in the order the model sees them."""
     preprocessor = pipeline.named_steps["preprocessor"]
     return list(preprocessor.get_feature_names_out())
+
+
+#: Shared bootstrap settings so every module reports a CI at the same
+#: precision from the same number of resamples, rather than each analysis
+#: picking its own and making the reports incomparable.
+BOOTSTRAP_RESAMPLES = 1000
+BOOTSTRAP_ALPHA = 0.05
+
+
+def bootstrap_percentile_ci(
+    n: int,
+    statistic_fn,
+    n_resamples: int = BOOTSTRAP_RESAMPLES,
+    alpha: float = BOOTSTRAP_ALPHA,
+    seed: int = 42,
+) -> dict[str, float]:
+    """Percentile bootstrap confidence interval for an arbitrary row-level statistic.
+
+    Args:
+        n: number of rows in the population being resampled.
+        statistic_fn: called with one integer index array (with replacement,
+            length ``n``) per resample; must return a single float.
+        n_resamples: bootstrap resamples. 1,000 is enough for a stable 95% CI
+            at this sample size without being slow to compute.
+        alpha: significance level; 0.05 gives a 95% interval.
+        seed: makes the interval reproducible run to run, same convention as
+            every other seeded procedure in this project.
+
+    Returns:
+        A dict with ``low``, ``high`` (the percentile bounds) and ``estimate``
+        (the statistic on the unresampled data, for comparison).
+    """
+    rng = np.random.default_rng(seed)
+    point_estimate = statistic_fn(np.arange(n))
+    samples = np.empty(n_resamples, dtype=float)
+    for i in range(n_resamples):
+        indices = rng.integers(0, n, size=n)
+        samples[i] = statistic_fn(indices)
+
+    # nanpercentile rather than percentile: a statistic_fn may legitimately
+    # return NaN for a degenerate resample (e.g. a subgroup entirely absent by
+    # chance). Those resamples are excluded rather than poisoning the interval.
+    lower = float(np.nanpercentile(samples, 100 * (alpha / 2)))
+    upper = float(np.nanpercentile(samples, 100 * (1 - alpha / 2)))
+    return {"estimate": float(point_estimate), "low": lower, "high": upper}

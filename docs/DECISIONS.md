@@ -497,3 +497,70 @@ training performance — and the outcome was not to change the model, so the pub
 metrics remain a single-use evaluation of the deployed artifact. Had the experiment
 recommended adoption, the new metrics would have had to be reported as a mildly optimistic
 second-look estimate rather than an untouched holdout result.
+
+---
+
+## D-30 — Revenue-at-risk uses a survival-based expected remaining tenure, not a flat multiplier
+
+**Decision.** Value a customer's exposure as `probability x MonthlyCharges x expected
+remaining months`, where the remaining-months figure comes from a Kaplan-Meier survival curve
+fitted per `Contract` type (`src/survival.py`), not a constant such as "12 months for
+everyone."
+
+**Why.** `tenure` (duration) and `Churn` (event, with `No` as right-censoring) already form a
+valid survival-analysis dataset — no synthetic assumption is required. A flat multiplier would
+have been simpler to build but wrong in a way that is easy to demonstrate: a two-year-contract
+customer plainly has a different expected commercial future than a month-to-month customer at
+the same tenure, and the flat version would value them identically.
+
+**Scope kept honest.** The curve is fitted on the full validated dataset, not the train/test
+split — it describes observed data, not the classifier's predictions, so the split that
+protects the model evaluation from leakage has no equivalent requirement here (see
+`reports/survival_report.md`). Stratification is by `Contract` only; finer segmentation would
+thin the strata for a marginal gain in resolution.
+
+**What this explicitly is not.** Not a forecast of realised revenue loss, and no retention
+intervention's return has been measured. It is a transparent multiplication of three
+already-disclosed numbers, offered to prioritise a queue by commercial stake rather than
+probability alone — the same "state the ceiling of the evidence honestly" discipline applied
+to every other governance analysis in this project.
+
+---
+
+## D-31 — Fairness and calibration confidence intervals bootstrap the signed difference
+
+**Decision.** `src.fairness.bootstrap_disparity_ci` and `src.calibration.bootstrap_calibration_ci`
+report a 95% percentile-bootstrap interval, computed on the **signed** difference between two
+groups (or a metric on one population), converted to a magnitude only for display.
+
+**Why not bootstrap `max(rates) - min(rates)` directly, which was the first implementation.**
+That statistic cannot go negative in any resample, so its bootstrap distribution is biased
+away from zero **even when the true gap is zero** — every interval would "exclude zero"
+regardless of whether a disparity is real, which would have made the interval worse than
+useless for the one question it exists to answer. Verified directly: on `gender`, whose point
+estimate gap is 0.0006–0.048, the max-min version produced intervals that never touched zero;
+the signed version correctly produces intervals that do, while `SeniorCitizen`'s intervals
+(true disparity ≈0.12–0.33) stay clearly bounded away from zero either way.
+
+**Scope.** Both audited attributes have exactly two levels by this project's own design (see
+D-entries on the fairness audit), so `bootstrap_disparity_ci` raises rather than silently
+guessing if it is ever pointed at a three-level attribute.
+
+---
+
+## D-32 — The batch-alert webhook sends aggregate counts only, and ships disabled
+
+**Decision.** `deploy/alerts.py` posts a Slack-compatible summary (customer counts, risk-band
+counts, aggregate revenue at risk) when a scored batch contains High-risk accounts. It never
+includes a customer identifier or row, and is off unless both `ENABLE_BATCH_ALERTS` and
+`ALERT_WEBHOOK_URL` are set — the same kill-switch discipline as the GenAI rationale layer
+(D-entries under H2-4).
+
+**Why aggregate-only, not configurable.** The batch page already promises uploaded data is
+scored in memory and never persisted. Forwarding individual customer rows to a third-party
+webhook would break that promise the moment the feature was switched on, so this is not
+offered as an option — the payload shape enforces the guardrail rather than documenting it.
+
+**Why Slack's payload shape specifically.** `{"text": ...}` is the simplest widely supported
+incoming-webhook format. Microsoft Teams' workflow webhooks expect an Adaptive Card instead;
+supporting both now would be building for a destination nobody has asked for yet.

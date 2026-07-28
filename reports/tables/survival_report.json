@@ -1,0 +1,31 @@
+{
+  "tau_months": 72,
+  "segments": [
+    {
+      "contract": "Month-to-month",
+      "n": 3875,
+      "events_observed": 1655,
+      "median_survival_months": 35.0,
+      "restricted_mean_survival_months": 36.3
+    },
+    {
+      "contract": "One year",
+      "n": 1473,
+      "events_observed": 166,
+      "median_survival_months": null,
+      "restricted_mean_survival_months": 66.42
+    },
+    {
+      "contract": "Two year",
+      "n": 1695,
+      "events_observed": 48,
+      "median_survival_months": null,
+      "restricted_mean_survival_months": 71.54
+    }
+  ],
+  "logrank_test": {
+    "test_statistic": 2352.87253825934,
+    "p_value": 0.0
+  },
+  "figure": "20_survival_curves_by_contract.png"
+}

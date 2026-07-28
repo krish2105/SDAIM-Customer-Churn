@@ -49,12 +49,22 @@ Confusion matrix per group:
 
 ### Disparities
 
-| Criterion | Max | Min | Gap | Ratio (min/max) | Material? | Passes 4/5 screen |
-|---|---:|---:|---:|---:|---|---|
-| demographic parity | 0.4134 | 0.4127 | 0.0006 | 0.9984 | no | yes |
-| equal opportunity | 0.7901 | 0.7772 | 0.0129 | 0.9837 | no | yes |
-| predictive parity | 0.5282 | 0.4799 | 0.0483 | 0.9085 | no | yes |
-| false positive rate | 0.2865 | 0.2713 | 0.0153 | 0.9468 | no | yes |
+| Criterion | Max | Min | Gap | 95% CI (gap) | Ratio (min/max) | Material? | Passes 4/5 screen |
+|---|---:|---:|---:|---:|---:|---|---|
+| demographic parity | 0.4134 | 0.4127 | 0.0006 | [0.0000, 0.0548] | 0.9984 | no | yes |
+| equal opportunity | 0.7901 | 0.7772 | 0.0129 | [0.0000, 0.0885] | 0.9837 | no | yes |
+| predictive parity | 0.5282 | 0.4799 | 0.0483 | [0.0000, 0.1336] | 0.9085 | no | yes |
+| false positive rate | 0.2865 | 0.2713 | 0.0153 | [0.0000, 0.0725] | 0.9468 | no | yes |
+
+95% confidence intervals from a 1,000-resample paired bootstrap over the held-out test set, computed on the **signed** difference between the two
+groups and reported here as a magnitude (see `src.fairness.bootstrap_disparity_ci`).
+Bootstrapping `max - min` directly would bias the interval away from zero regardless
+of whether a real disparity exists, because that statistic cannot go negative in any
+resample. A gap whose signed interval excludes zero is distinguishable from sampling
+noise at this sample size; one whose interval includes zero could plausibly be zero in
+a repeated sample of the same size, however large the point estimate looks.
+None of this attribute's gaps are distinguishable from zero at the 95% level — every interval includes zero.
+
 
 Actual churn rate differs between groups by 0.0302 (0.2507 to 0.2809). This is a property of the sample, not of
 the model, and it is the reason the three criteria cannot all be satisfied.
@@ -77,12 +87,22 @@ Confusion matrix per group:
 
 ### Disparities
 
-| Criterion | Max | Min | Gap | Ratio (min/max) | Material? | Passes 4/5 screen |
-|---|---:|---:|---:|---:|---|---|
-| demographic parity | 0.6892 | 0.3614 | 0.3278 | 0.5244 | **YES** | **NO** |
-| equal opportunity | 0.9286 | 0.7319 | 0.1967 | 0.7882 | **YES** | **NO** |
-| predictive parity | 0.5948 | 0.4709 | 0.1239 | 0.7917 | **YES** | **NO** |
-| false positive rate | 0.5000 | 0.2492 | 0.2508 | 0.4984 | **YES** | **NO** |
+| Criterion | Max | Min | Gap | 95% CI (gap) | Ratio (min/max) | Material? | Passes 4/5 screen |
+|---|---:|---:|---:|---:|---:|---|---|
+| demographic parity | 0.6892 | 0.3614 | 0.3278 | [0.2634, 0.3962] | 0.5244 | **YES** | **NO** |
+| equal opportunity | 0.9286 | 0.7319 | 0.1967 | [0.1218, 0.2643] | 0.7882 | **YES** | **NO** |
+| predictive parity | 0.5948 | 0.4709 | 0.1239 | [0.0290, 0.2152] | 0.7917 | **YES** | **NO** |
+| false positive rate | 0.5000 | 0.2492 | 0.2508 | [0.1605, 0.3481] | 0.4984 | **YES** | **NO** |
+
+95% confidence intervals from a 1,000-resample paired bootstrap over the held-out test set, computed on the **signed** difference between the two
+groups and reported here as a magnitude (see `src.fairness.bootstrap_disparity_ci`).
+Bootstrapping `max - min` directly would bias the interval away from zero regardless
+of whether a real disparity exists, because that statistic cannot go negative in any
+resample. A gap whose signed interval excludes zero is distinguishable from sampling
+noise at this sample size; one whose interval includes zero could plausibly be zero in
+a repeated sample of the same size, however large the point estimate looks.
+Distinguishable from zero at the 95% level here: `demographic parity`, `equal opportunity`, `predictive parity`, `false positive rate`.
+
 
 Actual churn rate differs between groups by 0.2089 (0.2325 to 0.4414). This is a property of the sample, not of
 the model, and it is the reason the three criteria cannot all be satisfied.

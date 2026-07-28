@@ -107,6 +107,84 @@ def test_fairness_report_exists_and_reports_a_decision() -> None:
     assert "gender" in content and "SeniorCitizen" in content
 
 
+def test_bootstrap_percentile_ci_brackets_a_known_constant() -> None:
+    from src.analysis_base import bootstrap_percentile_ci
+
+    result = bootstrap_percentile_ci(200, lambda indices: 3.0, n_resamples=50, seed=1)
+    assert result["estimate"] == pytest.approx(3.0)
+    assert result["low"] == pytest.approx(3.0)
+    assert result["high"] == pytest.approx(3.0)
+
+
+def test_bootstrap_percentile_ci_is_reproducible_for_a_fixed_seed() -> None:
+    from src.analysis_base import bootstrap_percentile_ci
+
+    rng = np.random.default_rng(0)
+    values = rng.normal(size=300)
+
+    def mean_of(indices: np.ndarray) -> float:
+        return float(values[indices].mean())
+
+    first = bootstrap_percentile_ci(300, mean_of, n_resamples=200, seed=7)
+    second = bootstrap_percentile_ci(300, mean_of, n_resamples=200, seed=7)
+    assert first == second
+
+
+def test_fairness_bootstrap_ci_flags_the_material_attribute_and_clears_the_clean_one(context) -> None:
+    """The whole point of the interval: SeniorCitizen's gap should not touch zero;
+
+    gender's should.
+    """
+    from src.fairness import bootstrap_disparity_ci
+
+    senior_ci = bootstrap_disparity_ci(context, "SeniorCitizen", config.DECISION_THRESHOLD,
+                                        n_resamples=200)
+    gender_ci = bootstrap_disparity_ci(context, "gender", config.DECISION_THRESHOLD,
+                                        n_resamples=200)
+
+    assert senior_ci["equal_opportunity"]["excludes_zero"] is True
+    assert senior_ci["equal_opportunity"]["low"] > 0.0
+    # gender's gap is small; it is not guaranteed to include zero on every seed,
+    # but its interval must at least be far tighter to zero than SeniorCitizen's.
+    assert gender_ci["equal_opportunity"]["low"] < senior_ci["equal_opportunity"]["low"]
+
+
+def test_fairness_bootstrap_ci_rejects_attributes_with_more_than_two_levels(context) -> None:
+    from src.fairness import bootstrap_disparity_ci
+
+    with pytest.raises(ValueError):
+        bootstrap_disparity_ci(context, "Contract", config.DECISION_THRESHOLD, n_resamples=10)
+
+
+def test_calibration_bootstrap_ci_brackets_the_point_estimate() -> None:
+    from src.calibration import bootstrap_calibration_ci
+
+    rng = np.random.default_rng(config.RANDOM_STATE)
+    y_proba = rng.random(500)
+    y_true = (rng.random(500) < y_proba).astype(int)
+    ci = bootstrap_calibration_ci(y_true, y_proba, n_resamples=100)
+
+    for metric in ("brier_score", "expected_calibration_error"):
+        assert ci[metric]["low"] <= ci[metric]["estimate"] <= ci[metric]["high"]
+
+
+def test_fairness_report_shows_signed_bootstrap_methodology() -> None:
+    path = config.REPORTS_DIR / "fairness_report.md"
+    if not path.is_file():
+        pytest.skip("Fairness report not generated — run `make fairness`.")
+    content = path.read_text(encoding="utf-8")
+    assert "95% CI" in content
+    assert "signed" in content.lower()
+
+
+def test_calibration_report_shows_bootstrap_ci_for_the_deployed_variant() -> None:
+    path = config.REPORTS_DIR / "calibration_report.md"
+    if not path.is_file():
+        pytest.skip("Calibration report not generated — run `make calibration`.")
+    content = path.read_text(encoding="utf-8")
+    assert "bootstrap confidence interval" in content.lower()
+
+
 def test_model_card_no_longer_claims_the_audit_is_missing() -> None:
     """The card said no audit had been done. Once done, it must not still say so."""
     if not config.MODEL_CARD_PATH.is_file():
@@ -393,6 +471,97 @@ def test_tenure_buckets_cover_every_customer() -> None:
     out = engineer_features(load_model_frame())
     assert set(out["TenureBucket"].unique()) <= set(TENURE_LABELS)
     assert "nan" not in set(out["TenureBucket"].unique())
+
+
+# --------------------------------------------------------------------------
+# Survival analysis
+# --------------------------------------------------------------------------
+
+
+def test_survival_curves_are_monotonically_non_increasing() -> None:
+    from src.survival import fit_segment_curves, step_function
+    from src.train import load_model_frame
+
+    frame = load_model_frame()
+    tau = int(frame["tenure"].max())
+    fits = fit_segment_curves(frame, tau)
+    for level, kmf in fits.items():
+        survival = step_function(kmf, tau)
+        assert all(a >= b - 1e-9 for a, b in zip(survival, survival[1:])), level
+        assert survival[0] == pytest.approx(1.0)
+
+
+def test_expected_remaining_tenure_never_exceeds_the_horizon() -> None:
+    from src.survival import expected_remaining_tenure
+
+    survival = [1.0, 0.8, 0.6, 0.4, 0.2, 0.1]
+    tau = len(survival) - 1
+    for t0 in range(tau + 1):
+        remaining = expected_remaining_tenure(t0, survival)
+        assert 0 < remaining <= tau
+
+
+def test_expected_remaining_tenure_is_floored_at_the_horizon() -> None:
+    from src.survival import FLOOR_REMAINING_MONTHS, expected_remaining_tenure
+
+    survival = [1.0, 0.5, 0.1]
+    assert expected_remaining_tenure(2, survival) == FLOOR_REMAINING_MONTHS
+    assert expected_remaining_tenure(10, survival) == FLOOR_REMAINING_MONTHS  # beyond tau
+
+
+def test_survival_reference_segments_cover_every_contract_level() -> None:
+    from src.survival import build_reference
+    from src.train import load_model_frame
+
+    reference = build_reference(load_model_frame())
+    assert set(reference["segments"]) == set(config.EXPECTED_CATEGORIES["Contract"])
+    for payload in reference["segments"].values():
+        assert payload["survival"][0] == pytest.approx(1.0)
+
+
+def test_survival_report_states_the_extrapolation_limitation() -> None:
+    path = config.REPORTS_DIR / "survival_report.md"
+    if not path.is_file():
+        pytest.skip("Survival report not generated — run `make survival`.")
+    content = path.read_text(encoding="utf-8")
+    assert "held forward" in content.lower()
+    assert "not reached" in content.lower() or "restricted mean" in content.lower()
+
+
+# --------------------------------------------------------------------------
+# Revenue-weighted churn metrics
+# --------------------------------------------------------------------------
+
+
+def test_measured_revenue_churn_uses_the_actual_outcome_not_the_model(context) -> None:
+    from src.revenue import measured_revenue_churn
+
+    measured = measured_revenue_churn(context)
+    assert measured["logo_churn_rate"] == pytest.approx(float(context.y_test.mean()))
+    assert 0.0 <= measured["gross_revenue_churn_rate"] <= 1.0
+    assert measured["churned_monthly_revenue"] <= measured["total_monthly_revenue"]
+
+
+def test_prospective_exposure_flagged_share_is_consistent(context) -> None:
+    from src.revenue import prospective_exposure
+
+    if not config.SURVIVAL_REFERENCE_PATH.is_file():
+        pytest.skip("Survival reference missing — run `make survival`.")
+    reference = json.loads(config.SURVIVAL_REFERENCE_PATH.read_text(encoding="utf-8"))
+    prospective = prospective_exposure(context, 0.5, reference)
+
+    assert prospective["flagged_expected_revenue_at_risk"] <= prospective["total_expected_revenue_at_risk"]
+    assert 0.0 <= prospective["flagged_customer_share"] <= 1.0
+    assert 0.0 <= prospective["flagged_revenue_share"] <= 1.0
+
+
+def test_revenue_churn_report_documents_net_revenue_churn_as_not_computable() -> None:
+    path = config.REPORTS_DIR / "revenue_churn_report.md"
+    if not path.is_file():
+        pytest.skip("Revenue churn report not generated — run `make revenue`.")
+    content = path.read_text(encoding="utf-8")
+    assert "not computable" in content.lower()
+    assert "gross revenue churn" in content.lower()
 
 
 def test_tuning_experiment_records_a_decision_against_a_fixed_bar() -> None:

@@ -1,0 +1,20 @@
+{
+  "measured": {
+    "test_rows": 1409,
+    "logo_churn_rate": 0.2654364797728886,
+    "total_monthly_revenue": 90301.2,
+    "churned_monthly_revenue": 27214.9,
+    "gross_revenue_churn_rate": 0.3013791621816765
+  },
+  "prospective": {
+    "threshold": 0.5,
+    "flagged_customers": 582,
+    "flagged_customer_share": 0.41305890702625975,
+    "flagged_monthly_revenue": 44301.85,
+    "flagged_revenue_share": 0.4906009000987806,
+    "revenue_concentration_ratio": 1.1877,
+    "total_expected_revenue_at_risk": 1313910.01,
+    "flagged_expected_revenue_at_risk": 1097814.24
+  },
+  "figure": "21_revenue_at_risk.png"
+}

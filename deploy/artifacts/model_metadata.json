@@ -1,12 +1,12 @@
 {
   "project_name": "Customer Churn Intelligence and Retention Decision-Support Platform",
   "model_name": "Logistic Regression",
-  "model_version": "1.1.0",
+  "model_version": "1.2.0",
   "target": "Churn",
   "positive_class": 1,
   "decision_threshold": 0.5,
   "random_state": 42,
-  "training_timestamp_utc": "2026-07-23T16:49:04+00:00",
+  "training_timestamp_utc": "2026-07-28T21:35:37+00:00",
   "dataset_git_blob_sha": "3de7a612d1609f25f21a455bda77948729369002",
   "dataset_rows": 7043,
   "dataset_columns": 21,
@@ -15,7 +15,7 @@
   "test_size": 0.2,
   "cv_folds": 5,
   "selection_rule": "Candidates were compared by mean ROC-AUC under stratified 5-fold cross-validation on the training split only. Where the two means differed by less than 0.01 the tie was broken first on mean CV F1 and then on mean CV recall, because a missed churner costs more than an unnecessary review. The held-out test set was evaluated once, after selection, and did not influence the choice.",
-  "selection_justification": "Cross-validated ROC-AUC (gap 0.0005) and F1 (gap 0.0010) were both within the 0.01 tolerance, so the rule fell through to mean CV recall. Logistic Regression was selected with 0.8013, because a missed churner costs more than an unnecessary review.",
+  "selection_justification": "Cross-validated ROC-AUC (gap 0.0002) and F1 (gap 0.0015) were both within the 0.01 tolerance, so the rule fell through to mean CV recall. Logistic Regression was selected with 0.8013, because a missed churner costs more than an unnecessary review.",
   "metrics": {
     "accuracy": 0.737402,
     "precision": 0.503436,
@@ -50,11 +50,11 @@
       "roc_auc": 0.841406
     },
     "Random Forest": {
-      "accuracy": 0.760823,
-      "precision": 0.533698,
-      "recall": 0.783422,
-      "f1": 0.634886,
-      "roc_auc": 0.841711
+      "accuracy": 0.758694,
+      "precision": 0.53125,
+      "recall": 0.772727,
+      "f1": 0.62963,
+      "roc_auc": 0.841696
     },
     "Dummy (stratified) baseline": {
       "accuracy": 0.621718,

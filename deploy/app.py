@@ -22,11 +22,13 @@ import joblib
 import pandas as pd
 import streamlit as st
 
+import alerts as alerts_module
 import batch as batch_module
 import charts
 import explain as explain_module
 import rationale as rationale_module
 import theme as theme_module
+import valuation as valuation_module
 
 APP_DIR = Path(__file__).resolve().parent
 ARTIFACTS_DIR = APP_DIR / "artifacts"
@@ -34,6 +36,7 @@ MODEL_PATH = ARTIFACTS_DIR / "model_pipeline.joblib"
 METADATA_PATH = ARTIFACTS_DIR / "model_metadata.json"
 FEATURE_SCHEMA_PATH = ARTIFACTS_DIR / "feature_schema.json"
 REFERENCE_RATES_PATH = ARTIFACTS_DIR / "reference_rates.json"
+SURVIVAL_REFERENCE_PATH = ARTIFACTS_DIR / "survival_reference.json"
 MODEL_CARD_PATH = ARTIFACTS_DIR / "model_card.md"
 
 logging.basicConfig(
@@ -142,6 +145,10 @@ def load_artifacts() -> dict[str, Any]:
     if REFERENCE_RATES_PATH.is_file():
         reference = json.loads(REFERENCE_RATES_PATH.read_text(encoding="utf-8"))
 
+    survival_reference: dict[str, Any] = {}
+    if SURVIVAL_REFERENCE_PATH.is_file():
+        survival_reference = json.loads(SURVIVAL_REFERENCE_PATH.read_text(encoding="utf-8"))
+
     model_card = ""
     if MODEL_CARD_PATH.is_file():
         model_card = MODEL_CARD_PATH.read_text(encoding="utf-8")
@@ -157,6 +164,7 @@ def load_artifacts() -> dict[str, Any]:
         "metadata": metadata,
         "schema": schema,
         "reference": reference,
+        "survival_reference": survival_reference,
         "model_card": model_card,
     }
 
@@ -484,6 +492,52 @@ def render_result(
         "calibration analysis shows the model is over-confident about churn because it was "
         "trained with balanced class weights to favour recall. Use the ranking with more "
         "confidence than the magnitude."
+    )
+
+
+def render_revenue_at_risk(
+    probability: float,
+    values: dict[str, Any],
+    survival_reference: dict[str, Any],
+) -> None:
+    """Revenue-at-risk KPI: probability x MonthlyCharges x expected remaining tenure.
+
+    Purely a transparent multiplication of already-disclosed numbers — not a
+    prediction of realised loss and not a validated ROI figure.
+    """
+    if not survival_reference:
+        return
+    exposure = valuation_module.revenue_at_risk(
+        probability,
+        float(values["MonthlyCharges"]),
+        float(values["tenure"]),
+        str(values["Contract"]),
+        survival_reference,
+    )
+    if exposure is None:
+        return
+
+    cards = [
+        ("Revenue at risk", f"${exposure['revenue_at_risk']:,.0f}",
+         "Probability × monthly charge × expected remaining tenure"),
+        ("Expected remaining tenure", f"{exposure['expected_remaining_months']:.0f} months",
+         f"Conditional on this account's {values['Contract'].lower()} contract"),
+    ]
+    html = ['<div class="cci-kpis-narrow">']
+    for label, value, note in cards:
+        html.append(
+            f'<div class="cci-kpi"><div class="cci-kpi-label">{escape(label)}</div>'
+            f'<div class="cci-kpi-value">{escape(value)}</div>'
+            f'<div class="cci-kpi-note">{escape(note)}</div></div>'
+        )
+    html.append("</div>")
+    st.markdown("".join(html), unsafe_allow_html=True)
+    st.caption(
+        "An estimated dollar exposure, not a forecast of realised loss: it multiplies the "
+        "model's probability by the account's monthly charge and an expected-remaining-tenure "
+        "figure derived from observed Kaplan-Meier survival curves by contract type "
+        "(`reports/survival_report.md`). No retention outcome or return on investment has been "
+        "measured."
     )
 
 
@@ -843,6 +897,9 @@ def render_single_assessment(
                 metadata,
                 schema,
             )
+            render_revenue_at_risk(
+                assessment["probability"], assessment["values"], artifacts["survival_reference"]
+            )
         else:
             st.markdown(
                 """
@@ -1026,6 +1083,7 @@ def render_batch_page(
                 threshold,
                 validation.identifier_column,
                 bands,
+                artifacts.get("survival_reference") or None,
             )
     except Exception:  # noqa: BLE001
         logger.exception("Batch scoring failed")
@@ -1037,6 +1095,7 @@ def render_batch_page(
         "Batch scored: rows=%d flagged=%d threshold=%.2f",
         summary["total"], summary["flagged"], threshold,
     )
+    alerts_module.maybe_send_batch_alert(uploaded, summary, threshold)
 
     cards = [
         ("Customers scored", f"{summary['total']:,}", "In this upload"),
@@ -1045,6 +1104,12 @@ def render_batch_page(
         ("High risk band", f"{summary['high']:,}", "Probability ≥ 0.70"),
         ("Medium risk band", f"{summary['medium']:,}", "0.40 ≤ probability < 0.70"),
     ]
+    if "flagged_revenue_at_risk" in summary:
+        cards.append((
+            "Revenue at risk (flagged accounts)",
+            f"${summary['flagged_revenue_at_risk']:,.0f}",
+            f"${summary['total_revenue_at_risk']:,.0f} across the whole upload",
+        ))
     html = ['<div class="cci-kpis">']
     for label, value, note in cards:
         html.append(
@@ -1054,10 +1119,20 @@ def render_batch_page(
         )
     html.append("</div>")
     st.markdown("".join(html), unsafe_allow_html=True)
+    if "Revenue at risk" in queue.columns:
+        st.caption(
+            "Revenue at risk multiplies each row's churn probability by its monthly charge and "
+            "an expected-remaining-tenure estimate from observed survival curves by contract "
+            "type. It is an exposure estimate for prioritisation, not a forecast of realised loss."
+        )
     st.write("")
 
     display = queue.copy()
     display["Churn probability"] = display["Churn probability"].map(lambda v: f"{v:.1%}")
+    if "Revenue at risk" in display.columns:
+        display["Revenue at risk"] = display["Revenue at risk"].map(
+            lambda v: f"${v:,.0f}" if pd.notna(v) else "—"
+        )
     st.dataframe(display, width="stretch", hide_index=True, height=460)
 
     st.download_button(

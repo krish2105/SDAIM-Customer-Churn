@@ -31,7 +31,11 @@ from sklearn.calibration import CalibratedClassifierCV, calibration_curve  # noq
 from sklearn.metrics import brier_score_loss, roc_auc_score  # noqa: E402
 
 from src import config  # noqa: E402
-from src.analysis_base import load_evaluation_context  # noqa: E402
+from src.analysis_base import (  # noqa: E402
+    BOOTSTRAP_RESAMPLES,
+    bootstrap_percentile_ci,
+    load_evaluation_context,
+)
 
 FIGURE_DPI = 200
 N_BINS = 10
@@ -85,6 +89,35 @@ def bin_table(y_true: np.ndarray, y_proba: np.ndarray, n_bins: int = N_BINS) -> 
             }
         )
     return rows
+
+
+def bootstrap_calibration_ci(
+    y_true: np.ndarray,
+    y_proba: np.ndarray,
+    n_resamples: int = BOOTSTRAP_RESAMPLES,
+    seed: int = config.RANDOM_STATE,
+) -> dict[str, dict[str, float]]:
+    """95% bootstrap CI for Brier score and ECE of the **deployed, uncalibrated**
+
+    probabilities only. The isotonic/sigmoid variants are refits of a
+    calibrator via internal cross-validation; bootstrapping those honestly
+    would mean refitting `CalibratedClassifierCV` inside every resample, which
+    is a materially heavier computation for a number nobody currently ships.
+    This reports an interval for the number the application actually displays.
+    """
+    n = len(y_true)
+
+    def brier_statistic(indices: np.ndarray) -> float:
+        return float(brier_score_loss(y_true[indices], y_proba[indices]))
+
+    def ece_statistic(indices: np.ndarray) -> float:
+        ece, _ = expected_calibration_error(y_true[indices], y_proba[indices])
+        return ece
+
+    return {
+        "brier_score": bootstrap_percentile_ci(n, brier_statistic, n_resamples, seed=seed),
+        "expected_calibration_error": bootstrap_percentile_ci(n, ece_statistic, n_resamples, seed=seed),
+    }
 
 
 def plot_reliability(
@@ -154,6 +187,7 @@ def run_calibration_analysis() -> dict[str, Any]:
         probabilities[name] = proba
 
     record("Uncalibrated (deployed)", baseline_proba)
+    results["deployed_confidence_intervals"] = bootstrap_calibration_ci(y_test, baseline_proba)
 
     # Calibrators are fitted on the TRAINING split only, via internal CV. Fitting
     # them on the test set would be leakage and would make the result meaningless.
@@ -222,6 +256,29 @@ def _write_markdown(results: dict[str, Any]) -> None:
         "  average while being badly wrong in the high-probability band that actually drives",
         "  action.",
         "",
+    ]
+
+    deployed_ci = results.get("deployed_confidence_intervals")
+    if deployed_ci:
+        brier_ci = deployed_ci["brier_score"]
+        ece_ci = deployed_ci["expected_calibration_error"]
+        lines += [
+            f"**95% bootstrap confidence intervals for the deployed (uncalibrated) model** "
+            f"({BOOTSTRAP_RESAMPLES:,} resamples of the held-out test set):",
+            "",
+            "| Metric | Estimate | 95% CI |",
+            "|---|---:|---:|",
+            f"| Brier score | {brier_ci['estimate']:.4f} | [{brier_ci['low']:.4f}, {brier_ci['high']:.4f}] |",
+            f"| ECE | {ece_ci['estimate']:.4f} | [{ece_ci['low']:.4f}, {ece_ci['high']:.4f}] |",
+            "",
+            "Reported only for the deployed variant: the isotonic/sigmoid alternatives are fits of",
+            "an internal cross-validated calibrator, and bootstrapping those honestly would mean",
+            "refitting `CalibratedClassifierCV` inside every resample rather than reusing a fixed",
+            "set of probabilities.",
+            "",
+        ]
+
+    lines += [
         f"![Reliability diagram](figures/{results['figure']})",
         "",
         "## Interpretation",

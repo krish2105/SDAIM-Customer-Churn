@@ -9,7 +9,7 @@ Actual recorded output from `bash scripts/verify_release.sh`.
 | Host | macOS (Darwin 25.5.0), Apple silicon |
 | Python | 3.11.15 (`.venv`) |
 | Result | **10 PASS · 0 FAIL · 0 NOT RUN** — script exit code 0 |
-| Test suite | **115 tests**, all passing |
+| Test suite | **146 tests**, all passing |
 
 > Total wall time is short because the Docker layer cache was warm from an earlier build in
 > the same session. Every gate executed; the per-gate evidence below is quoted from the run.

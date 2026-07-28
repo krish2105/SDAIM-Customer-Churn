@@ -34,6 +34,10 @@ MODEL_CARD_PATH: Final[Path] = ARTIFACTS_DIR / "model_card.md"
 #: Computed on the training split (rates) and the held-out test split (score
 #: histogram). Never used to make a prediction.
 REFERENCE_RATES_PATH: Final[Path] = ARTIFACTS_DIR / "reference_rates.json"
+#: Per-contract survival step functions, used only to estimate expected
+#: remaining tenure for the revenue-at-risk valuation. Descriptive, not a
+#: model input — see ``src/survival.py``.
+SURVIVAL_REFERENCE_PATH: Final[Path] = ARTIFACTS_DIR / "survival_reference.json"
 
 SOURCE_MANIFEST_PATH: Final[Path] = PROJECT_ROOT / "SOURCE_MANIFEST.json"
 
@@ -44,7 +48,7 @@ SOURCE_MANIFEST_PATH: Final[Path] = PROJECT_ROOT / "SOURCE_MANIFEST.json"
 PROJECT_NAME: Final[str] = (
     "Customer Churn Intelligence and Retention Decision-Support Platform"
 )
-MODEL_VERSION: Final[str] = "1.1.0"
+MODEL_VERSION: Final[str] = "1.2.0"
 
 EXPECTED_COLUMNS: Final[list[str]] = [
     "customerID",

@@ -1,7 +1,7 @@
 # Executive Model Summary
 
 **Project:** Customer Churn Intelligence and Retention Decision-Support Platform  
-**Model version:** 1.1.0  
+**Model version:** 1.2.0  
 **Selected model:** Logistic Regression  
 **Decision threshold:** 0.5  
 **Random seed:** 42
@@ -19,7 +19,7 @@ support for a human retention specialist**, not an autonomous decision system.
 
 ## 2. Selection rule (fixed before the test set was examined)
 
-Candidates were compared by mean ROC-AUC under stratified 5-fold cross-validation on the training split only. Where the two means differed by less than 0.01 the tie was broken first on mean CV F1 and then on mean CV recall, because a missed churner costs more than an unnecessary review. The held-out test set was evaluated once, after selection, and did not influence the choice. Cross-validated ROC-AUC (gap 0.0005) and F1 (gap 0.0010) were both within the 0.01 tolerance, so the rule fell through to mean CV recall. Logistic Regression was selected with 0.8013, because a missed churner costs more than an unnecessary review.
+Candidates were compared by mean ROC-AUC under stratified 5-fold cross-validation on the training split only. Where the two means differed by less than 0.01 the tie was broken first on mean CV F1 and then on mean CV recall, because a missed churner costs more than an unnecessary review. The held-out test set was evaluated once, after selection, and did not influence the choice. Cross-validated ROC-AUC (gap 0.0002) and F1 (gap 0.0015) were both within the 0.01 tolerance, so the rule fell through to mean CV recall. Logistic Regression was selected with 0.8013, because a missed churner costs more than an unnecessary review.
 
 ## 3. Model comparison
 
@@ -29,7 +29,7 @@ held-out 20% that no model saw during fitting or selection.
 | Model | Role | CV ROC-AUC | CV F1 | CV recall | Test ROC-AUC | Test F1 | Test recall | Test precision | Test accuracy |
 |---|---|---:|---:|---:|---:|---:|---:|---:|---:|
 | Logistic Regression | candidate | 0.8460 ± 0.0124 | 0.6286 | 0.8013 | 0.8414 | 0.6130 | 0.7834 | 0.5034 | 0.7374 |
-| Random Forest | candidate | 0.8454 ± 0.0091 | 0.6296 | 0.7632 | 0.8417 | 0.6349 | 0.7834 | 0.5337 | 0.7608 |
+| Random Forest | candidate | 0.8457 ± 0.0089 | 0.6300 | 0.7625 | 0.8417 | 0.6296 | 0.7727 | 0.5312 | 0.7587 |
 | Dummy (stratified) baseline | baseline | 0.5065 ± 0.0171 | 0.2762 | 0.2776 | 0.5163 | 0.2903 | 0.2914 | 0.2891 | 0.6217 |
 
 ## 4. Held-out performance of the selected model

@@ -151,13 +151,14 @@ verify_required_files() {
     data/raw/Telco-Customer-Churn.csv
     src/config.py src/data_validation.py src/eda.py src/train.py src/evaluate.py src/schemas.py
     src/analysis_base.py src/fairness.py src/calibration.py src/threshold.py
-    src/drift.py src/tracking.py
+    src/drift.py src/tracking.py src/survival.py src/revenue.py
     notebooks/01_eda_and_modeling.ipynb
     reports/model_comparison.csv reports/executive_model_summary.md reports/eda_observations.md
     reports/fairness_report.md reports/calibration_report.md reports/threshold_analysis.md
-    reports/drift_report.md reports/tracking_report.md
+    reports/drift_report.md reports/tracking_report.md reports/survival_report.md
+    reports/revenue_churn_report.md
     deploy/app.py deploy/theme.py deploy/charts.py deploy/explain.py deploy/batch.py
-    deploy/rationale.py deploy/Dockerfile
+    deploy/rationale.py deploy/valuation.py deploy/alerts.py deploy/Dockerfile
     deploy/requirements.txt deploy/README.md deploy/.dockerignore
     deploy/artifacts/model_pipeline.joblib deploy/artifacts/model_metadata.json
     deploy/artifacts/feature_schema.json deploy/artifacts/model_card.md
@@ -179,7 +180,7 @@ verify_required_files() {
   local figures
   figures="$(find reports/figures -name '*.png' 2>/dev/null | wc -l | tr -d ' ')"
   echo "Figures present: ${figures}"
-  [ "$figures" -ge 18 ] || { echo "Expected at least 18 figures"; missing=$((missing + 1)); }
+  [ "$figures" -ge 20 ] || { echo "Expected at least 20 figures"; missing=$((missing + 1)); }
   if [ "$missing" -ne 0 ]; then
     echo "${missing} required file(s) missing." >&2
     return 1

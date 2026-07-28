@@ -1,7 +1,7 @@
 {
   "passed": true,
   "summary": {
-    "path": "/Users/krishnamathurm4pro/Desktop/Academics/SDIAM Term 3/SDAIM FINAL PROJECT/data/raw/Telco-Customer-Churn.csv",
+    "path": "/home/user/SDAIM-Customer-Churn/data/raw/Telco-Customer-Churn.csv",
     "rows": 7043,
     "columns": 21,
     "git_blob_sha": "3de7a612d1609f25f21a455bda77948729369002",
@@ -156,7 +156,7 @@
         "Mailed check"
       ]
     },
-    "validated_at_utc": "2026-07-23T17:03:06+00:00"
+    "validated_at_utc": "2026-07-28T21:38:43+00:00"
   },
   "checks": [
     {
@@ -164,7 +164,7 @@
       "passed": true,
       "expected": true,
       "observed": true,
-      "detail": "/Users/krishnamathurm4pro/Desktop/Academics/SDIAM Term 3/SDAIM FINAL PROJECT/data/raw/Telco-Customer-Churn.csv"
+      "detail": "/home/user/SDAIM-Customer-Churn/data/raw/Telco-Customer-Churn.csv"
     },
     {
       "check": "columns_exact_and_ordered",

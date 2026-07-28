@@ -1,8 +1,8 @@
 # Model Card — Customer Churn Intelligence
 
 **Model name:** Logistic Regression  
-**Model version:** 1.1.0  
-**Trained (UTC):** 2026-07-23T16:49:04+00:00  
+**Model version:** 1.2.0  
+**Trained (UTC):** 2026-07-28T21:35:37+00:00  
 **Random seed:** 42  
 **Decision threshold:** 0.5  
 **Artifact:** `deploy/artifacts/model_pipeline.joblib` (complete preprocessing + estimator pipeline)
@@ -62,7 +62,7 @@ This model must **not** be used to:
 
 ## Selection
 
-Cross-validated ROC-AUC (gap 0.0005) and F1 (gap 0.0010) were both within the 0.01 tolerance, so the rule fell through to mean CV recall. Logistic Regression was selected with 0.8013, because a missed churner costs more than an unnecessary review.
+Cross-validated ROC-AUC (gap 0.0002) and F1 (gap 0.0015) were both within the 0.01 tolerance, so the rule fell through to mean CV recall. Logistic Regression was selected with 0.8013, because a missed churner costs more than an unnecessary review.
 
 ## Metrics (held-out test set, evaluated once after selection)
 
@@ -79,7 +79,7 @@ Full comparison including the reference baseline:
 | Model | Role | CV ROC-AUC | Test ROC-AUC | Test recall | Test F1 |
 |---|---|---:|---:|---:|---:|
 | Logistic Regression | candidate | 0.8460 | 0.8414 | 0.7834 | 0.6130 |
-| Random Forest | candidate | 0.8454 | 0.8417 | 0.7834 | 0.6349 |
+| Random Forest | candidate | 0.8457 | 0.8417 | 0.7727 | 0.6296 |
 | Dummy (stratified) baseline | baseline | 0.5065 | 0.5163 | 0.2914 | 0.2903 |
 
 ## Limitations

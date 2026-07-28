@@ -14,7 +14,7 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.60-FF4B4B?logo=streamlit&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Deployed-2496ED?logo=docker&logoColor=white)
 ![CI](https://img.shields.io/badge/CI-passing-2EA043?logo=githubactions&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-115_passing-2EA043)
+![Tests](https://img.shields.io/badge/tests-146_passing-2EA043)
 ![License](https://img.shields.io/badge/dataset-Apache--2.0-blue)
 
 </div>
@@ -63,12 +63,16 @@ Recall is weighted deliberately: a missed churner receives no review at all and 
 
 - 🔐 **Provenance proven, not assumed** — the dataset's Git blob SHA is verified against the official IBM publication on every run, locally and in CI.
 - 🧪 **Unbiased evaluation** — the model-selection rule was fixed in code *before* the test set was examined.
-- ⚖️ **Fairness audited with a measured counterfactual** — removing the protected attributes was found to cost only +0.0008 ROC-AUC.
-- 📊 **Calibration predicted, then confirmed** — the model was expected to be over-confident (balanced class weights) and is, by 0.15.
+- ⚖️ **Fairness audited with a measured counterfactual, and a bootstrap CI** — removing the protected attributes was found to cost only +0.0008 ROC-AUC; a 1,000-resample bootstrap shows `gender`'s disparity is indistinguishable from noise while `SeniorCitizen`'s is not.
+- 📊 **Calibration predicted, then confirmed** — the model was expected to be over-confident (balanced class weights) and is, by 0.15 (95% CI [0.1317, 0.1703]).
 - 🔎 **Exact explainability** — per-prediction log-odds contributions that reconstruct the model to floating-point precision (not SHAP).
-- 📦 **Batch scoring** — upload a customer book, get a ranked retention work queue; 1,000 rows in 0.01 s.
+- 💵 **Revenue-at-risk valuation** — churn probability × monthly charge × an expected-remaining-tenure estimate from observed Kaplan-Meier survival curves by contract type, surfaced per customer and per work queue.
+- 📉 **Survival analysis** — retention curves by contract type (Month-to-month, One year, Two year), log-rank tested, feeding the valuation above.
+- 💰 **Revenue-weighted churn metrics** — gross revenue churn vs. logo churn on the held-out set, with net revenue churn explicitly reported as not computable from a single cross-section.
+- 📦 **Batch scoring** — upload a customer book, get a ranked retention work queue with revenue-at-risk; 1,000 rows in 0.01 s.
+- 🔔 **Optional Slack alert on a scored queue** — off by default, aggregate counts only, never a customer row.
 - 🤖 **Fully automated deployment** — push to `main` → validate → sync → the Space rebuilds itself, verified end-to-end with a visible-change test.
-- ✅ **115 automated tests · 10/10 quality gates · £0 running cost.**
+- ✅ **146 automated tests · 10/10 quality gates · £0 running cost.**
 
 ---
 
@@ -105,9 +109,10 @@ SDAIM-Customer-Churn/
 ├── reports/                     Figures, tables and analysis reports
 ├── deploy/                      ◄── everything that ships to the Space
 │   ├── app.py  theme.py  charts.py  explain.py  batch.py  rationale.py
+│   ├── valuation.py  alerts.py
 │   ├── Dockerfile  requirements.txt  README.md
 │   └── artifacts/              model_pipeline.joblib + metadata, schema, card
-├── tests/                       115 automated tests
+├── tests/                       146 automated tests
 ├── scripts/                     bootstrap · validate · train · test · docker ·
 │                                secret-scan · release-verify · report · shots
 ├── docs/                        Audit trail and all supporting documentation
@@ -134,7 +139,7 @@ make validate         # verify the dataset against its documented contract
 make eda              # regenerate figures, tables and observations
 make train            # train, compare, select and export the pipeline
 make analysis         # fairness, calibration, threshold and drift reports
-make test             # run the full pytest suite (115 tests)
+make test             # run the full pytest suite (146 tests)
 make app              # run the app locally at http://localhost:8501
 make docker-run       # build, run and health-check at http://localhost:7860
 make verify           # every non-interactive local quality gate (10)
@@ -151,10 +156,10 @@ Cross-validation on the training split only; test columns from the held-out 20%.
 | Model | Role | CV ROC-AUC | Test ROC-AUC | Test recall | Test F1 | Test accuracy |
 |---|---|---:|---:|---:|---:|---:|
 | **Logistic Regression** | **selected** | 0.8460 ± 0.0124 | **0.8414** | 0.7834 | 0.6130 | 0.7374 |
-| Random Forest | candidate | 0.8454 ± 0.0091 | 0.8417 | 0.7834 | 0.6349 | 0.7608 |
+| Random Forest | candidate | 0.8457 ± 0.0089 | 0.8417 | 0.7727 | 0.6296 | 0.7587 |
 | Dummy (stratified) | baseline | 0.5065 | 0.5163 | 0.2914 | 0.2903 | 0.6217 |
 
-**Selection.** The candidates tied on cross-validated ROC-AUC (gap 0.0005) and F1 (gap 0.0010), so the pre-declared rule fell through to CV recall, where Logistic Regression led 0.8013 to 0.7632. On the held-out set the Random Forest is marginally better on three metrics — the model was *not* switched, because reselecting after seeing test results would invalidate the evaluation. This is documented openly in [`docs/DECISIONS.md`](docs/DECISIONS.md) (D-08).
+**Selection.** The candidates tied on cross-validated ROC-AUC (gap 0.0002) and F1 (gap 0.0015), so the pre-declared rule fell through to CV recall, where Logistic Regression led 0.8013 to 0.7625. On the held-out set the Random Forest is marginally better on ROC-AUC — the model was *not* switched, because reselecting after seeing test results would invalidate the evaluation. This is documented openly in [`docs/DECISIONS.md`](docs/DECISIONS.md) (D-08). (Random Forest's exact reference-only figures move slightly between retrainings — `RandomForestClassifier` with `n_jobs=-1` is not bit-for-bit reproducible under a fixed seed in this scikit-learn version; the **selected** Logistic Regression's metrics are unaffected and reproduce exactly.)
 
 **Why not accuracy alone?** The sample is 26.54% churners, so always predicting "retained" scores 73.46% accuracy while finding nobody at risk. The dummy baseline confirms it.
 
@@ -166,10 +171,12 @@ Each of these closes a limitation the project published about itself.
 
 | Analysis | Finding | Report |
 |---|---|---|
-| **Fairness audit** | No material disparity on `gender`. Material on `SeniorCitizen`, driven largely by a genuine base-rate gap. Removal recommended (costs +0.0008 ROC-AUC). | [`fairness_report.md`](reports/fairness_report.md) |
-| **Calibration** | Over-confident by 0.15; isotonic cuts ECE 0.1503 → 0.0194 with ROC-AUC unchanged. | [`calibration_report.md`](reports/calibration_report.md) |
+| **Fairness audit** | No material disparity on `gender` (bootstrap CI includes zero). Material on `SeniorCitizen` (CI excludes zero), driven largely by a genuine base-rate gap. Removal recommended (costs +0.0008 ROC-AUC). | [`fairness_report.md`](reports/fairness_report.md) |
+| **Calibration** | Over-confident by 0.15 (95% CI [0.1317, 0.1703]); isotonic cuts ECE 0.1503 → 0.0194 with ROC-AUC unchanged. | [`calibration_report.md`](reports/calibration_report.md) |
 | **Threshold** | Cost-ratio sensitivity curve; the deployed 0.50 is optimal at ≈3:1. | [`threshold_analysis.md`](reports/threshold_analysis.md) |
 | **Drift apparatus** | Validated both ways: stable on control, alert on a simulated shift. | [`drift_report.md`](reports/drift_report.md) |
+| **Survival analysis** | Kaplan-Meier retention curves by contract; Month-to-month RMST 36.3 months vs. Two year 71.5 (log-rank p ≈ 0). Feeds the revenue-at-risk valuation. | [`survival_report.md`](reports/survival_report.md) |
+| **Revenue-weighted churn** | Gross revenue churn 30.14% vs. logo churn 26.54% on the held-out set; net revenue churn explicitly reported as not computable. | [`revenue_churn_report.md`](reports/revenue_churn_report.md) |
 | **Feature engineering + tuning** | Tried, measured, **not adopted** — best gain +0.0022, below the 0.005 bar. | [`tuning_experiment.md`](reports/tuning_experiment.md) |
 | **Experiment tracking** | MLflow runs, model registry, documented rollback. | [`tracking_report.md`](reports/tracking_report.md) |
 
@@ -181,7 +188,7 @@ Pushing a change to `main` that touches `deploy/**` triggers the deployment work
 
 ```
 push to main (deploy/**)
-   └─ job: validate ── dataset check · 115 tests · secret scan
+   └─ job: validate ── dataset check · 146 tests · secret scan
         └─ (only if green) job: deploy
              ├─ verify HF_SPACE_ID variable + HF_TOKEN secret exist
              ├─ verify the deployment package is complete
@@ -242,7 +249,7 @@ Full detail: [`docs/SECURITY.md`](docs/SECURITY.md) · [`deploy/artifacts/model_
 
 <div align="center">
 
-**Customer Churn Intelligence and Retention Decision-Support Platform** · Version 1.1.0
+**Customer Churn Intelligence and Retention Decision-Support Platform** · Version 1.2.0
 
 Built with reproducibility, provenance and governance as first-class concerns.
 

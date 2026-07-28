@@ -1,0 +1,4 @@
+contract,n,events_observed,median_survival_months,restricted_mean_survival_months
+Month-to-month,3875,1655,35.0,36.3
+One year,1473,166,,66.42
+Two year,1695,48,,71.54

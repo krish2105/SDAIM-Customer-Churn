@@ -72,6 +72,32 @@
           "ratio": 0.892361
         }
       },
+      "disparity_confidence_intervals": {
+        "demographic_parity": {
+          "estimate": 0.0006491752248928284,
+          "low": 0.0,
+          "high": 0.054760877049214854,
+          "excludes_zero": false
+        },
+        "equal_opportunity": {
+          "estimate": 0.012853176079924422,
+          "low": 0.0,
+          "high": 0.08850252040889867,
+          "excludes_zero": false
+        },
+        "predictive_parity": {
+          "estimate": 0.048303242272426494,
+          "low": 0.0,
+          "high": 0.1335707127871813,
+          "excludes_zero": false
+        },
+        "false_positive_rate": {
+          "estimate": 0.015251408772179287,
+          "low": 0.0,
+          "high": 0.07247861676786047,
+          "excludes_zero": false
+        }
+      },
       "assessment": {
         "demographic_parity": {
           "gap": 0.000649,
@@ -163,6 +189,32 @@
           "min": 0.232519,
           "gap": 0.208922,
           "ratio": 0.526727
+        }
+      },
+      "disparity_confidence_intervals": {
+        "demographic_parity": {
+          "estimate": 0.3277738564174958,
+          "low": 0.26338053710225345,
+          "high": 0.39616114745215447,
+          "excludes_zero": true
+        },
+        "equal_opportunity": {
+          "estimate": 0.19668737060041408,
+          "low": 0.12180358779567722,
+          "high": 0.26430070674053463,
+          "excludes_zero": true
+        },
+        "predictive_parity": {
+          "estimate": 0.1239087709675945,
+          "low": 0.028998912547672614,
+          "high": 0.2151980812314931,
+          "excludes_zero": true
+        },
+        "false_positive_rate": {
+          "estimate": 0.2508232711306257,
+          "low": 0.1605119571834259,
+          "high": 0.3481492099616059,
+          "excludes_zero": true
         }
       },
       "assessment": {

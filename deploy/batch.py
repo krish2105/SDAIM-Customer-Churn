@@ -20,6 +20,8 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+import valuation
+
 #: Upper bound on rows accepted in one upload. Chosen so a scoring pass stays
 #: comfortably inside a Space's request budget; exceeding it is a clear error
 #: rather than a slow, silent degradation.
@@ -139,8 +141,14 @@ def score_batch(
     threshold: float,
     identifier_column: str | None = None,
     risk_bands: tuple[float, float] = (0.40, 0.70),
+    survival_reference: dict[str, Any] | None = None,
 ) -> pd.DataFrame:
-    """Score every row and return a queue ranked by descending risk."""
+    """Score every row and return a queue ranked by descending risk.
+
+    ``survival_reference`` is optional: when supplied (the persisted
+    ``survival_reference.json``), a "Revenue at risk" column is added — see
+    ``valuation.py``. Without it the queue is produced exactly as before.
+    """
     prepared = prepare_batch(frame, schema)
     probabilities = pipeline.predict_proba(prepared)[:, 1]
     low_max, medium_max = risk_bands
@@ -168,6 +176,19 @@ def score_batch(
         if column in prepared.columns:
             queue[column] = prepared[column].to_numpy()
 
+    has_valuation_inputs = {"Contract", "tenure", "MonthlyCharges"} <= set(queue.columns)
+    if survival_reference is not None and has_valuation_inputs:
+        exposures = [
+            valuation.revenue_at_risk(
+                float(probability), float(row["MonthlyCharges"]), float(row["tenure"]),
+                str(row["Contract"]), survival_reference,
+            )
+            for probability, (_, row) in zip(probabilities, queue.iterrows())
+        ]
+        queue["Revenue at risk"] = [
+            e["revenue_at_risk"] if e is not None else np.nan for e in exposures
+        ]
+
     queue = queue.sort_values("Churn probability", ascending=False).reset_index(drop=True)
     queue.insert(0, "Priority", range(1, len(queue) + 1))
     return queue
@@ -178,7 +199,7 @@ def queue_summary(queue: pd.DataFrame, threshold: float) -> dict[str, Any]:
     total = len(queue)
     flagged = int((queue["Predicted class"] == "Likely to churn").sum())
     bands = queue["Risk band"].value_counts().to_dict()
-    return {
+    summary = {
         "total": total,
         "flagged": flagged,
         "flagged_share": flagged / total if total else 0.0,
@@ -188,3 +209,8 @@ def queue_summary(queue: pd.DataFrame, threshold: float) -> dict[str, Any]:
         "threshold": threshold,
         "mean_probability": float(queue["Churn probability"].mean()) if total else 0.0,
     }
+    if "Revenue at risk" in queue.columns:
+        flagged_mask = queue["Predicted class"] == "Likely to churn"
+        summary["total_revenue_at_risk"] = float(queue["Revenue at risk"].sum())
+        summary["flagged_revenue_at_risk"] = float(queue.loc[flagged_mask, "Revenue at risk"].sum())
+    return summary

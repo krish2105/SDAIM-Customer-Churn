@@ -19,7 +19,7 @@ from src import config
 DEPLOY_DIR = config.DEPLOY_DIR
 WORKFLOWS_DIR = config.PROJECT_ROOT / ".github" / "workflows"
 
-RUNTIME_MODULES = {"app.py", "theme.py", "charts.py"}
+RUNTIME_MODULES = {"app.py", "theme.py", "charts.py", "valuation.py", "alerts.py"}
 
 #: Import name -> distribution name, for imports whose package name differs.
 IMPORT_TO_DISTRIBUTION = {
@@ -41,6 +41,7 @@ STANDARD_MODULES = {
     "sys",
     "re",
     "math",
+    "hashlib",
 }
 
 
@@ -142,6 +143,22 @@ def test_dockerfile_configuration() -> None:
     assert "--server.port=7860" in content
     assert "--server.address=0.0.0.0" in content
     assert "--server.headless=true" in content
+
+
+def test_dockerfile_copies_every_local_python_module() -> None:
+    """A module imported by app.py but missing from this COPY line builds fine
+
+    locally (where the whole ``deploy/`` directory is on disk) and then fails
+    at import time inside the container, where only the copied files exist.
+    """
+    content = (DEPLOY_DIR / "Dockerfile").read_text(encoding="utf-8")
+    match = re.search(r"^COPY --chown=\S+ (.+?) /app/$", content, re.MULTILINE)
+    assert match, "Dockerfile must have a COPY line for the application's Python modules"
+    copied = set(match.group(1).split())
+
+    local_modules = {f"{name}.py" for name in _local_module_names()}
+    missing = local_modules - copied
+    assert not missing, f"Dockerfile COPY line is missing local module(s): {missing}"
 
 
 def test_dockerfile_contains_no_credentials() -> None:

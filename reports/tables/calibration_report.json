@@ -243,5 +243,17 @@
       ]
     }
   },
+  "deployed_confidence_intervals": {
+    "brier_score": {
+      "estimate": 0.16875040340861464,
+      "low": 0.15788943016823662,
+      "high": 0.18046769258343323
+    },
+    "expected_calibration_error": {
+      "estimate": 0.15027784166773836,
+      "low": 0.1317308656272095,
+      "high": 0.17027192974406727
+    }
+  },
   "figure": "16_calibration_curve.png"
 }

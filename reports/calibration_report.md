@@ -32,6 +32,18 @@ it distorts the predicted probabilities upward. The model was therefore expected
   average while being badly wrong in the high-probability band that actually drives
   action.
 
+**95% bootstrap confidence intervals for the deployed (uncalibrated) model** (1,000 resamples of the held-out test set):
+
+| Metric | Estimate | 95% CI |
+|---|---:|---:|
+| Brier score | 0.1688 | [0.1579, 0.1805] |
+| ECE | 0.1503 | [0.1317, 0.1703] |
+
+Reported only for the deployed variant: the isotonic/sigmoid alternatives are fits of
+an internal cross-validated calibrator, and bootstrapping those honestly would mean
+refitting `CalibratedClassifierCV` inside every resample rather than reusing a fixed
+set of probabilities.
+
 ![Reliability diagram](figures/16_calibration_curve.png)
 
 ## Interpretation

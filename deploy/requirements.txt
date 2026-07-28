@@ -10,3 +10,7 @@ numpy==2.4.6
 scikit-learn==1.9.0
 joblib==1.5.3
 matplotlib==3.11.1
+
+# alerts.py — batch-scoring webhook notification. Disabled by default; imported
+# lazily so the rest of the application works even if this were ever absent.
+requests==2.34.2
