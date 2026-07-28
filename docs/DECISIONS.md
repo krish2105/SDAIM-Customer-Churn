@@ -564,3 +564,43 @@ offered as an option — the payload shape enforces the guardrail rather than do
 **Why Slack's payload shape specifically.** `{"text": ...}` is the simplest widely supported
 incoming-webhook format. Microsoft Teams' workflow webhooks expect an Adaptive Card instead;
 supporting both now would be building for a destination nobody has asked for yet.
+
+---
+
+## D-33 — A self-issued governance framework crosswalk, not a claimed certification
+
+**Decision.** Add `docs/GOVERNANCE_FRAMEWORK_CROSSWALK.md`, mapping the project's existing
+fairness, calibration, security and monitoring work onto the NIST AI Risk Management Framework,
+ISO/IEC 42001, and the EU AI Act — and state, as the document's first substantive claim, that
+this is **not** a compliance certification, a legal opinion, or a claim of conformity.
+
+**Why these three frameworks.** NIST AI RMF and ISO/IEC 42001 are the two most-cited
+general-purpose AI governance frameworks as of 2026 and require no assumption about
+jurisdiction. The EU AI Act was added because it is the one binding instrument in the trio and
+because its Annex III high-risk classification is checkable against this project's actual use
+case rather than assumed either way.
+
+**Why the EU AI Act section includes an explicit applicability assessment instead of only a
+crosswalk.** Mapping this project onto Articles 9–15 and 72 without first asking whether those
+articles are even triggered would silently imply the system is a high-risk AI system under the
+Act. Checked against Annex III's eight categories (biometrics, critical infrastructure,
+education, employment, essential services including credit scoring and insurance, law
+enforcement, migration, justice), retention prioritisation for existing customers is not a
+listed use case — it does not gate access to a service or evaluate creditworthiness. Stating
+this reasoning explicitly, rather than the document's presence merely implying otherwise, is
+the same "do not let evidence imply more than it shows" discipline already applied to the
+fairness audit's four-fifths screen and the drift apparatus's "no real drift observed"
+caveat.
+
+**Why specific subcategory citations (GOVERN 1.1, MEASURE 2.11) but not an exhaustive
+subcategory-by-subcategory table.** Only NIST AI RMF subcategories whose exact wording was
+verified against a source are cited by ID. Fabricating precise subcategory numbers for the
+remainder — plausible-looking but unverified — would be a worse failure mode than mapping the
+rest at the function/category level, where the claim being made is accurate at the resolution
+it is stated.
+
+**What was deliberately not attempted.** An organisational AI policy document, a Statement of
+Applicability, a Data Protection Impact Assessment, or any artefact that presumes an
+organisation with a certifiable management system exists behind this project. A three-person
+academic submission does not have one, and manufacturing the paperwork of one would be a
+worse governance failure than the gap it would paper over.

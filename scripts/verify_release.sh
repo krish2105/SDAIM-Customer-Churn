@@ -169,7 +169,7 @@ verify_required_files() {
     docs/INPUT_AUDIT.md docs/IMPLEMENTATION_PLAN.md docs/IMPLEMENTATION_LOG.md
     docs/DECISIONS.md docs/ARCHITECTURE.md docs/SECURITY.md docs/TEST_PLAN.md
     docs/TROUBLESHOOTING.md docs/SCREENSHOT_CHECKLIST.md docs/DELIVERABLES_CHECKLIST.md
-    docs/REPORT_TEMPLATE.md docs/DEMONSTRATION_SCRIPT.md
+    docs/REPORT_TEMPLATE.md docs/DEMONSTRATION_SCRIPT.md docs/GOVERNANCE_FRAMEWORK_CROSSWALK.md
   )
   for path in "${required[@]}"; do
     if [ ! -f "$path" ]; then

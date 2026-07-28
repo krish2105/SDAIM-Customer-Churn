@@ -292,3 +292,33 @@ def test_no_env_file_is_committed_to_the_repository() -> None:
         if ".venv" in path.parts:
             continue
         pytest.fail(f"A .env file exists at {path}; it must never be committed.")
+
+
+# --------------------------------------------------------------------------
+# Governance framework crosswalk
+# --------------------------------------------------------------------------
+
+
+def test_governance_crosswalk_exists_and_covers_all_three_frameworks() -> None:
+    path = config.PROJECT_ROOT / "docs" / "GOVERNANCE_FRAMEWORK_CROSSWALK.md"
+    assert path.is_file(), "docs/GOVERNANCE_FRAMEWORK_CROSSWALK.md is missing"
+    content = path.read_text(encoding="utf-8")
+    for framework in ("NIST", "ISO/IEC 42001", "EU AI Act", "Annex III"):
+        assert framework in content, f"Crosswalk does not mention {framework}"
+
+
+def test_governance_crosswalk_disclaims_certification_and_legal_advice() -> None:
+    """The single most important line in the document: it must not overclaim."""
+    path = config.PROJECT_ROOT / "docs" / "GOVERNANCE_FRAMEWORK_CROSSWALK.md"
+    content = path.read_text(encoding="utf-8").lower()
+    assert "not a compliance certification" in content
+    assert "not legal advice" in content
+    assert "not a legal" in content or "not a legal opinion" in content
+
+
+def test_governance_crosswalk_states_gaps_not_only_evidence() -> None:
+    """A crosswalk that only ever finds coverage would be marketing, not governance."""
+    path = config.PROJECT_ROOT / "docs" / "GOVERNANCE_FRAMEWORK_CROSSWALK.md"
+    content = path.read_text(encoding="utf-8").lower()
+    assert "gap, stated plainly" in content or "not applicable at this project" in content
+    assert "no external audit has occurred" in content

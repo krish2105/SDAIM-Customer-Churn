@@ -71,6 +71,7 @@ Recall is weighted deliberately: a missed churner receives no review at all and 
 - 💰 **Revenue-weighted churn metrics** — gross revenue churn vs. logo churn on the held-out set, with net revenue churn explicitly reported as not computable from a single cross-section.
 - 📦 **Batch scoring** — upload a customer book, get a ranked retention work queue with revenue-at-risk; 1,000 rows in 0.01 s.
 - 🔔 **Optional Slack alert on a scored queue** — off by default, aggregate counts only, never a customer row.
+- 🧭 **Governance framework crosswalk** — the fairness/calibration/security work mapped onto NIST AI RMF, ISO/IEC 42001 and the EU AI Act, with an explicit, reasoned assessment of why this use case is very likely outside the Act's high-risk tier — a self-issued crosswalk, not a certification.
 - 🤖 **Fully automated deployment** — push to `main` → validate → sync → the Space rebuilds itself, verified end-to-end with a visible-change test.
 - ✅ **146 automated tests · 10/10 quality gates · £0 running cost.**
 
@@ -237,8 +238,9 @@ Full detail: [`docs/SECURITY.md`](docs/SECURITY.md) · [`deploy/artifacts/model_
 | Document | Purpose |
 |---|---|
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Training, inference and CI/CD diagrams |
-| [`docs/DECISIONS.md`](docs/DECISIONS.md) | 29 design decisions with alternatives |
+| [`docs/DECISIONS.md`](docs/DECISIONS.md) | 33 design decisions with alternatives |
 | [`docs/SECURITY.md`](docs/SECURITY.md) | Credentials, scanning, container hardening |
+| [`docs/GOVERNANCE_FRAMEWORK_CROSSWALK.md`](docs/GOVERNANCE_FRAMEWORK_CROSSWALK.md) | NIST AI RMF, ISO/IEC 42001 and EU AI Act mapped to existing evidence — self-issued, not a certification |
 | [`docs/TEST_PLAN.md`](docs/TEST_PLAN.md) | What is tested, and what is deliberately not |
 | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | Documented failure modes and fixes |
 | [`docs/IMPROVEMENT_PLAN.md`](docs/IMPROVEMENT_PLAN.md) | Three-horizon roadmap (H1 & H2 delivered) |
