@@ -109,3 +109,9 @@ Thumbs.db
 /IBM_Telco_Customer_Churn_Data_Dictionary.xlsx
 /CLAUDE_CODE_MASTER_PROMPT.md
 /Final Group Project.docx
+
+# Intermediate HTML produced by scripts/make_report_pdf.py while rendering
+# Customer_Churn_Intelligence_Final_Report.pdf from the .docx. Multi-megabyte,
+# fully reproducible, not a deliverable in its own right.
+/scripts/report_base.html
+/scripts/report_styled.html

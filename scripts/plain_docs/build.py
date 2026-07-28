@@ -1,7 +1,12 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
-DEST = Path("/Users/krishnamathurm4pro/Desktop/Academics/SDIAM Term 3/SDAIM FINAL PROJECT")
+DEST = Path(__file__).resolve().parents[2]
+# Some hosts (e.g. this project's CI-adjacent sandboxes) pre-install Chromium
+# outside Playwright's own managed browser directory. Prefer it if present;
+# otherwise fall back to Playwright's default discovery.
+_PRESEEDED_CHROMIUM = Path("/opt/pw-browsers/chromium")
+CHROMIUM_PATH = str(_PRESEEDED_CHROMIUM) if _PRESEEDED_CHROMIUM.is_file() else None
 jobs = [
     ("explainer.html", "Project_Explained_Simply.pdf",
      "Customer Churn Intelligence — Plain-English Summary"),
@@ -9,7 +14,7 @@ jobs = [
      "Customer Churn Intelligence — Presentation Script"),
 ]
 with sync_playwright() as pw:
-    b = pw.chromium.launch()
+    b = pw.chromium.launch(executable_path=CHROMIUM_PATH)
     for src, out, foot in jobs:
         pg = b.new_page()
         pg.goto(Path(src).resolve().as_uri(), wait_until="load")

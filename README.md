@@ -14,7 +14,7 @@
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.60-FF4B4B?logo=streamlit&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Deployed-2496ED?logo=docker&logoColor=white)
 ![CI](https://img.shields.io/badge/CI-passing-2EA043?logo=githubactions&logoColor=white)
-![Tests](https://img.shields.io/badge/tests-146_passing-2EA043)
+![Tests](https://img.shields.io/badge/tests-149_passing-2EA043)
 ![License](https://img.shields.io/badge/dataset-Apache--2.0-blue)
 
 </div>
@@ -33,7 +33,9 @@
 | 🐙 **GitHub repository** | https://github.com/krish2105/SDAIM-Customer-Churn |
 | ✅ **Successful CI run** | [Actions run 30019016553](https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30019016553) |
 | 🚀 **Successful deploy run** | [Actions run 30020847651](https://github.com/krish2105/SDAIM-Customer-Churn/actions/runs/30020847651) |
-| 📄 **Full report** | [`Customer_Churn_Intelligence_Final_Report.pdf`](Customer_Churn_Intelligence_Final_Report.pdf) |
+| 📄 **Full report** (46 pages, incl. v1.2.0 addendum §19) | [`Customer_Churn_Intelligence_Final_Report.pdf`](Customer_Churn_Intelligence_Final_Report.pdf) · [`.docx`](Customer_Churn_Intelligence_Final_Report.docx) |
+| 🗣️ **Presentation script (3 speakers)** | [`Presentation_Script_3_Speakers.pdf`](Presentation_Script_3_Speakers.pdf) |
+| 📝 **Plain-English summary** | [`Project_Explained_Simply.pdf`](Project_Explained_Simply.pdf) |
 
 ---
 
@@ -73,7 +75,7 @@ Recall is weighted deliberately: a missed churner receives no review at all and 
 - 🔔 **Optional Slack alert on a scored queue** — off by default, aggregate counts only, never a customer row.
 - 🧭 **Governance framework crosswalk** — the fairness/calibration/security work mapped onto NIST AI RMF, ISO/IEC 42001 and the EU AI Act, with an explicit, reasoned assessment of why this use case is very likely outside the Act's high-risk tier — a self-issued crosswalk, not a certification.
 - 🤖 **Fully automated deployment** — push to `main` → validate → sync → the Space rebuilds itself, verified end-to-end with a visible-change test.
-- ✅ **146 automated tests · 10/10 quality gates · £0 running cost.**
+- ✅ **149 automated tests · 10/10 quality gates · £0 running cost.**
 
 ---
 
@@ -113,7 +115,7 @@ SDAIM-Customer-Churn/
 │   ├── valuation.py  alerts.py
 │   ├── Dockerfile  requirements.txt  README.md
 │   └── artifacts/              model_pipeline.joblib + metadata, schema, card
-├── tests/                       146 automated tests
+├── tests/                       149 automated tests
 ├── scripts/                     bootstrap · validate · train · test · docker ·
 │                                secret-scan · release-verify · report · shots
 ├── docs/                        Audit trail and all supporting documentation
@@ -140,7 +142,7 @@ make validate         # verify the dataset against its documented contract
 make eda              # regenerate figures, tables and observations
 make train            # train, compare, select and export the pipeline
 make analysis         # fairness, calibration, threshold and drift reports
-make test             # run the full pytest suite (146 tests)
+make test             # run the full pytest suite (149 tests)
 make app              # run the app locally at http://localhost:8501
 make docker-run       # build, run and health-check at http://localhost:7860
 make verify           # every non-interactive local quality gate (10)
@@ -189,7 +191,7 @@ Pushing a change to `main` that touches `deploy/**` triggers the deployment work
 
 ```
 push to main (deploy/**)
-   └─ job: validate ── dataset check · 146 tests · secret scan
+   └─ job: validate ── dataset check · 149 tests · secret scan
         └─ (only if green) job: deploy
              ├─ verify HF_SPACE_ID variable + HF_TOKEN secret exist
              ├─ verify the deployment package is complete

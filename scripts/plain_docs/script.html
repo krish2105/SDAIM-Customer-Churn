@@ -48,7 +48,7 @@
 
 <div class="title">Customer Churn Intelligence</div>
 <div class="subtitle">Presentation script for three speakers, walking through the live dashboard</div>
-<div class="meta">Krishna Mathur, Yash Petkar, Atharva Soundankar &nbsp;·&nbsp; SDAIM Term 3 &nbsp;·&nbsp; Instructor: JP Aggarwal &nbsp;·&nbsp; Roughly 7 minutes</div>
+<div class="meta">Krishna Mathur, Yash Petkar, Atharva Soundankar &nbsp;·&nbsp; SDAIM Term 3 &nbsp;·&nbsp; Instructor: JP Aggarwal &nbsp;·&nbsp; Roughly 8 minutes &nbsp;·&nbsp; App version 1.2.0</div>
 <hr class="rule">
 
 <div class="howto">
@@ -115,9 +115,13 @@
 
 <p class="line"><span class="speaker a">Atharva:</span> This slider lets the team decide how cautious to be. Slide it one way and the tool flags more people, so you catch more leavers but do more work. Slide it the other way and it flags fewer. There is no single right setting. It depends on how much a lost customer is worth to the business, and that is their call, not ours. We just make the trade-off visible instead of hiding it.</p>
 
+<span class="stage">Point at the "Revenue at risk" and "Expected remaining tenure" cards under the result.</span>
+
+<p class="line"><span class="speaker a">Atharva:</span> One more thing we added recently. A risk percentage on its own does not tell you how much is actually at stake. So we turned it into a dollar figure: this account's risk, times what they pay a month, times how many more months we would expect them to stay based on their contract type. We worked that last part out properly, using survival curves, the same kind of maths used to study how long things last over time, fitted separately for monthly, one-year and two-year contracts. A month-to-month customer's expected time left is nothing like a two-year customer's, and now the tool accounts for that instead of pretending everyone is the same.</p>
+
 <span class="stage">Click the "Batch scoring" tab.</span>
 
-<p class="line"><span class="speaker a">Atharva:</span> Checking one customer is nice, but a real team has thousands. So this second tab takes a whole list. You upload a file of customers and it hands them back sorted, most at risk at the top, ready to work down. It does a thousand customers almost instantly, and it never saves anyone's data, it just scores it and forgets it.</p>
+<p class="line"><span class="speaker a">Atharva:</span> Checking one customer is nice, but a real team has thousands. So this second tab takes a whole list. You upload a file of customers and it hands them back sorted, most at risk at the top, ready to work down. It does a thousand customers almost instantly, and it never saves anyone's data, it just scores it and forgets it. That same revenue-at-risk figure now shows up here too, both per customer and as a total for the whole queue, so a manager can prioritise by money at stake, not just by percentage.</p>
 
 <span class="stage">Flip the dark mode toggle on and off once.</span>
 
@@ -133,6 +137,8 @@
 <p class="line"><span class="speaker">Krishna:</span> We actually tested that end to end. We changed the version number, saved it, and watched the live site update itself with nobody touching it. And we have the records showing each run really happened, so it is not just us claiming it.</p>
 
 <p class="line"><span class="speaker">Krishna:</span> On security, connecting to the site needs a secret key, and we never put that in our code where someone could copy it. It is locked away in settings, and we even wrote a scanner that checks nobody left a key lying around by accident. We tested the scanner by planting fake keys to be sure it catches them.</p>
+
+<p class="line"><span class="speaker">Krishna:</span> We also went back and checked our own fairness and calibration findings against three governance frameworks people in the industry actually use, things like the NIST risk framework and the EU AI Act. Not to claim we are certified, we are not, and we say so in the report. But we worked through it properly, including checking whether this kind of tool would even count as high-risk under the EU rules, and we are confident it does not, because it does not decide who gets a service, only who a human looks at first. Writing that reasoning down properly, instead of just assuming it either way, is the kind of thing a real governance team would expect to see.</p>
 
 <p class="line"><span class="speaker">Krishna:</span> To finish, I want to be honest about the limits, because we think that is part of doing this properly. The data is a made-up company, so we cannot promise the exact numbers on a real one. And we have not proven it saves money. To do that you would need to trial it on real customers, which is beyond this project. What we can say is that the tool works, it is live, it is properly built and properly tested, and it could genuinely help a team decide who to look at first. That is what we set out to do, and it is done. Thank you. We are happy to take any questions.</p>
 

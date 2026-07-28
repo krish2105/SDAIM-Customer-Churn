@@ -1,20 +1,35 @@
 """Render the report DOCX (via pandoc HTML) to a paginated, styled PDF.
 
-LibreOffice is not available on this host, so the route is:
+The route is:
   docx  --pandoc-->  HTML (structure)  --inject CSS-->  --Chromium print--> PDF
 
 The CSS restores the navy headings, ruled tables, captions and page breaks that
 the flat pandoc HTML loses, and controls pagination so figures do not split.
+
+Run from the repository root: ``python scripts/make_report_pdf.py``. Requires
+``pandoc`` on PATH and Playwright's Chromium (``PLAYWRIGHT_BROWSERS_PATH`` /
+the default managed install both work; a pre-seeded system Chromium at
+``/opt/pw-browsers/chromium`` is used automatically if present).
+
+Known limitation: the DOCX's Table of Contents is a live Word field
+(``TOC \\h \\o "1-3"``). pandoc extracts document content, not a Word field's
+cached render, so a TOC populated only by opening the DOCX in Word/LibreOffice
+will not appear in this PDF. Open the DOCX once in Word (it is configured to
+prompt to update fields on open) or press Ctrl+A, F9 to refresh it there.
 """
 
 import re
+import subprocess
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
-SRC = Path("/tmp/claude-501/docxview/report_base.html")
+ROOT = Path(__file__).resolve().parents[1]
+DOCX = ROOT / "Customer_Churn_Intelligence_Final_Report.docx"
+SRC = Path(__file__).with_name("report_base.html")
 STYLED = Path(__file__).with_name("report_styled.html")
-PDF = Path("/Users/krishnamathurm4pro/Desktop/Academics/SDIAM Term 3/SDAIM FINAL PROJECT/"
-           "Customer_Churn_Intelligence_Final_Report.pdf")
+PDF = ROOT / "Customer_Churn_Intelligence_Final_Report.pdf"
+_PRESEEDED_CHROMIUM = Path("/opt/pw-browsers/chromium")
+CHROMIUM_PATH = str(_PRESEEDED_CHROMIUM) if _PRESEEDED_CHROMIUM.is_file() else None
 
 CSS = """
 <style>
@@ -68,6 +83,11 @@ li, blockquote { page-break-inside: avoid; }
 
 
 def main() -> int:
+    subprocess.run(
+        ["pandoc", "-f", "docx", "-t", "html", "--embed-resources", "--standalone",
+         str(DOCX), "-o", str(SRC)],
+        check=True,
+    )
     html = SRC.read_text(encoding="utf-8")
 
     # Inject CSS just before </head>.
@@ -79,7 +99,7 @@ def main() -> int:
     STYLED.write_text(html, encoding="utf-8")
 
     with sync_playwright() as pw:
-        browser = pw.chromium.launch()
+        browser = pw.chromium.launch(executable_path=CHROMIUM_PATH)
         page = browser.new_page()
         page.goto(STYLED.resolve().as_uri(), wait_until="load")
         page.wait_for_timeout(3500)
